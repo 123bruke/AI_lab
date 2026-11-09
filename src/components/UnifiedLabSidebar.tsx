@@ -21,12 +21,14 @@ import {
   Play,
   Shield,
   Save,
-  BookmarkCheck
+  BookmarkCheck,
+  Bot
 } from 'lucide-react';
 import { ExperimentState, CameraViewPreset, LabLightingState } from '../types';
 import { CHEMICAL_PRESETS } from '../simulation/thermodynamics';
 import { api, AgentResponse } from '../services/api';
 import { labAudio } from '../utils/audio';
+import { MultiAgentCenter } from './MultiAgentCenter';
 
 interface UnifiedLabSidebarProps {
   experiment: ExperimentState;
@@ -67,6 +69,7 @@ export const UnifiedLabSidebar: React.FC<UnifiedLabSidebarProps> = ({
 }) => {
   const [activePanel, setActivePanel] = useState<FlyoutPanel>(null);
   const [savedToast, setSavedToast] = useState<string | null>(null);
+  const [isMultiAgentDeckOpen, setIsMultiAgentDeckOpen] = useState(false);
 
   const handleSaveToDatabase = async () => {
     try {
