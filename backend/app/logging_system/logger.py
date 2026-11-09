@@ -38,3 +38,9 @@ def setup_logger() -> logging.Logger:
     return logger
 
 lab_logger = setup_logger()
+app_logger = lab_logger
+
+def log_frontend_error(component: str, error_type: str, message: str, stack_trace: str = None):
+    """Log an error originating from frontend React components."""
+    lab_logger.error(f"[FRONTEND:{component}] {error_type}: {message} | Stack: {stack_trace}")
+

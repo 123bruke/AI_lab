@@ -71,3 +71,28 @@ class ErrorLogService:
 
 def log_error(message: str, source: str = "backend", stack_trace: str = None):
     return ErrorLogService.log(message=message, source=source, stack_trace=stack_trace)
+
+def record_error_to_db(level: str, error_type: str, message: str, component: str = "system", stack_trace: str = None):
+    return ErrorLogService.log(
+        message=f"{error_type}: {message}",
+        level=level,
+        source=component,
+        stack_trace=stack_trace
+    )
+
+def get_recent_errors(limit: int = 50):
+    records = ErrorLogService.get_recent_errors(limit=limit)
+    formatted = []
+    for r in records:
+        formatted.append({
+            "id": r.id,
+            "timestamp": r.created_at.isoformat() if r.created_at else "",
+            "level": r.level,
+            "error_type": r.source,
+            "message": r.error_message,
+            "component": r.source,
+            "stack_trace": r.stack_trace,
+            "resolved": False
+        })
+    return formatted
+
