@@ -4,17 +4,37 @@ Integrates Multi-Agent AI System, YOLOv8 Vision, ChromaDB Hybrid Search,
 SQL Database, and Frontend Error Telemetry.
 """
 
+import sys
+from pathlib import Path
+
+# Ensure both backend root and workspace root are in sys.path
+_current_dir = Path(__file__).resolve().parent
+_backend_dir = _current_dir.parent
+_workspace_dir = _backend_dir.parent
+for _p in [str(_backend_dir), str(_workspace_dir)]:
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import contextlib
 
-from backend.app.database.connection import engine, Base
-import backend.app.database.expanded_models  # Ensure all expanded tables are registered
-from backend.app.routers import auth_router, experiment_router, ai_agent_router
-from backend.app.routers.multi_agent_router import router as multi_agent_api_router, telemetry_router
-from backend.app.routers.rag_assistant_router import router as rag_assistant_router
-from backend.app.vector_store.chroma_service import chroma_service
-from backend.app.logging_system.logger import app_logger
+try:
+    from backend.app.database.connection import engine, Base
+    import backend.app.database.expanded_models
+    from backend.app.routers import auth_router, experiment_router, ai_agent_router
+    from backend.app.routers.multi_agent_router import router as multi_agent_api_router, telemetry_router
+    from backend.app.routers.rag_assistant_router import router as rag_assistant_router
+    from backend.app.vector_store.chroma_service import chroma_service
+    from backend.app.logging_system.logger import app_logger
+except ImportError:
+    from app.database.connection import engine, Base
+    import app.database.expanded_models
+    from app.routers import auth_router, experiment_router, ai_agent_router
+    from app.routers.multi_agent_router import router as multi_agent_api_router, telemetry_router
+    from app.routers.rag_assistant_router import router as rag_assistant_router
+    from app.vector_store.chroma_service import chroma_service
+    from app.logging_system.logger import app_logger
 
 
 @contextlib.asynccontextmanager

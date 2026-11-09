@@ -1,0 +1,12 @@
+.venv/
+env/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.git/
+.gitignore
+logs/*.log
+error_logs.db
+moseb_lab.db
