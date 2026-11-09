@@ -1,6 +1,7 @@
 'use client'
 
 import Logo from "./logo"
+import AuthHeaderButton from "./auth-header-button"
 import Link from "next/link"
 import { Button } from "./ui/button"
 import { AlignJustify, Moon, Sun, X } from "lucide-react"
@@ -65,6 +66,10 @@ export default function Navbar() {
         <Link href={settings.cta.href} title={settings.cta.content}>
           <Button className="glass-hover capitalize">{settings.cta.content}</Button>
         </Link>
+
+        {/* Animated Login / Logout Scientist Space */}
+        <AuthHeaderButton />
+
         <button
           type="button"
           onClick={toggleTheme}
@@ -76,7 +81,9 @@ export default function Navbar() {
         </button>
       </div>
 
-      <div className="ml-auto flex items-center gap-3 md:hidden">
+      <div className="ml-auto flex items-center gap-2 md:hidden">
+        <AuthHeaderButton />
+
         <button
           type="button"
           onClick={toggleTheme}
