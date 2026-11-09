@@ -8,20 +8,19 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export default defineConfig({
-  root: __dirname,
   base: '/',
   plugins: [react(), tailwindcss()],
   resolve: {
+    preserveSymlinks: true,
     alias: {
       '@': path.resolve(__dirname, 'src'),
     },
   },
   build: {
-    outDir: path.resolve(__dirname, 'dist'),
+    outDir: 'dist',
     emptyOutDir: true,
     chunkSizeWarningLimit: 1200,
     rollupOptions: {
-      input: path.resolve(__dirname, 'index.html'),
       output: {
         manualChunks(id) {
           if (id.includes('node_modules/three') || id.includes('node_modules/@react-three')) {
