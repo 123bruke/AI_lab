@@ -38,7 +38,20 @@ export default function App() {
     const timer = setTimeout(() => {
       setIsReady(true);
     }, 500);
-    return () => clearTimeout(timer);
+
+    const handlePopState = () => {
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        const isLab = params.get('view') === 'lab' || window.location.pathname === '/lab';
+        setCurrentView(isLab ? 'lab' : 'landing');
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('popstate', handlePopState);
+    };
   }, []);
 
   const rotateCounter = useRef(0);

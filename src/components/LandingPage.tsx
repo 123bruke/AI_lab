@@ -37,10 +37,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
     try {
-      return typeof api?.getUser === 'function' ? api.getUser() : null;
-    } catch {
-      return null;
-    }
+      if (typeof window !== 'undefined') {
+        const cached = localStorage.getItem('moseb_user');
+        if (cached) return JSON.parse(cached);
+      }
+      if (typeof api !== 'undefined' && typeof api?.getUser === 'function') {
+        return api.getUser();
+      }
+    } catch { }
+    return null;
   });
 
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -60,7 +65,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
   useEffect(() => {
     try {
-      if (typeof api?.getUser === 'function') {
+      if (typeof api !== 'undefined' && typeof api?.getUser === 'function') {
         setCurrentUser(api.getUser());
       }
     } catch { }

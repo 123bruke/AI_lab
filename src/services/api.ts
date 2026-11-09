@@ -136,6 +136,10 @@ class ApiService {
   private currentUser: User | null = null;
 
   constructor() {
+    this.getUser = this.getUser.bind(this);
+    this.getCurrentUser = this.getCurrentUser.bind(this);
+    this.getToken = this.getToken.bind(this);
+    this.logout = this.logout.bind(this);
     try {
       this.token = typeof window !== 'undefined' ? localStorage.getItem('moseb_token') : null;
       const cachedUser = typeof window !== 'undefined' ? localStorage.getItem('moseb_user') : null;
