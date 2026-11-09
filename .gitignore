@@ -2,6 +2,8 @@
 node_modules/
 lab1-front-main/node_modules/
 lab1-front-main/.next/
+lab_view/node_modules/
+lab_view/dist/
 .pnp
 .pnp.js
 temp_zip_extract/

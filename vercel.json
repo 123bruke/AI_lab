@@ -1,9 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
-  "installCommand": "npm install",
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
+  "installCommand": "npm install && cd lab_view && npm install",
+  "buildCommand": "cd lab_view && npm run build",
+  "outputDirectory": "lab_view/dist",
   "cleanUrls": true,
   "rewrites": [
     {
