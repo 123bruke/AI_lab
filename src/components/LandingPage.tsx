@@ -110,8 +110,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
   return (
     <div
-      className={`min-h-screen w-full relative transition-colors duration-500 overflow-y-auto overflow-x-hidden ${isDarkMode ? 'bg-neutral-950 text-neutral-100' : 'bg-slate-50 text-neutral-900'
-        }`}
+      className={`w-full min-h-screen relative transition-colors duration-500 overflow-x-hidden ${
+        isDarkMode ? 'bg-neutral-950 text-neutral-100' : 'bg-slate-50 text-neutral-900'
+      }`}
     >
       {/* 1. 4D Interactive Refractive Balls Background with Frosted Blur Separator */}
       <Floating4DBackground isDarkMode={isDarkMode} />

@@ -143,10 +143,34 @@ export default function App() {
   }, []);
 
   return (
-    <main className="w-screen h-screen relative bg-neutral-950 font-sans">
+    <main className="w-screen h-screen relative bg-neutral-950 font-sans overflow-hidden">
+      {/* Persistent Quick Mode Switcher Dock */}
+      <div className="fixed top-3 right-6 z-50 flex items-center p-1 rounded-xl bg-black/90 border border-white/20 backdrop-blur-2xl shadow-2xl text-xs font-mono">
+        <button
+          onClick={() => setCurrentView('landing')}
+          className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+            currentView === 'landing'
+              ? 'bg-white text-black font-bold shadow'
+              : 'text-neutral-400 hover:text-white'
+          }`}
+        >
+          Landing Page
+        </button>
+        <button
+          onClick={() => setCurrentView('lab')}
+          className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+            currentView === 'lab'
+              ? 'bg-white text-black font-bold shadow'
+              : 'text-neutral-400 hover:text-white'
+          }`}
+        >
+          4D Virtual Lab
+        </button>
+      </div>
+
       {/* 1. Landing Page View */}
       {currentView === 'landing' ? (
-        <div className="w-full h-full overflow-y-auto overflow-x-hidden">
+        <div className="w-full h-full overflow-y-auto overflow-x-hidden relative">
           <LandingPage
             onEnterLab={handleEnterLab}
             isDarkMode={isDarkMode}
