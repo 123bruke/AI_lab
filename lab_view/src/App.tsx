@@ -20,8 +20,8 @@ export default function App() {
   });
   const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
   const [experiment, setExperiment] = useState<ExperimentState>(INITIAL_EXPERIMENT_STATE);
-  const [selectedId, setSelectedId] = useState<string | null>('beaker');
-  const [selectedToolType, setSelectedToolType] = useState<LabToolType | null>('beaker');
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedToolType, setSelectedToolType] = useState<LabToolType | null>(null);
   const [cameraPreset, setCameraPreset] = useState<CameraViewPreset>('experiment_focus');
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [isDraggingItem, setIsDraggingItem] = useState<boolean>(false);

@@ -10,8 +10,12 @@ import pathlib
 from typing import List, Dict, Any, Optional
 import math
 
-from backend.app.vector_store.embeddings import LocalScientificEmbedder, cosine_similarity
-from backend.app.logging_system.logger import app_logger
+try:
+    from backend.app.vector_store.embeddings import LocalScientificEmbedder, cosine_similarity
+    from backend.app.logging_system.logger import app_logger
+except ImportError:
+    from app.vector_store.embeddings import LocalScientificEmbedder, cosine_similarity
+    from app.logging_system.logger import app_logger
 
 
 class EmbeddedVectorCollection:
@@ -22,7 +26,11 @@ class EmbeddedVectorCollection:
     def __init__(self, name: str, storage_dir: str, embedder: LocalScientificEmbedder):
         self.name = name
         self.storage_dir = pathlib.Path(storage_dir) / "collections"
-        self.storage_dir.mkdir(parents=True, exist_ok=True)
+        try:
+            self.storage_dir.mkdir(parents=True, exist_ok=True)
+        except Exception:
+            self.storage_dir = pathlib.Path("/tmp/chroma_db/collections")
+            self.storage_dir.mkdir(parents=True, exist_ok=True)
         self.file_path = self.storage_dir / f"{name}.json"
         self.embedder = embedder
         self.data: Dict[str, Dict[str, Any]] = {}
@@ -89,11 +97,19 @@ class ChromaService:
     def __init__(self, db_dir: Optional[str] = None):
         if db_dir is None:
             base_dir = pathlib.Path(__file__).resolve().parent.parent.parent
-            self.db_dir = str(base_dir / "chroma_db")
+            target_dir = base_dir / "chroma_db"
+            if os.access(str(base_dir), os.W_OK):
+                self.db_dir = str(target_dir)
+            else:
+                self.db_dir = "/tmp/chroma_db"
         else:
             self.db_dir = db_dir
 
-        os.makedirs(self.db_dir, exist_ok=True)
+        try:
+            os.makedirs(self.db_dir, exist_ok=True)
+        except Exception:
+            self.db_dir = "/tmp/chroma_db"
+            os.makedirs(self.db_dir, exist_ok=True)
         self.embedder = LocalScientificEmbedder()
         self.is_chroma_native = False
         self.collections: Dict[str, Any] = {}

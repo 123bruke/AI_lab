@@ -1,16 +1,33 @@
 import os
+import shutil
 import datetime
 from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime
 from sqlalchemy.orm import sessionmaker, declarative_base
 from .logger import lab_logger
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-ERROR_DB_PATH = os.path.join(BASE_DIR, "..", "..", "error_logs.db")
+DEFAULT_ERROR_DB = os.path.abspath(os.path.join(BASE_DIR, "..", "..", "error_logs.db"))
+
+def _resolve_error_db_path(target_path: str) -> str:
+    db_dir = os.path.dirname(target_path)
+    if os.access(db_dir, os.W_OK):
+        return target_path
+    
+    tmp_path = os.path.join("/tmp", "error_logs.db")
+    if os.path.exists(target_path) and not os.path.exists(tmp_path):
+        try:
+            shutil.copy2(target_path, tmp_path)
+        except Exception:
+            pass
+    return tmp_path
+
+ERROR_DB_PATH = _resolve_error_db_path(DEFAULT_ERROR_DB)
 ERROR_DB_URL = f"sqlite:///{ERROR_DB_PATH}"
 
 engine = create_engine(ERROR_DB_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 ErrorBase = declarative_base()
+
 
 class ErrorRecord(ErrorBase):
     __tablename__ = "system_error_logs"
@@ -25,8 +42,13 @@ class ErrorRecord(ErrorBase):
     metadata_json = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow, index=True)
 
-# Create the dedicated error database tables
-ErrorBase.metadata.create_all(bind=engine)
+
+# Safe schema creation
+try:
+    ErrorBase.metadata.create_all(bind=engine)
+except Exception as e:
+    lab_logger.warning(f"Could not automatically create error_logs table: {e}")
+
 
 class ErrorLogService:
     @staticmethod
@@ -53,46 +75,72 @@ class ErrorLogService:
             db.add(record)
             db.commit()
             db.refresh(record)
-            lab_logger.error(f"[{source.upper()}] {message} (Error Logged ID: {record.id})")
             return record.id
         except Exception as e:
+            db.rollback()
             lab_logger.critical(f"Failed to persist error into error_logs.db: {e}")
             return -1
         finally:
             db.close()
 
     @staticmethod
-    def get_recent_errors(limit: int = 50):
+    def get_recent_errors(limit: int = 50, level: str = None):
         db = SessionLocal()
         try:
-            return db.query(ErrorRecord).order_by(ErrorRecord.created_at.desc()).limit(limit).all()
+            query = db.query(ErrorRecord).order_by(ErrorRecord.created_at.desc())
+            if level:
+                query = query.filter(ErrorRecord.level == level.upper())
+            return query.limit(limit).all()
+        except Exception as e:
+            lab_logger.error(f"Error querying error_logs.db: {e}")
+            return []
         finally:
             db.close()
 
-def log_error(message: str, source: str = "backend", stack_trace: str = None):
-    return ErrorLogService.log(message=message, source=source, stack_trace=stack_trace)
 
-def record_error_to_db(level: str, error_type: str, message: str, component: str = "system", stack_trace: str = None):
+def log_error(
+    message: str,
+    level: str = "ERROR",
+    source: str = "backend",
+    stack_trace: str = None,
+    endpoint: str = None,
+    client_ip: str = None,
+    metadata_json: str = None,
+) -> int:
+    """Convenience helper to record an error into error_logs.db."""
     return ErrorLogService.log(
-        message=f"{error_type}: {message}",
+        message=message,
         level=level,
-        source=component,
-        stack_trace=stack_trace
+        source=source,
+        stack_trace=stack_trace,
+        endpoint=endpoint,
+        client_ip=client_ip,
+        metadata_json=metadata_json,
     )
 
-def get_recent_errors(limit: int = 50):
-    records = ErrorLogService.get_recent_errors(limit=limit)
-    formatted = []
-    for r in records:
-        formatted.append({
-            "id": r.id,
-            "timestamp": r.created_at.isoformat() if r.created_at else "",
-            "level": r.level,
-            "error_type": r.source,
-            "message": r.error_message,
-            "component": r.source,
-            "stack_trace": r.stack_trace,
-            "resolved": False
-        })
-    return formatted
+
+def record_error_to_db(
+    message: str,
+    level: str = "ERROR",
+    source: str = "backend",
+    stack_trace: str = None,
+    endpoint: str = None,
+    client_ip: str = None,
+    metadata_json: str = None,
+) -> int:
+    """Alias for record_error_to_db imported by multi_agent_router."""
+    return log_error(
+        message=message,
+        level=level,
+        source=source,
+        stack_trace=stack_trace,
+        endpoint=endpoint,
+        client_ip=client_ip,
+        metadata_json=metadata_json,
+    )
+
+
+def get_recent_errors(limit: int = 50, level: str = None):
+    """Retrieve recorded errors from error_logs.db."""
+    return ErrorLogService.get_recent_errors(limit=limit, level=level)
 

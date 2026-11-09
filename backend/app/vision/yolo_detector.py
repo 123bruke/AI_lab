@@ -11,13 +11,24 @@ import time
 from typing import List, Dict, Any, Optional
 import math
 
-# Safe workspace-isolated YOLO configuration
-_WORKSPACE_ROOT = pathlib.Path(__file__).resolve().parent.parent.parent.parent
-_YOLO_DIR = _WORKSPACE_ROOT / ".ultralytics"
-(_YOLO_DIR / "Ultralytics").mkdir(parents=True, exist_ok=True)
-os.environ["YOLO_CONFIG_DIR"] = str(_YOLO_DIR)
+# Safe workspace-isolated YOLO configuration with serverless /tmp fallback
+try:
+    _WORKSPACE_ROOT = pathlib.Path(__file__).resolve().parent.parent.parent.parent
+    _YOLO_DIR = _WORKSPACE_ROOT / ".ultralytics"
+    (_YOLO_DIR / "Ultralytics").mkdir(parents=True, exist_ok=True)
+    os.environ["YOLO_CONFIG_DIR"] = str(_YOLO_DIR)
+except Exception:
+    _YOLO_DIR = pathlib.Path("/tmp/.ultralytics")
+    try:
+        (_YOLO_DIR / "Ultralytics").mkdir(parents=True, exist_ok=True)
+        os.environ["YOLO_CONFIG_DIR"] = str(_YOLO_DIR)
+    except Exception:
+        pass
 
-from backend.app.logging_system.logger import app_logger
+try:
+    from backend.app.logging_system.logger import app_logger
+except ImportError:
+    from app.logging_system.logger import app_logger
 
 
 class LaboratoryYOLODetector:

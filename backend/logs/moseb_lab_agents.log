@@ -143,3 +143,72 @@
 [2026-11-10 01:52:14] [WARNING] [MOSEB_LAB:chroma_service:__init__:112] ChromaDB native PersistentClient not available (Chroma is running in http-only client mode, and can only be run with 'chromadb.api.fastapi.FastAPI' or 'chromadb.api.async_fastapi.AsyncFastAPI' as the chroma_api_impl.             see https://docs.trychroma.com/guides#using-the-python-http-only-client for more information.). Using persistent embedded vector store.
 [2026-11-10 01:52:14] [INFO] [MOSEB_LAB:yolo_detector:_init_model:57] Using high-precision laboratory apparatus optical analyzer (model: yolov8n.pt)
 [2026-11-10 01:52:14] [INFO] [MOSEB_LAB:orchestrator:_register_default_agents:52] Master Agent Orchestrator initialized with 10 specialized agents
+[2026-11-10 02:04:23] [INFO] [MOSEB_LAB:main:lifespan:52] MOSEB Student Lab API shutting down
+[2026-11-10 02:05:57] [WARNING] [MOSEB_LAB:chroma_service:__init__:116] ChromaDB native PersistentClient not available (Chroma is running in http-only client mode, and can only be run with 'chromadb.api.fastapi.FastAPI' or 'chromadb.api.async_fastapi.AsyncFastAPI' as the chroma_api_impl.             see https://docs.trychroma.com/guides#using-the-python-http-only-client for more information.). Using persistent embedded vector store.
+[2026-11-10 02:05:57] [INFO] [MOSEB_LAB:yolo_detector:_init_model:68] Using high-precision laboratory apparatus optical analyzer (model: yolov8n.pt)
+[2026-11-10 02:05:57] [INFO] [MOSEB_LAB:orchestrator:_register_default_agents:52] Master Agent Orchestrator initialized with 10 specialized agents
+[2026-11-10 02:06:06] [WARNING] [MOSEB_LAB:chroma_service:__init__:128] ChromaDB native PersistentClient not available (Chroma is running in http-only client mode, and can only be run with 'chromadb.api.fastapi.FastAPI' or 'chromadb.api.async_fastapi.AsyncFastAPI' as the chroma_api_impl.             see https://docs.trychroma.com/guides#using-the-python-http-only-client for more information.). Using persistent embedded vector store.
+[2026-11-10 02:06:06] [INFO] [MOSEB_LAB:yolo_detector:_init_model:68] Using high-precision laboratory apparatus optical analyzer (model: yolov8n.pt)
+[2026-11-10 02:06:06] [INFO] [MOSEB_LAB:orchestrator:_register_default_agents:52] Master Agent Orchestrator initialized with 10 specialized agents
+[2026-11-10 02:06:53] [WARNING] [MOSEB_LAB:chroma_service:__init__:128] ChromaDB native PersistentClient not available (Chroma is running in http-only client mode, and can only be run with 'chromadb.api.fastapi.FastAPI' or 'chromadb.api.async_fastapi.AsyncFastAPI' as the chroma_api_impl.             see https://docs.trychroma.com/guides#using-the-python-http-only-client for more information.). Using persistent embedded vector store.
+[2026-11-10 02:06:53] [INFO] [MOSEB_LAB:yolo_detector:_init_model:68] Using high-precision laboratory apparatus optical analyzer (model: yolov8n.pt)
+[2026-11-10 02:06:53] [INFO] [MOSEB_LAB:orchestrator:_register_default_agents:52] Master Agent Orchestrator initialized with 10 specialized agents
+[2026-11-10 02:06:53] [INFO] [MOSEB_LAB:main:lifespan:44] SQL database schema initialized successfully
+[2026-11-10 02:06:53] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'proto_titration_002' into collection 'protocols'
+[2026-11-10 02:06:54] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'proto_spectro_003' into collection 'protocols'
+[2026-11-10 02:06:54] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'proto_calorimetry_001' into collection 'protocols'
+[2026-11-10 02:06:54] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'proto_distill_004' into collection 'protocols'
+[2026-11-10 02:06:54] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'proto_kinetics_005' into collection 'protocols'
+[2026-11-10 02:06:54] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'proto_solubility_006' into collection 'protocols'
+[2026-11-10 02:06:54] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'msds_cuso4_003' into collection 'msds'
+[2026-11-10 02:06:54] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'msds_c2h5oh_004' into collection 'msds'
+[2026-11-10 02:06:54] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'msds_hcl_001' into collection 'msds'
+[2026-11-10 02:06:54] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'msds_naoh_002' into collection 'msds'
+[2026-11-10 02:06:54] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'report_calorimetry_001' into collection 'reports'
+[2026-11-10 02:06:54] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'report_cuvette_002' into collection 'reports'
+[2026-11-10 02:06:54] [INFO] [MOSEB_LAB:chroma_service:seed_test_data:285] Vector Store seeded successfully: {'protocols': 6, 'msds': 4, 'reports': 2}
+[2026-11-10 02:06:54] [INFO] [MOSEB_LAB:main:lifespan:47] ChromaDB knowledge base seeded: {'protocols': 6, 'msds': 4, 'reports': 2}
+[2026-11-10 02:07:32] [WARNING] [MOSEB_LAB:chroma_service:__init__:128] ChromaDB native PersistentClient not available (Chroma is running in http-only client mode, and can only be run with 'chromadb.api.fastapi.FastAPI' or 'chromadb.api.async_fastapi.AsyncFastAPI' as the chroma_api_impl.             see https://docs.trychroma.com/guides#using-the-python-http-only-client for more information.). Using persistent embedded vector store.
+[2026-11-10 02:07:32] [INFO] [MOSEB_LAB:yolo_detector:_init_model:68] Using high-precision laboratory apparatus optical analyzer (model: yolov8n.pt)
+[2026-11-10 02:07:32] [INFO] [MOSEB_LAB:orchestrator:_register_default_agents:52] Master Agent Orchestrator initialized with 10 specialized agents
+[2026-11-10 02:07:46] [INFO] [MOSEB_LAB:main:lifespan:52] MOSEB Student Lab API shutting down
+[2026-11-10 02:07:49] [WARNING] [MOSEB_LAB:chroma_service:__init__:128] ChromaDB native PersistentClient not available (Chroma is running in http-only client mode, and can only be run with 'chromadb.api.fastapi.FastAPI' or 'chromadb.api.async_fastapi.AsyncFastAPI' as the chroma_api_impl.             see https://docs.trychroma.com/guides#using-the-python-http-only-client for more information.). Using persistent embedded vector store.
+[2026-11-10 02:07:49] [INFO] [MOSEB_LAB:yolo_detector:_init_model:68] Using high-precision laboratory apparatus optical analyzer (model: yolov8n.pt)
+[2026-11-10 02:07:49] [INFO] [MOSEB_LAB:orchestrator:_register_default_agents:52] Master Agent Orchestrator initialized with 10 specialized agents
+[2026-11-10 02:07:49] [INFO] [MOSEB_LAB:main:lifespan:44] SQL database schema initialized successfully
+[2026-11-10 02:07:49] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'proto_titration_002' into collection 'protocols'
+[2026-11-10 02:07:49] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'proto_spectro_003' into collection 'protocols'
+[2026-11-10 02:07:49] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'proto_calorimetry_001' into collection 'protocols'
+[2026-11-10 02:07:49] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'proto_distill_004' into collection 'protocols'
+[2026-11-10 02:07:49] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'proto_kinetics_005' into collection 'protocols'
+[2026-11-10 02:07:49] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'proto_solubility_006' into collection 'protocols'
+[2026-11-10 02:07:49] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'msds_cuso4_003' into collection 'msds'
+[2026-11-10 02:07:49] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'msds_c2h5oh_004' into collection 'msds'
+[2026-11-10 02:07:49] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'msds_hcl_001' into collection 'msds'
+[2026-11-10 02:07:49] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'msds_naoh_002' into collection 'msds'
+[2026-11-10 02:07:49] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'report_calorimetry_001' into collection 'reports'
+[2026-11-10 02:07:49] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'report_cuvette_002' into collection 'reports'
+[2026-11-10 02:07:49] [INFO] [MOSEB_LAB:chroma_service:seed_test_data:285] Vector Store seeded successfully: {'protocols': 6, 'msds': 4, 'reports': 2}
+[2026-11-10 02:07:49] [INFO] [MOSEB_LAB:main:lifespan:47] ChromaDB knowledge base seeded: {'protocols': 6, 'msds': 4, 'reports': 2}
+[2026-11-10 02:07:56] [INFO] [MOSEB_LAB:main:lifespan:52] MOSEB Student Lab API shutting down
+[2026-11-10 02:07:59] [WARNING] [MOSEB_LAB:chroma_service:__init__:128] ChromaDB native PersistentClient not available (Chroma is running in http-only client mode, and can only be run with 'chromadb.api.fastapi.FastAPI' or 'chromadb.api.async_fastapi.AsyncFastAPI' as the chroma_api_impl.             see https://docs.trychroma.com/guides#using-the-python-http-only-client for more information.). Using persistent embedded vector store.
+[2026-11-10 02:07:59] [INFO] [MOSEB_LAB:yolo_detector:_init_model:68] Using high-precision laboratory apparatus optical analyzer (model: yolov8n.pt)
+[2026-11-10 02:08:00] [INFO] [MOSEB_LAB:orchestrator:_register_default_agents:52] Master Agent Orchestrator initialized with 10 specialized agents
+[2026-11-10 02:08:00] [INFO] [MOSEB_LAB:main:lifespan:45] SQL database schema initialized successfully
+[2026-11-10 02:08:00] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'proto_titration_002' into collection 'protocols'
+[2026-11-10 02:08:00] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'proto_spectro_003' into collection 'protocols'
+[2026-11-10 02:08:00] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'proto_calorimetry_001' into collection 'protocols'
+[2026-11-10 02:08:00] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'proto_distill_004' into collection 'protocols'
+[2026-11-10 02:08:00] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'proto_kinetics_005' into collection 'protocols'
+[2026-11-10 02:08:00] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'proto_solubility_006' into collection 'protocols'
+[2026-11-10 02:08:00] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'msds_cuso4_003' into collection 'msds'
+[2026-11-10 02:08:00] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'msds_c2h5oh_004' into collection 'msds'
+[2026-11-10 02:08:00] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'msds_hcl_001' into collection 'msds'
+[2026-11-10 02:08:00] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'msds_naoh_002' into collection 'msds'
+[2026-11-10 02:08:00] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'report_calorimetry_001' into collection 'reports'
+[2026-11-10 02:08:00] [DEBUG] [MOSEB_LAB:chroma_service:add_document:168] Indexed doc 'report_cuvette_002' into collection 'reports'
+[2026-11-10 02:08:00] [INFO] [MOSEB_LAB:chroma_service:seed_test_data:285] Vector Store seeded successfully: {'protocols': 6, 'msds': 4, 'reports': 2}
+[2026-11-10 02:08:00] [INFO] [MOSEB_LAB:main:lifespan:50] ChromaDB knowledge base seeded: {'protocols': 6, 'msds': 4, 'reports': 2}
+[2026-11-10 02:08:51] [WARNING] [MOSEB_LAB:chroma_service:__init__:128] ChromaDB native PersistentClient not available (Chroma is running in http-only client mode, and can only be run with 'chromadb.api.fastapi.FastAPI' or 'chromadb.api.async_fastapi.AsyncFastAPI' as the chroma_api_impl.             see https://docs.trychroma.com/guides#using-the-python-http-only-client for more information.). Using persistent embedded vector store.
+[2026-11-10 02:08:51] [INFO] [MOSEB_LAB:yolo_detector:_init_model:68] Using high-precision laboratory apparatus optical analyzer (model: yolov8n.pt)
+[2026-11-10 02:08:51] [INFO] [MOSEB_LAB:orchestrator:_register_default_agents:52] Master Agent Orchestrator initialized with 10 specialized agents

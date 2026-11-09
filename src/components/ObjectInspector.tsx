@@ -280,7 +280,7 @@ export const ObjectInspector: React.FC<ObjectInspectorProps> = ({
               Inject Chemical Solute:
             </span>
             <div className="grid grid-cols-2 gap-1.5">
-              {CHEMICAL_PRESETS.slice(1).map((chem) => (
+              {CHEMICAL_PRESETS.slice(1, 9).map((chem) => (
                 <button
                   key={chem.formula}
                   onClick={() => {

@@ -40,8 +40,11 @@ except ImportError:
 @contextlib.asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup: Create SQL tables and seed ChromaDB vector store
-    Base.metadata.create_all(bind=engine)
-    app_logger.info("SQL database schema initialized successfully")
+    try:
+        Base.metadata.create_all(bind=engine)
+        app_logger.info("SQL database schema initialized successfully")
+    except Exception as e:
+        app_logger.warning(f"SQL database initialization warning: {e}")
     try:
         counts = chroma_service.seed_test_data()
         app_logger.info(f"ChromaDB knowledge base seeded: {counts}")

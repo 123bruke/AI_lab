@@ -17,38 +17,17 @@ export const INITIAL_EXPERIMENT_STATE: ExperimentState = {
   simSpeed: 1.5,
 };
 
-export const CHEMICAL_PRESETS = [
-  {
-    name: 'Pure Deionized H₂O',
-    formula: 'H₂O',
-    color: '#38bdf8',
-    description: 'Ultra-pure laboratory water for standard thermodynamic experiments.',
-  },
-  {
-    name: 'Copper(II) Sulfate Pentahydrate',
-    formula: 'CuSO₄ · 5H₂O',
-    color: '#0284c7',
-    description: 'Vibrant azure-blue crystalline solution used in thermal dehydration studies.',
-  },
-  {
-    name: 'Potassium Permanganate',
-    formula: 'KMnO₄',
-    color: '#9333ea',
-    description: 'Deep royal purple oxidizing agent with striking convective color diffusion.',
-  },
-  {
-    name: 'Iron(III) Chloride',
-    formula: 'FeCl₃',
-    color: '#d97706',
-    description: 'Warm amber-orange aqueous salt showing vivid convective plumes under heat.',
-  },
-  {
-    name: 'Universal Indicator (Neutral)',
-    formula: 'pH 7.0',
-    color: '#10b981',
-    description: 'Emerald green aqueous indicator sensitive to acidic or basic vapor shifts.',
-  },
-];
+import { REAGENTS_DATABASE, ChemicalReagent } from '../data/reagentsData';
+
+export { REAGENTS_DATABASE };
+export type { ChemicalReagent };
+
+export const CHEMICAL_PRESETS = REAGENTS_DATABASE.map((r) => ({
+  name: r.name,
+  formula: r.formula,
+  color: r.color,
+  description: r.description,
+}));
 
 export function computeWaterState(temp: number): WaterState {
   if (temp < 10) return 'ice';

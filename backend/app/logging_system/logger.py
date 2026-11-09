@@ -3,9 +3,17 @@ import os
 import sys
 from logging.handlers import RotatingFileHandler
 
+# Safe log directory with fallback for read-only serverless environments (Vercel/Lambda)
 LOG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "logs")
-os.makedirs(LOG_DIR, exist_ok=True)
-LOG_FILE = os.path.join(LOG_DIR, "moseb_lab_agents.log")
+try:
+    os.makedirs(LOG_DIR, exist_ok=True)
+    LOG_FILE = os.path.join(LOG_DIR, "moseb_lab_agents.log")
+except (OSError, PermissionError):
+    # Fallback to writable /tmp directory on Vercel / serverless runtimes
+    LOG_DIR = os.path.join("/tmp", "moseb_logs")
+    os.makedirs(LOG_DIR, exist_ok=True)
+    LOG_FILE = os.path.join(LOG_DIR, "moseb_lab_agents.log")
+
 
 def setup_logger() -> logging.Logger:
     logger = logging.getLogger("MOSEB_LAB")
@@ -21,26 +29,31 @@ def setup_logger() -> logging.Logger:
         datefmt="%Y-%m-%d %H:%M:%S"
     )
 
-    # 1. Console Stream Handler
+    # 1. Console Stream Handler (Always active - captured by Vercel function logs)
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(logging.INFO)
     console_handler.setFormatter(formatter)
     logger.addHandler(console_handler)
 
     # 2. Rotating File Handler (Max 10 MB per file, keep 5 backups)
-    file_handler = RotatingFileHandler(
-        LOG_FILE, maxBytes=10 * 1024 * 1024, backupCount=5, encoding="utf-8"
-    )
-    file_handler.setLevel(logging.DEBUG)
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
+    try:
+        file_handler = RotatingFileHandler(
+            LOG_FILE, maxBytes=10 * 1024 * 1024, backupCount=5, encoding="utf-8"
+        )
+        file_handler.setLevel(logging.DEBUG)
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
+    except (OSError, PermissionError, IOError):
+        # Gracefully continue with console handler if file logging is restricted
+        pass
 
     return logger
+
 
 lab_logger = setup_logger()
 app_logger = lab_logger
 
+
 def log_frontend_error(component: str, error_type: str, message: str, stack_trace: str = None):
     """Log an error originating from frontend React components."""
     lab_logger.error(f"[FRONTEND:{component}] {error_type}: {message} | Stack: {stack_trace}")
-

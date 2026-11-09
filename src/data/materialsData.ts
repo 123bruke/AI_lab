@@ -1,0 +1,665 @@
+// Comprehensive Laboratory Materials Database
+// Includes Fire-Type Materials, Glassware, Metals, Ceramics, Polymers, Crystals
+// and 10 Brand-New 4D Hyper-Dimensional Materials (Hidden by default in the UI)
+
+export type MaterialCategory =
+  | 'all'
+  | 'fire_type'
+  | 'glassware'
+  | 'metals'
+  | 'ceramics'
+  | 'polymers'
+  | 'crystals'
+  | '4d_hyper';
+
+export interface LabMaterial {
+  id: string;
+  name: string;
+  category: MaterialCategory;
+  composition: string;
+  color: string;
+  description: string;
+  properties: {
+    meltingPoint?: string;
+    thermalConductivity?: string;
+    density?: string;
+    flameType?: string;
+    refractiveIndex?: string;
+    chemicalResistance?: string;
+    quantumPhase?: string;
+    dimensionFactor?: string;
+  };
+  is4D?: boolean;
+  isFireType?: boolean;
+  visualEffect?: 'fire_burst' | 'quantum_distortion' | 'holographic' | 'tesseract_flow' | 'standard';
+}
+
+export const LAB_MATERIALS_DATABASE: LabMaterial[] = [
+  // ==========================================
+  // 1. FIRE-TYPE LAB MATERIALS (12 Items)
+  // ==========================================
+  {
+    id: 'mat_fire_thermite',
+    name: 'Thermite Pyrotechnic Core',
+    category: 'fire_type',
+    composition: 'Fe₂O₃ + 2Al (Stoichiometric)',
+    color: '#ea580c',
+    description: 'High-energy exothermic redox composition reaching 2500°C, producing molten elemental iron and blinding thermal white radiation.',
+    isFireType: true,
+    visualEffect: 'fire_burst',
+    properties: {
+      meltingPoint: 'Reaction Temp > 2500°C',
+      thermalConductivity: 'Extreme Exothermic Heat Flux',
+      density: '3.75 g/cm³',
+      flameType: 'Dazzling White-Gold Molten Flux (Senko)',
+      chemicalResistance: 'Self-propagating reaction unaffected by water once ignited',
+    },
+  },
+  {
+    id: 'mat_fire_strontium',
+    name: 'Strontium Scarlet Flare Matrix',
+    category: 'fire_type',
+    composition: 'Sr(NO₃)₂ + Mg + Hexamine',
+    color: '#e11d48',
+    description: 'Pyrotechnic formulation yielding intense 650nm scarlet-red atomic emission, used in maritime distress signals and high-visibility flares.',
+    isFireType: true,
+    visualEffect: 'fire_burst',
+    properties: {
+      meltingPoint: 'Ignition at 570°C',
+      thermalConductivity: '1850°C Combustion Flame',
+      density: '2.98 g/cm³',
+      flameType: 'Pure 650nm Scarlet Crimson Flame',
+      chemicalResistance: 'Stable in moisture-sealed casings',
+    },
+  },
+  {
+    id: 'mat_fire_barium',
+    name: 'Barium Emerald Starfire',
+    category: 'fire_type',
+    composition: 'Ba(ClO₃)₂ · H₂O + Parlon Binder',
+    color: '#10b981',
+    description: 'High-purity green pyrotechnic emitter generating bright 510nm emerald green flame spectra through excited BaCl radicals.',
+    isFireType: true,
+    visualEffect: 'fire_burst',
+    properties: {
+      meltingPoint: 'Decomposes at 250°C',
+      thermalConductivity: '1600°C Flame Temperature',
+      density: '3.18 g/cm³',
+      flameType: 'Brilliant 510nm Emerald Green Plasma',
+      chemicalResistance: 'Keep away from sulfur and red phosphorus',
+    },
+  },
+  {
+    id: 'mat_fire_magnesium',
+    name: 'Magnesium Actinic Ribbon Torch',
+    category: 'fire_type',
+    composition: 'Mg Pure Metal (99.9%)',
+    color: '#f8fafc',
+    description: 'Ultra-pure metallic magnesium burning in atmospheric oxygen with a blinding 3100K UV-rich white torch, capable of burning underwater in CO₂.',
+    isFireType: true,
+    visualEffect: 'fire_burst',
+    properties: {
+      meltingPoint: '650°C (Burns at 3100 K)',
+      thermalConductivity: '156 W/m·K',
+      density: '1.74 g/cm³',
+      flameType: 'Blinding 3100K Actinic UV-White Torch',
+      chemicalResistance: 'Reduces hot steam to H₂ gas',
+    },
+  },
+  {
+    id: 'mat_fire_copper_azure',
+    name: 'Copper(II) Azure Plasma Flame',
+    category: 'fire_type',
+    composition: 'CuCl₂ + Chlorinated Donor Matrix',
+    color: '#06b6d4',
+    description: 'Spectral azure-blue pyrotechnic fuel producing intense 436nm blue flame radiation via gas-phase CuCl molecular emission.',
+    isFireType: true,
+    visualEffect: 'fire_burst',
+    properties: {
+      meltingPoint: '620°C',
+      thermalConductivity: '1400°C Low-Soot Flame',
+      density: '2.51 g/cm³',
+      flameType: 'Deep Celestial Turquoise-Blue Flame',
+      chemicalResistance: 'Soluble in ethanol, burns clean with blue vapor',
+    },
+  },
+  {
+    id: 'mat_fire_napalm',
+    name: 'Napalm-B Pyropolymer Gel',
+    category: 'fire_type',
+    composition: '46% Polystyrene + 33% Gasoline + 21% Benzene',
+    color: '#f59e0b',
+    description: 'Viscous, high-adhesion incendiary gel that clings stubbornly to surfaces while burning at 1000°C with prolonged thermal endurance.',
+    isFireType: true,
+    visualEffect: 'fire_burst',
+    properties: {
+      meltingPoint: 'Viscous Non-Newtonian Gel',
+      thermalConductivity: 'Sustained 1000°C Combustion',
+      density: '0.85 g/cm³',
+      flameType: 'Sustained Heavy Orange Incendiary Fire',
+      chemicalResistance: 'Hydrophobic, resistant to water extinguishing',
+    },
+  },
+  {
+    id: 'mat_fire_white_p',
+    name: 'White Phosphorus Pyrophoric Matrix',
+    category: 'fire_type',
+    composition: 'P₄ Allotrope',
+    color: '#fef08a',
+    description: 'Spontaneously pyrophoric tetrahedral phosphorus igniting instantly on ambient air exposure at 30°C to generate massive white P₄O₁₀ smoke curtains.',
+    isFireType: true,
+    visualEffect: 'fire_burst',
+    properties: {
+      meltingPoint: '44.1°C (Spontaneous Ignition at 30°C)',
+      thermalConductivity: 'Combustion Temp 1300°C',
+      density: '1.82 g/cm³',
+      flameType: 'Spontaneous Phosphorescent Luminous Flame',
+      chemicalResistance: 'Must be stored submerged in deaerated water',
+    },
+  },
+  {
+    id: 'mat_fire_nitrocellulose',
+    name: 'Nitrocellulose Smokeless Flash Fiber',
+    category: 'fire_type',
+    composition: '[C₆H₇O₂(NO₃)₃]ₙ (13.4% Nitrogen)',
+    color: '#ffffff',
+    description: 'Nitrated polymer fiber burning with supersonic sub-millisecond deflagration, generating instantaneous flash and zero solid smoke or ash residue.',
+    isFireType: true,
+    visualEffect: 'fire_burst',
+    properties: {
+      meltingPoint: 'Deflagrates instantly at 160°C',
+      thermalConductivity: 'Supersonic Gas Expansion (3100 m/s)',
+      density: '1.20 g/cm³',
+      flameType: 'Sub-millisecond Instant Flash (Zero Ash)',
+      chemicalResistance: 'Soluble in acetone and ether-alcohol',
+    },
+  },
+  {
+    id: 'mat_fire_potassium_violet',
+    name: 'Potassium Violet Deflagration Core',
+    category: 'fire_type',
+    composition: 'KClO₄ + C₁₂H₂₂O₁₁ + Charcoal',
+    color: '#a855f7',
+    description: 'Rapid-burning deflagrating propellant generating high pressure gas with distinct 766nm royal violet flame emissions.',
+    isFireType: true,
+    visualEffect: 'fire_burst',
+    properties: {
+      meltingPoint: 'Ignition at 320°C',
+      thermalConductivity: '1900°C High-Velocity Flame',
+      density: '2.10 g/cm³',
+      flameType: 'Royal Violet 766nm Potassium Flame',
+      chemicalResistance: 'Stable dry, sensitive to shock and friction',
+    },
+  },
+  {
+    id: 'mat_fire_lithium_carmine',
+    name: 'Lithium Carmine Flare Substrate',
+    category: 'fire_type',
+    composition: 'Li₂CO₃ + Potassium Nitrate + Shellac',
+    color: '#be123c',
+    description: 'Deep carmine-magenta flame emitter utilizing excited neutral lithium atoms emitting at 670.8nm with high chromatic purity.',
+    isFireType: true,
+    visualEffect: 'fire_burst',
+    properties: {
+      meltingPoint: '723°C',
+      thermalConductivity: '1500°C Luminous Flame',
+      density: '2.11 g/cm³',
+      flameType: 'Deep 670.8nm Carmine-Magenta Flare',
+      chemicalResistance: 'Insoluble in alcohol, dissolves in acids',
+    },
+  },
+  {
+    id: 'mat_fire_boron_torch',
+    name: 'Amorphous Boron Green Torch',
+    category: 'fire_type',
+    composition: 'Boron (95% Amorphous Sub-micron)',
+    color: '#15803d',
+    description: 'Extremely high volumetric heat of combustion (138 kJ/cm³) burning with electric green BO₂ radical luminescence for rocket igniters.',
+    isFireType: true,
+    visualEffect: 'fire_burst',
+    properties: {
+      meltingPoint: '2076°C',
+      thermalConductivity: 'Heat of Combustion 58.7 MJ/kg',
+      density: '2.34 g/cm³',
+      flameType: 'Electric Emerald Green Pyrotechnic Torch',
+      chemicalResistance: 'Inert to acids at room temperature',
+    },
+  },
+  {
+    id: 'mat_fire_teb_fuel',
+    name: 'Triethylborane (TEB) Pyrophoric Fuel',
+    category: 'fire_type',
+    composition: 'B(C₂H₅)₃ (Liquid Organoborane)',
+    color: '#22c55e',
+    description: 'Spontaneously pyrophoric organoboron liquid used to ignite the Pratt & Whitney J58 engines on the SR-71 Blackbird with brilliant emerald flame.',
+    isFireType: true,
+    visualEffect: 'fire_burst',
+    properties: {
+      meltingPoint: '-93°C (Boiling Point 95°C)',
+      thermalConductivity: 'Instant Hypergolic Combustion in Air',
+      density: '0.677 g/cm³',
+      flameType: 'SR-71 Signature Emerald Green Shock Flame',
+      chemicalResistance: 'Hypergolic with atmospheric oxygen',
+    },
+  },
+
+  // ==========================================
+  // 2. GLASSWARE & OPTICAL MATERIALS (8 Items)
+  // ==========================================
+  {
+    id: 'mat_boro_33',
+    name: 'Borosilicate Glass 3.3',
+    category: 'glassware',
+    composition: '81% SiO₂, 13% B₂O₃, 4% Na₂O/K₂O, 2% Al₂O₃',
+    color: '#e0f2fe',
+    description: 'Benchmark laboratory glass featuring ultra-low thermal expansion (3.3 × 10⁻⁶ /K), superb thermal shock resistance, and universal acid resistance.',
+    properties: {
+      meltingPoint: 'Softening Point 820°C (Annealing 560°C)',
+      thermalConductivity: '1.2 W/m·K',
+      density: '2.23 g/cm³',
+      refractiveIndex: '1.473',
+      chemicalResistance: 'Class 1 Hydrolytic, Class A Acid resistance',
+    },
+  },
+  {
+    id: 'mat_fused_quartz',
+    name: 'Fused Quartz Silica (HPFS)',
+    category: 'glassware',
+    composition: 'High-Purity Amorphous SiO₂ (>99.99%)',
+    color: '#f8fafc',
+    description: 'Ultra-pure fused silica capable of operating continuously at 1100°C without thermal stress; 90%+ optical transmission from 180nm UV to 2500nm IR.',
+    properties: {
+      meltingPoint: 'Softening Point 1665°C',
+      thermalConductivity: '1.4 W/m·K',
+      density: '2.20 g/cm³',
+      refractiveIndex: '1.458',
+      chemicalResistance: 'Resistant to all acids except HF',
+    },
+  },
+  {
+    id: 'mat_sapphire_crystal',
+    name: 'Single-Crystal Synthetic Sapphire',
+    category: 'glassware',
+    composition: 'Single-Crystal α-Al₂O₃ (C-Plane)',
+    color: '#bae6fd',
+    description: 'Mohs hardness 9 crystalline optical window resistant to extreme pressure vessels, fluorine plasmas, and temperatures up to 2000°C.',
+    properties: {
+      meltingPoint: '2040°C',
+      thermalConductivity: '35 W/m·K (High for glass/dielectric)',
+      density: '3.98 g/cm³',
+      refractiveIndex: '1.768 (Birefringent Δn = 0.008)',
+      chemicalResistance: 'Completely insoluble in all mineral acids up to 300°C',
+    },
+  },
+  {
+    id: 'mat_chalcogenide',
+    name: 'Chalcogenide Infrared Glass (AMTIR)',
+    category: 'glassware',
+    composition: 'Ge₃₃As₁₂Se₅₅ Glassy Matrix',
+    color: '#334155',
+    description: 'Specialty black chalcogenide glass transparent across the 2 to 14 micron thermal imaging spectrum, ideal for IR spectrometer cells.',
+    properties: {
+      meltingPoint: 'Glass Transition Tg = 362°C',
+      thermalConductivity: '0.24 W/m·K',
+      density: '4.4 g/cm³',
+      refractiveIndex: '2.50 (High IR Refractive Index)',
+      chemicalResistance: 'Resistant to non-oxidizing aqueous acids',
+    },
+  },
+
+  // ==========================================
+  // 3. METALS & HIGH-PERFORMANCE ALLOYS (6 Items)
+  // ==========================================
+  {
+    id: 'mat_titanium_gr5',
+    name: 'Titanium Grade 5 (Ti-6Al-4V)',
+    category: 'metals',
+    composition: '90% Ti, 6% Al, 4% V',
+    color: '#94a3b8',
+    description: 'Aerospace-grade alpha-beta titanium alloy combining high specific strength, extreme corrosion resistance in seawater, and bio-compatibility.',
+    properties: {
+      meltingPoint: '1660°C',
+      thermalConductivity: '6.7 W/m·K',
+      density: '4.43 g/cm³',
+      chemicalResistance: 'Self-healing passivating TiO₂ surface oxide layer',
+    },
+  },
+  {
+    id: 'mat_platinum_iridium',
+    name: 'Platinum-Iridium (Pt/Ir 90/10)',
+    category: 'metals',
+    composition: '90% Pt, 10% Ir',
+    color: '#cbd5e1',
+    description: 'Noble metal standard used for analytical crucibles and the International Prototype Kilogram. Unaffected by air, hot aqua regia, or molten carbonates.',
+    properties: {
+      meltingPoint: '1780°C',
+      thermalConductivity: '31 W/m·K',
+      density: '21.56 g/cm³',
+      chemicalResistance: 'Impervious to almost all acids and oxidation',
+    },
+  },
+  {
+    id: 'mat_tungsten_pure',
+    name: 'Tungsten High-Purity (99.95%)',
+    category: 'metals',
+    composition: 'W Pure Refractory Element',
+    color: '#64748b',
+    description: 'Highest melting point of all elemental metals (3422°C) with the lowest vapor pressure, used in ultra-high vacuum heating filaments and electron emitters.',
+    properties: {
+      meltingPoint: '3422°C (Boiling 5555°C)',
+      thermalConductivity: '173 W/m·K',
+      density: '19.25 g/cm³',
+      chemicalResistance: 'Resists molten glass and non-oxidizing acids',
+    },
+  },
+  {
+    id: 'mat_inconel_718',
+    name: 'Inconel 718 Superalloy',
+    category: 'metals',
+    composition: '52% Ni, 19% Cr, 18% Fe, 5% Nb, 3% Mo',
+    color: '#71717a',
+    description: 'Precipitation-hardenable nickel-chromium superalloy maintaining immense tensile and creep-rupture strength up to 700°C in oxidizing furnace atmospheres.',
+    properties: {
+      meltingPoint: '1336°C',
+      thermalConductivity: '11.4 W/m·K',
+      density: '8.19 g/cm³',
+      chemicalResistance: 'Immune to chloride stress corrosion cracking',
+    },
+  },
+
+  // ==========================================
+  // 4. CERAMICS & REFRACTORIES (6 Items)
+  // ==========================================
+  {
+    id: 'mat_alumina_998',
+    name: 'High-Purity Alumina (Al₂O₃ 99.8%)',
+    category: 'ceramics',
+    composition: '99.8% α-Al₂O₃ (Corundum Phase)',
+    color: '#f8fafc',
+    description: 'Fine-grained structural ceramic with Vickers hardness 16 GPa, capable of continuous operation up to 1750°C in tube furnaces and crucibles.',
+    properties: {
+      meltingPoint: '2072°C',
+      thermalConductivity: '30 W/m·K',
+      density: '3.92 g/cm³',
+      chemicalResistance: 'Resistant to molten metals, fluxes, and boiling mineral acids',
+    },
+  },
+  {
+    id: 'mat_zirconia_ysz',
+    name: 'Yttria-Stabilized Zirconia (YSZ)',
+    category: 'ceramics',
+    composition: 'ZrO₂ + 8 mol% Y₂O₃',
+    color: '#f1f5f9',
+    description: 'Phase-transformation toughened ceramic exhibiting extraordinary fracture toughness (8 MPa·m½) and oxygen-ion conductivity for solid oxide fuel cells.',
+    properties: {
+      meltingPoint: '2700°C',
+      thermalConductivity: '2.0 W/m·K (Thermal Barrier Coating)',
+      density: '6.05 g/cm³',
+      chemicalResistance: 'Inert to molten slag, hot alkali, and high-temp steam',
+    },
+  },
+  {
+    id: 'mat_silicon_carbide',
+    name: 'Sintered Silicon Carbide (SSiC)',
+    category: 'ceramics',
+    composition: 'Hexagonal α-SiC (>98.5%)',
+    color: '#1e293b',
+    description: 'Extremely hard ceramic (Knoop 2800) maintaining strength beyond 1400°C with exceptional thermal shock resistance and abrasion immunity.',
+    properties: {
+      meltingPoint: 'Sublimes at 2730°C',
+      thermalConductivity: '120 W/m·K (Very High)',
+      density: '3.15 g/cm³',
+      chemicalResistance: 'Universal resistance to acids, bases, and molten salts',
+    },
+  },
+
+  // ==========================================
+  // 5. POLYMERS & FLUOROPLASTICS (6 Items)
+  // ==========================================
+  {
+    id: 'mat_ptfe_teflon',
+    name: 'Polytetrafluoroethylene (PTFE Teflon)',
+    category: 'polymers',
+    composition: '(C₂F₄)ₙ Fully Fluorinated Polymer',
+    color: '#f8fafc',
+    description: 'The golden standard of chemical inertness: immune to aqua regia, molten alkali metals (except hot solvated), and continuous temp range from -200°C to +260°C.',
+    properties: {
+      meltingPoint: '327°C (Continuous service to 260°C)',
+      thermalConductivity: '0.25 W/m·K',
+      density: '2.20 g/cm³',
+      chemicalResistance: 'Universal chemical immunity across pH 0 - 14',
+    },
+  },
+  {
+    id: 'mat_peek',
+    name: 'Polyether Ether Ketone (PEEK)',
+    category: 'polymers',
+    composition: 'Semi-crystalline Polyaromatic Ketone',
+    color: '#d4d4d8',
+    description: 'Engineering thermoplastic capable of continuous 250°C service, widely used in HPLC pump heads, chromatography fittings, and autoclave components.',
+    properties: {
+      meltingPoint: '343°C (Tg = 143°C)',
+      thermalConductivity: '0.25 W/m·K',
+      density: '1.32 g/cm³',
+      chemicalResistance: 'Resistant to organic solvents, steam, and radiation',
+    },
+  },
+
+  // ==========================================
+  // 6. CRYSTALS & ADVANCED SEMICONDUCTORS (6 Items)
+  // ==========================================
+  {
+    id: 'mat_silicon_111',
+    name: 'Monocrystalline Silicon (111 Wafer)',
+    category: 'crystals',
+    composition: 'Ultra-Pure Electronic Grade Si (99.9999999%)',
+    color: '#475569',
+    description: 'Diamond cubic lattice monocrystal wafer oriented along the (111) Miller plane, polished to sub-angstrom atomic roughness for microelectronics.',
+    properties: {
+      meltingPoint: '1414°C',
+      thermalConductivity: '149 W/m·K',
+      density: '2.33 g/cm³',
+      refractiveIndex: '3.42 (High Index)',
+      chemicalResistance: 'Anisotropically etched by hot KOH solutions',
+    },
+  },
+  {
+    id: 'mat_graphene',
+    name: 'Free-Standing Graphene Monolayer',
+    category: 'crystals',
+    composition: 'Single-Atom sp²-Hybridized Carbon Honeycomb Lattice',
+    color: '#0f172a',
+    description: 'Two-dimensional Dirac semimetal featuring room-temperature electron mobility >200,000 cm²/V·s, breaking strength 130 GPa, and 97.7% optical transparency.',
+    properties: {
+      meltingPoint: 'Sublimes ~4500 K',
+      thermalConductivity: '5000 W/m·K (Highest known)',
+      density: '0.77 mg/m² (Areal Density)',
+      chemicalResistance: 'Impermeable to all standard gas molecules including Helium',
+    },
+  },
+
+  // ==============================================================================
+  // 7. 10 BRAND-NEW 4D-LIKE VIEW MATERIALS (HIDDEN IN THE MATERIALS SECTION)
+  // ==============================================================================
+  {
+    id: 'mat_4d_tesseract_glass',
+    name: 'Tesseract Hyper-Glass (Polytope Refraction 4D)',
+    category: '4d_hyper',
+    composition: '4-Polytope Hypercube Lattice SiO₂·[w-coordinate]',
+    color: '#38bdf8',
+    description: '4-dimensional hypercube crystal projecting non-Euclidean light rays. Photons traverse the 4th spatial coordinate (w), generating impossible internal parallax, geometric rotation, and infinite depth refraction.',
+    is4D: true,
+    visualEffect: 'tesseract_flow',
+    properties: {
+      meltingPoint: 'Invariant under 4D Metric Rotation',
+      thermalConductivity: 'Non-Euclidean Heat Dissipation',
+      density: '2.23 g/cm³ (Projected to 3D)',
+      flameType: 'Hyper-Dimensional Chromatic Aura',
+      refractiveIndex: 'n₄ = 4.22 + 0.18i (4-Manifold Dispersion)',
+      quantumPhase: 'Tesseract 4D Lensing & Spatial Super-Reflection',
+      dimensionFactor: '4D Spatial Hypercube (x, y, z, w)',
+    },
+  },
+  {
+    id: 'mat_4d_chrono_mercury',
+    name: 'Chrono-Spatial Mercury (Temporal Phase Shifter)',
+    category: '4d_hyper',
+    composition: 'Temporal Isotope Hg-198·[Δt ± 12μs]',
+    color: '#a855f7',
+    description: 'Superconducting liquid metal oscillating backward and forward through micro-seconds of temporal entropy. Liquid droplets reconnect into the bulk fluid before making physical contact with vessel walls.',
+    is4D: true,
+    visualEffect: 'quantum_distortion',
+    properties: {
+      meltingPoint: '-38.8°C (Temporal Loop Stable)',
+      thermalConductivity: 'Negative Retarded Thermal Wave',
+      density: '13.53 g/cm³ (Time-Averaged)',
+      flameType: 'Pulsing Violet Temporal Shockwave',
+      quantumPhase: 'Chronospatial Supercurrent (Time-Reversal Sym)',
+      dimensionFactor: '4D Spatio-Temporal Phase (x, y, z, it)',
+    },
+  },
+  {
+    id: 'mat_4d_bec_superposition',
+    name: 'Quantum Superposition Bose-Einstein Condensate',
+    category: '4d_hyper',
+    composition: 'Macroscopic |Ψ⟩ Wavepacket (Rb-87 BEC)',
+    color: '#06b6d4',
+    description: 'Sub-microkelvin macroscopic quantum fluid coexisting across 7 discrete eigenstates simultaneously. The liquid meniscus exhibits permanent quantum interference fringes with zero internal shear viscosity.',
+    is4D: true,
+    visualEffect: 'quantum_distortion',
+    properties: {
+      meltingPoint: 'Tc = 170 nK (Zero Viscosity Superfluid)',
+      thermalConductivity: 'Infinite (Second Sound Propagation)',
+      density: '10¹⁴ atoms/cm³',
+      flameType: 'Neon Cyan Coherent Wave Emission',
+      quantumPhase: 'Macroscopic Probability Amplitude |Ψ|²',
+      dimensionFactor: 'Hilbert Space Metric Tensor',
+    },
+  },
+  {
+    id: 'mat_4d_noneuclidean_aerogel',
+    name: 'Non-Euclidean Aerogel (Higher-Dimensional Insulator)',
+    category: '4d_hyper',
+    composition: 'Calabi-Yau Nanoporous Hyper-Silica Matrix',
+    color: '#818cf8',
+    description: 'Higher-dimensional hyper-porous matrix with ultra-low density (0.0008 g/cm³) that vents incoming thermal entropy directly into the bulk 4D spatial manifold, nullifying external flame heating.',
+    is4D: true,
+    visualEffect: 'holographic',
+    properties: {
+      meltingPoint: 'Sublimes across bulk 4D boundary',
+      thermalConductivity: 'κ = 0.0000 W/m·K (Absolute Nullifier)',
+      density: '0.0008 g/cm³ (Hyper-Ethereal)',
+      flameType: 'Opalescent Lavender Dimensional Shield',
+      quantumPhase: 'Higher-Dimensional Heat Sink Isolation',
+      dimensionFactor: 'Calabi-Yau 4D Spatial Projection',
+    },
+  },
+  {
+    id: 'mat_4d_tachyon_plasma',
+    name: 'Tachyon Singularity Plasma (Negative Entropy Conductor)',
+    category: '4d_hyper',
+    composition: 'Ionized Superluminal Flux (v > c Quantum State)',
+    color: '#ec4899',
+    description: 'Superluminal plasma exhibiting negative thermodynamic resistance and inverted Carnot cycles. When subjected to flame heat, this material cools down spontaneously and emits high-energy coherent photons.',
+    is4D: true,
+    visualEffect: 'quantum_distortion',
+    properties: {
+      meltingPoint: 'Inverted Energy Eigenvalues',
+      thermalConductivity: 'Negative Thermal Resistance (dS/dt < 0)',
+      density: 'Non-Local Superluminal Dispersion',
+      flameType: 'Radiant Hot Magenta Photon Laser Plasma',
+      quantumPhase: 'Negative Thermodynamic Entropy',
+      dimensionFactor: 'Minkowski Hyperbolic Spacetime',
+    },
+  },
+  {
+    id: 'mat_4d_calabi_yau_crystal',
+    name: 'Calabi-Yau Compactified Meta-Crystal',
+    category: '4d_hyper',
+    composition: '6D Compactified Manifold Crystal Projected to 4D',
+    color: '#f59e0b',
+    description: 'Macroscopic projection of a 6-dimensional compactified string-theoretic manifold. Displays continuous prismatic chromatic shifts that rotate dynamically depending on observer 3D vantage angle.',
+    is4D: true,
+    visualEffect: 'holographic',
+    properties: {
+      meltingPoint: 'Topologically Protected (Euler χ = -6)',
+      thermalConductivity: 'Kaluza-Klein Mode Resonant Transfer',
+      density: '4.88 g/cm³',
+      flameType: 'Golden Prismatic Rainbow Flare',
+      quantumPhase: 'String Compactification Harmonic Multiplets',
+      dimensionFactor: '6D Compactified Manifold (x, y, z, u, v, w)',
+    },
+  },
+  {
+    id: 'mat_4d_dark_energy_vortex',
+    name: 'Dark Energy Cosmological Vortex (Metric Expansion)',
+    category: '4d_hyper',
+    composition: 'Quintessence Λ-Scalar Field Condensate',
+    color: '#312e81',
+    description: 'Localized cosmological constant fluid exhibiting negative gravitational pressure (p = -ρc²). Generates a subtle spacetime expansion vector inside the beaker that creates cosmic Doppler shifts in light.',
+    is4D: true,
+    visualEffect: 'tesseract_flow',
+    properties: {
+      meltingPoint: 'Cosmic Horizon Boundary State',
+      thermalConductivity: 'Anti-De Sitter Metric Expansion',
+      density: 'Negative Effective Gravitational Mass',
+      flameType: 'Deep Cosmic Void Swirl with Pulsing Stars',
+      quantumPhase: 'Cosmological Constant Tensor Repulsion',
+      dimensionFactor: '4D FLRW Cosmological Metric',
+    },
+  },
+  {
+    id: 'mat_4d_spatial_fold_obsidian',
+    name: 'Spatial Fold Obsidian (Gravitational Lensing Matrix)',
+    category: '4d_hyper',
+    composition: 'Vitrified Micro-Singularity Silicate Network',
+    color: '#18181b',
+    description: 'Super-dense gravitational warp glass embedded with localized quantum micro-singularities that bend laser lines and visible photons into an astrophysical Einstein ring around the vessel perimeter.',
+    is4D: true,
+    visualEffect: 'quantum_distortion',
+    properties: {
+      meltingPoint: '2400°C (Extreme Metric Density)',
+      thermalConductivity: 'Gravitational Wave Energy Damping',
+      density: '18.40 g/cm³',
+      flameType: 'Einstein Ring Gravitational Rainbow Fringe',
+      quantumPhase: 'Micro-Wormhole Photon Trajectory Folding',
+      dimensionFactor: 'Schwarzschild Local Warp Metric',
+    },
+  },
+  {
+    id: 'mat_4d_vacuum_ether',
+    name: 'Zero-Point Fluctuation Ether (Vacuum Polarizer)',
+    category: '4d_hyper',
+    composition: 'Polarized Casimir Vacuum Substrate',
+    color: '#10b981',
+    description: 'Sub-Planckian Casimir field fluid with spontaneous creation and annihilation of virtual electron-positron pairs, emitting an unpowered ambient teal quantum electroluminescence.',
+    is4D: true,
+    visualEffect: 'holographic',
+    properties: {
+      meltingPoint: 'Absolute Ground State ⟨0|T_μν|0⟩',
+      thermalConductivity: 'Dynamic Casimir Effect Emission',
+      density: 'Quantum Vacuum Ground State',
+      flameType: 'Emerald-Teal Bioluminescent Quantum Aura',
+      quantumPhase: 'Spontaneous Virtual Photon Annihilation',
+      dimensionFactor: 'Planck-Scale Casimir Coordinate Fabric',
+    },
+  },
+  {
+    id: 'mat_4d_chromatic_bismuth',
+    name: 'Hyper-Dimensional Chromatic Bismuth',
+    category: '4d_hyper',
+    composition: 'Bi-Oxide 4D Fractal Hopper Crystal',
+    color: '#f43f5e',
+    description: 'Stepped 4D hyper-hopper staircases exhibiting infinite thin-film interference. The crystal cycles through every color in the visible and UV spectrum smoothly with endless animated chromatic shifts.',
+    is4D: true,
+    visualEffect: 'holographic',
+    properties: {
+      meltingPoint: '271.4°C (Sublimes at 1564°C)',
+      thermalConductivity: '7.97 W/m·K',
+      density: '9.78 g/cm³',
+      flameType: 'Animated 360° Infinite Rainbow Hologram',
+      quantumPhase: 'Fractal Polytope Optical Interference',
+      dimensionFactor: 'Fractal Dimension D = 3.42 (4D Projection)',
+    },
+  },
+];

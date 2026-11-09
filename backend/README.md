@@ -4,41 +4,22 @@ High-performance Python FastAPI service with 10+ Autonomous AI Agents, ChromaDB 
 
 ---
 
-## 🚀 Deployment Options
+## 🏗️ Architecture
 
-### 1. Vercel Serverless Function Deployment
-The backend includes a dedicated [`vercel.json`](vercel.json) using `@vercel/python`:
-- In your Vercel Dashboard:
-  - **Root Directory**: `backend`
-  - **Framework Preset**: Other
-- Automatically routes `/(.*)` to `app/main.py` via ASGI serverless handlers.
-
-### 2. Render / Railway / Heroku Deployment
-A [`Procfile`](Procfile) and [`runtime.txt`](runtime.txt) are included:
-```bash
-web: uvicorn app.main:app --host 0.0.0.0 --port $PORT
-```
-- Set `PYTHONPATH=.` in your environment variables.
-
-### 3. Docker & Container Deployment
-Build and run using the production-ready [`Dockerfile`](Dockerfile):
-```bash
-cd backend
-docker build -t moseb-lab-backend .
-docker run -p 8000:8000 moseb-lab-backend
-```
-Or with [`docker-compose.yml`](docker-compose.yml):
-```bash
-cd backend
-docker compose up -d
-```
+- **FastAPI Core**: 12 REST endpoints including auth, experiments, multi-agent dispatch, RAG assistant, and telemetry.
+- **Multi-Agent Orchestrator**: 10 specialized laboratory agents (Diagram, Report, Chemical, Research, Simulation, Safety, Spectroscopy, Stoichiometry, Vision, QA).
+- **Hybrid Search**: Dense semantic vector similarity combined with BM25 keyword matching via Reciprocal Rank Fusion (RRF).
+- **Optical Apparatus Analyzer**: YOLOv8 laboratory vision pipeline with standalone offline fallbacks.
+- **Relational SQL Database**: SQLite via SQLAlchemy with 7 normalized tables.
+- **Error Telemetry**: Self-healing error logging persisted to dedicated `error_logs.db`.
 
 ---
 
-## 🛠️ Local Development
+## 🛠️ Quick Start & Local Execution
 
-1. Install dependencies:
+1. Install Python dependencies:
    ```bash
+   cd backend
    pip install -r requirements.txt
    ```
 
@@ -51,5 +32,14 @@ docker compose up -d
    uvicorn app.main:app --reload --port 8000
    ```
 
-3. Open Interactive Swagger UI:
+3. Open the Interactive Swagger UI:
    [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+
+---
+
+## 🌐 Production Server & Cloud Hosting
+
+To run in production environments (Render, Railway, DigitalOcean, AWS, VPS):
+```bash
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
+```
