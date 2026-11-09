@@ -1,0 +1,28 @@
+{
+  "id": "proto_distill_004",
+  "title": "Separation of Binary Mixture via Fractional Distillation",
+  "category": "Organic Chemistry",
+  "difficulty": "Intermediate",
+  "description": "Separation of an ethanol-water binary mixture utilizing a Vigreux fractionating column with vapor temperature monitoring.",
+  "chemicals": [
+    {"name": "Ethanol (95%)", "formula": "C2H5OH", "volume_ml": 50.0},
+    {"name": "Deionized Water", "formula": "H2O", "volume_ml": 50.0},
+    {"name": "Boiling Stones (Porous Ceramic)", "count": 3}
+  ],
+  "apparatus": [
+    "Round-Bottom Distillation Flask 250mL",
+    "Vigreux Fractionating Column",
+    "Liebig Water Condenser with Recirculating Chiller",
+    "Thermometer Adapter & Digital Stillhead Thermocouple",
+    "Graduated Receiving Flask 100mL"
+  ],
+  "steps": [
+    "Assemble fractional distillation apparatus ensuring all ground glass joints are lightly greased.",
+    "Charge round bottom flask with 50 mL ethanol and 50 mL water, adding 3 boiling chips.",
+    "Initiate counter-current cooling water through condenser jacket.",
+    "Gradually increase heating mantle voltage until gentle reflux begins in column.",
+    "Collect distillate when vapor temperature stabilizes at 78.3°C (ethanol boiling point).",
+    "Switch receiving flask when vapor temperature rises towards 100.0°C."
+  ],
+  "safety": "Ethanol is highly flammable. Keep all open flames away from distillation apparatus. Ensure system is open to atmosphere."
+}

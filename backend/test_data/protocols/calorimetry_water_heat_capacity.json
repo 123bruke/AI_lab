@@ -1,0 +1,26 @@
+{
+  "id": "proto_calorimetry_001",
+  "title": "Determination of Specific Heat Capacity via Aqueous Calorimetry",
+  "category": "Thermodynamics",
+  "difficulty": "Undergraduate Level 1",
+  "description": "Standard protocol for measuring the specific heat capacity (c) of liquid water using continuous Bunsen burner energy transfer and immersion thermocouple probe.",
+  "chemicals": [
+    {"name": "Deionized Water", "formula": "H2O", "volume_ml": 150.0}
+  ],
+  "apparatus": [
+    "Borosilicate Glass Beaker 250mL",
+    "Atmospheric Bunsen Burner",
+    "Ceramic Center Wire Gauze",
+    "K-Type Thermocouple Probe (±0.1°C)",
+    "Graduated Cylinder 100mL"
+  ],
+  "steps": [
+    "Measure exactly 150.0 mL of deionized water using the graduated cylinder and transfer to the 250 mL beaker.",
+    "Record initial ambient liquid temperature T_initial (target 20.0°C to 25.0°C).",
+    "Light the Bunsen burner and adjust to non-luminous blue flame cone.",
+    "Place beaker on wire gauze directly above the flame.",
+    "Record thermocouple temperature at 5-second intervals until boiling plateau (100.0°C) is reached.",
+    "Calculate sensible heat absorbed using Q = m * c * ΔT."
+  ],
+  "safety": "Wear ANSI Z87.1 splash goggles and heat-resistant silicone tongs. Do not heat dry glassware."
+}

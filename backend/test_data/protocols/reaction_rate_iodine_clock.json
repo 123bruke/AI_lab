@@ -1,0 +1,28 @@
+{
+  "id": "proto_kinetics_005",
+  "title": "Kinetics of the Persulfate-Iodide Clock Reaction",
+  "category": "Chemical Kinetics",
+  "difficulty": "Advanced",
+  "description": "Measurement of initial reaction rates and determination of rate law orders (m, n) for persulfate oxidation of iodide ions.",
+  "chemicals": [
+    {"name": "Potassium Iodide (KI)", "concentration_molar": 0.20},
+    {"name": "Ammonium Persulfate ((NH4)2S2O8)", "concentration_molar": 0.10},
+    {"name": "Sodium Thiosulfate (Na2S2O3)", "concentration_molar": 0.005},
+    {"name": "Starch Indicator Solution (1%)", "volume_ml": 2.0}
+  ],
+  "apparatus": [
+    "Digital Chronometer (±0.01s)",
+    "Graduated Pipettes 10mL",
+    "Erlenmeyer Flasks 125mL",
+    "Constant-Temperature Water Bath (25.0°C)"
+  ],
+  "steps": [
+    "Prepare Reaction Mixture A (KI + Na2S2O3 + starch + deionized water).",
+    "Prepare Reaction Mixture B ((NH4)2S2O8).",
+    "Combine solutions rapidly and initiate digital chronometer simultaneously.",
+    "Swirl continuously until instantaneous sudden transition to deep triiodide-starch blue.",
+    "Record elapsed time delta_t and compute reaction velocity rate = delta[S2O8^2-] / delta_t.",
+    "Vary concentrations to extract reaction order with respect to each reactant."
+  ],
+  "safety": "Persulfate is an oxidizer. Avoid inhalation of dust and contact with organic reducing agents."
+}

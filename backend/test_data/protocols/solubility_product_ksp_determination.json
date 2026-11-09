@@ -1,0 +1,27 @@
+{
+  "id": "proto_solubility_006",
+  "title": "Determination of Solubility Product Constant (Ksp) of Calcium Hydroxide",
+  "category": "Inorganic Equilibrium",
+  "difficulty": "Intermediate",
+  "description": "Equilibrium titration of saturated aqueous Ca(OH)2 solution with standardized HCl to determine Ksp and Gibbs free energy delta G.",
+  "chemicals": [
+    {"name": "Calcium Hydroxide Saturated Supernatant (Ca(OH)2)", "formula": "Ca(OH)2"},
+    {"name": "Standardized Hydrochloric Acid (HCl)", "concentration_molar": 0.050},
+    {"name": "Methyl Orange Indicator Solution"}
+  ],
+  "apparatus": [
+    "Gravity Funnel with Whatman No. 1 Filter Paper",
+    "Burette 50mL (0.05mL subdivisions)",
+    "Erlenmeyer Flasks 125mL",
+    "Volumetric Pipette 20mL"
+  ],
+  "steps": [
+    "Filter saturated Ca(OH)2 solution through fine filter paper discarding initial 5 mL.",
+    "Pipette 20.0 mL of clear filtrate into an Erlenmeyer flask.",
+    "Add 2 drops of methyl orange indicator.",
+    "Titrate with standardized 0.050 M HCl until color changes from yellow to orange-red.",
+    "Calculate [OH-] from volume of HCl titrant consumed.",
+    "Compute [Ca2+] = 0.5 * [OH-] and calculate Ksp = [Ca2+][OH-]^2."
+  ],
+  "safety": "Calcium hydroxide is strongly basic and caustic to ocular tissues. Immediate flush required on accidental contact."
+}

@@ -1,0 +1,25 @@
+{
+  "id": "proto_spectro_003",
+  "title": "Verification of the Beer-Lambert Law via Optical Absorbance",
+  "category": "Physical Chemistry",
+  "difficulty": "Intermediate",
+  "description": "Measurement of optical density and determination of molar absorptivity (epsilon) for aqueous copper(II) sulfate at 635 nm.",
+  "chemicals": [
+    {"name": "Copper(II) Sulfate Pentahydrate (CuSO4·5H2O)", "formula": "CuSO4", "stock_concentration": 0.10},
+    {"name": "Deionized Dilution Water", "formula": "H2O"}
+  ],
+  "apparatus": [
+    "UV-Vis Spectrophotometer",
+    "Standard Optical Glass Cuvette (b = 1.00 cm)",
+    "Volumetric Flasks (50mL series)",
+    "Micropipette 100-1000uL"
+  ],
+  "steps": [
+    "Prepare five serial standard concentrations: 0.010, 0.025, 0.050, 0.075, 0.100 M CuSO4.",
+    "Zero the spectrophotometer using a deionized water blank cuvette at 635 nm.",
+    "Measure absorbance (A) and percentage transmittance (%T) for each standard solution.",
+    "Plot Absorbance versus Molar Concentration to construct the calibration curve.",
+    "Extract slope = ε · b to find molar extinction coefficient ε in L/(mol·cm)."
+  ],
+  "safety": "CuSO4 is an aquatic toxin and mild skin irritant. Collect all residues in designated heavy-metal waste vessel."
+}

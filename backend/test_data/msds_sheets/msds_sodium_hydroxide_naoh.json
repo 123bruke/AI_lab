@@ -1,0 +1,22 @@
+{
+  "id": "msds_naoh_002",
+  "chemical_name": "Sodium Hydroxide (Caustic Soda)",
+  "formula": "NaOH",
+  "cas_number": "1310-73-2",
+  "molecular_weight": 40.00,
+  "physical_state": "Solid (White Deliquescent Pellets)",
+  "properties": {
+    "density": 2.13,
+    "boiling_point": 1388.0,
+    "melting_point": 318.0,
+    "solubility_g_100ml": 109.0,
+    "ph": "14.0 (strongly alkaline)"
+  },
+  "hazards": "GHS05 Corrosive. Causes catastrophic irreversible chemical burns to cornea and dermis. Exothermic heat of solution can cause vigorous boiling.",
+  "handling": "Dissolve pellets slowly with continuous mechanical stirring. Do not touch pellets barehanded. Wear nitrile gloves and face shield.",
+  "first_aid": {
+    "eye_contact": "Emergency ocular irrigation for minimum 20 minutes. Continuous ophthalmology consult.",
+    "ingestion": "Do NOT induce vomiting. Rinse mouth with water and contact poison control immediately."
+  },
+  "storage": "Store in tightly sealed airtight HDPE container inside designated inorganic base cabinet. Keep away from strong acids and aluminum."
+}

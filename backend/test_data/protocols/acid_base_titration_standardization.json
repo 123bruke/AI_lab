@@ -1,0 +1,28 @@
+{
+  "id": "proto_titration_002",
+  "title": "Quantitative Acid-Base Neutralization Titration",
+  "category": "Analytical Chemistry",
+  "difficulty": "Undergraduate Level 1",
+  "description": "Standardization of hydrochloric acid against sodium hydroxide with phenolphthalein indicator and pH probe tracking.",
+  "chemicals": [
+    {"name": "Hydrochloric Acid (HCl)", "concentration_molar": 0.10, "volume_ml": 25.0},
+    {"name": "Sodium Hydroxide (NaOH)", "concentration_molar": 0.10, "volume_ml": 50.0},
+    {"name": "Phenolphthalein Indicator Solution", "volume_ml": 1.0}
+  ],
+  "apparatus": [
+    "Precision Class-A Burette 50mL",
+    "Erlenmeyer Flask 250mL",
+    "Magnetic Stirrer Plate with PTFE Stir Bar",
+    "pH Electrode Sensor",
+    "Volumetric Pipette 25mL"
+  ],
+  "steps": [
+    "Pipette 25.0 mL of 0.10 M HCl into the Erlenmeyer flask.",
+    "Add 3 drops of phenolphthalein indicator solution.",
+    "Position flask on magnetic stirrer and insert calibrated pH electrode.",
+    "Slowly dispense 0.10 M NaOH from burette while continuously monitoring pH.",
+    "Record the volume at the persistent pale pink equivalence endpoint (pH 7.0 - 8.2).",
+    "Compute analyte molarity using n_acid = n_base."
+  ],
+  "safety": "Corrosive reagents. Wear nitrile protective gloves and chemical splash goggles."
+}

@@ -1,0 +1,22 @@
+{
+  "id": "msds_hcl_001",
+  "chemical_name": "Hydrochloric Acid (37% w/w)",
+  "formula": "HCl",
+  "cas_number": "7647-01-0",
+  "molecular_weight": 36.46,
+  "physical_state": "Liquid (Fuming)",
+  "properties": {
+    "density": 1.189,
+    "boiling_point": 108.6,
+    "melting_point": -30.0,
+    "vapor_pressure_kpa": 16.0,
+    "ph": "< 1.0 (strongly acidic)"
+  },
+  "hazards": "GHS05 Corrosive (Causes severe skin burns and eye damage). GHS07 Irritant (May cause respiratory irritation). May be corrosive to metals.",
+  "handling": "Handle only inside certified chemical fume hood. Never pour water into acid (exothermic spattering hazard). Always add acid to water (AA).",
+  "first_aid": {
+    "eye_contact": "Flush immediately with copious water for 15 minutes holding eyelids open. Seek emergency medical attention.",
+    "skin_contact": "Remove contaminated clothing instantly and wash affected area with deluge shower."
+  },
+  "storage": "Store in acid-resistant corrosion cabinet away from bases, hypochlorites, and active metals."
+}
