@@ -52,14 +52,14 @@ export default function Features1() {
             <Card>
               <div className="flex w-full items-center justify-between">
                 <span className="text-xs font-medium tracking-[0.16em] text-foreground">{number} / 03</span>
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600">
-                  <Icon size={20} />
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-100 text-neutral-800 dark:bg-neutral-800 dark:text-neutral-200">
+                  <Icon size={18} strokeWidth={1.75} />
                 </span>
               </div>
 
-              <div className="space-y-2">
-                <span className="text-xs font-semibold tracking-wider text-emerald-600 uppercase">{label}</span>
-                <h3 className="text-lg font-semibold text-black">{title}</h3>
+              <div className="space-y-2 mt-2">
+                <span className="text-[11px] font-medium tracking-wider text-neutral-500 uppercase">{label}</span>
+                <h3 className="text-base font-semibold text-black dark:text-white">{title}</h3>
                 <p className="text-xs leading-relaxed text-foreground">{content}</p>
               </div>
             </Card>
