@@ -38,10 +38,21 @@ export class ErrorBoundary extends Component<Props, State> {
       if (typeof window !== 'undefined') {
         localStorage.clear();
         sessionStorage.clear();
+        window.history.replaceState({}, '', '/');
       }
     } catch { }
     this.setState({ hasError: false, error: null });
-    window.location.reload();
+    window.location.href = '/';
+  };
+
+  private handleReload = () => {
+    try {
+      if (typeof window !== 'undefined') {
+        window.history.replaceState({}, '', '/');
+      }
+    } catch { }
+    this.setState({ hasError: false, error: null });
+    window.location.href = '/';
   };
 
   public render() {
@@ -56,20 +67,17 @@ export class ErrorBoundary extends Component<Props, State> {
               Laboratory Recovery Console
             </h2>
             <p className="text-xs text-neutral-400 leading-relaxed">
-              A temporary initialization condition was caught. Click below to refresh your virtual session.
+              A temporary initialization condition was caught. Click below to return to the landing page and refresh your session.
             </p>
             <div className="w-full text-[11px] p-3 rounded-xl bg-black text-rose-300 font-mono text-left overflow-auto max-h-28 border border-white/10">
               {this.state.error?.message || 'Initialization anomaly detected.'}
             </div>
             <div className="flex items-center gap-3 w-full">
               <button
-                onClick={() => {
-                  this.setState({ hasError: false, error: null });
-                  window.location.reload();
-                }}
+                onClick={this.handleReload}
                 className="flex-1 py-2.5 px-4 rounded-xl bg-white text-black font-bold text-xs uppercase tracking-wider hover:bg-neutral-200 transition-all cursor-pointer shadow-lg shadow-white/10"
               >
-                Reload Lab
+                Go to Landing Page
               </button>
               <button
                 onClick={this.handleClearCacheAndRestart}
