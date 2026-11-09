@@ -70,15 +70,19 @@ class ApiService {
   private setSession(token: string, user: User) {
     this.token = token;
     this.currentUser = user;
-    localStorage.setItem('moseb_token', token);
-    localStorage.setItem('moseb_user', JSON.stringify(user));
+    try {
+      localStorage.setItem('moseb_token', token);
+      localStorage.setItem('moseb_user', JSON.stringify(user));
+    } catch {}
   }
 
   logout() {
     this.token = null;
     this.currentUser = null;
-    localStorage.removeItem('moseb_token');
-    localStorage.removeItem('moseb_user');
+    try {
+      localStorage.removeItem('moseb_token');
+      localStorage.removeItem('moseb_user');
+    } catch {}
   }
 
   async register(data: { username: string; email: string; password: string; full_name?: string; role?: string }): Promise<AuthResponse> {
