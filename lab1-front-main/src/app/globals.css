@@ -191,6 +191,31 @@ body {
   animation: code-caret 850ms steps(2, start) infinite;
 }
 
+@keyframes water-drop-bounce {
+  0% {
+    transform: scale(1, 1) translateY(0);
+  }
+  20% {
+    transform: scale(1.12, 0.88) translateY(4px);
+  }
+  45% {
+    transform: scale(0.92, 1.09) translateY(-6px);
+  }
+  70% {
+    transform: scale(1.04, 0.96) translateY(2px);
+  }
+  85% {
+    transform: scale(0.98, 1.02) translateY(-1px);
+  }
+  100% {
+    transform: scale(1, 1) translateY(0);
+  }
+}
+
+.animate-water-bounce {
+  animation: water-drop-bounce 0.65s cubic-bezier(0.28, 0.84, 0.42, 1) forwards;
+}
+
 @keyframes hero-gradient-drift {
   from {
     transform: translate3d(-3%, -2%, 0) scale(0.96);

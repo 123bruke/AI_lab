@@ -83,7 +83,7 @@ I am your **Agentic AI Lab Assistant**. I can directly control the 3D apparatus,
 
 **How can I assist you today?**
 - Ask me to prepare the lab space: *"Prepare copper sulfate solution and heat to 80°C"*
-- Attach an experimental protocol or laboratory manual (`📎` icon)
+- Attach an experimental protocol or laboratory manual (clip icon)
 - Ask chemistry, thermodynamics, or reaction mechanism questions`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },

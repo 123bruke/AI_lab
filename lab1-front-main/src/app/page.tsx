@@ -17,8 +17,9 @@ export default function HomePage() {
       {/* 4D Volumetric Bubble Hyperspace Background */}
       <FourDBubbleBackground />
 
-      {/* Frosted Glass Blur Separation Layer (Separates background and page with smooth 4D blur) */}
-      <div className="fixed inset-0 pointer-events-none z-[1] backdrop-blur-[60px] md:backdrop-blur-[80px] bg-white/65 dark:bg-black/75 transition-colors duration-500" />
+      {/* Frosted Glass Separation Layer (Decreased blur for front sections on the first page, smooth & crisp) */}
+      <div className="fixed inset-0 pointer-events-none z-[1] backdrop-blur-[4px] md:backdrop-blur-[8px] bg-white/10 dark:bg-black/20 transition-all duration-500" />
+      <div className="fixed inset-0 pointer-events-none z-[1] backdrop-blur-[8px] md:backdrop-blur-[14px] bg-white/15 dark:bg-black/25 transition-all duration-500 [mask-image:linear-gradient(to_bottom,transparent_0%,transparent_18%,black_45%,black_100%)]" />
 
       {/* Foreground Content */}
       <div className="relative z-10 px-4 xl:px-0 max-w-5xl mx-auto space-y-20 sm:space-y-24 md:space-y-32 lg:space-y-40 scroll-smooth pt-2">

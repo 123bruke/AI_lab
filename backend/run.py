@@ -1,7 +1,8 @@
 """
 MOSEB STUDENT LAB - FastAPI Server Runner
-Execute with: python run.py
-git add -A ; git commit -m "Update code with latest improvements" ; git push origin main
+Execute with: python run.pygit add -A ;
+ git commit -m "Update code with latest improvements" ; git push origin main
+
 """
 import uvicorn
 import os

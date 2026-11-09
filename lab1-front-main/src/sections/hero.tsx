@@ -2,13 +2,13 @@
 
 import Navbar from "@/components/navbar"
 import SlideEffect from "@/components/slide-effect"
-import TextBlurEffect from "@/components/text-blur-effect"
+import WaterDrop4DText from "@/components/water-drop-4d-text"
 import UltraCinemaAtom4D from "@/components/ultra-cinema-atom-4d"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 
 const settings = {
-  headline: 'AFRO Lab',
+  headline: 'AFROLAB',
   mainCTA: {
     content: 'Launch Virtual Lab',
     href: '/'
@@ -30,9 +30,9 @@ export default function Hero() {
 
       {/* Center Content floating over the 4D Ultra Cinema Atom */}
       <section className="hero-content relative z-10 flex flex-col gap-7 md:gap-9 items-center text-center my-auto py-8 sm:py-12">
-        {/* Cinema Sub-badge */}
+        {/* Cinema Sub-badge - Crisp, decreased blur */}
         <SlideEffect>
-          <div className="inline-flex items-center gap-2 rounded-full border border-neutral-200/80 bg-white/70 px-4 py-1.5 text-xs font-medium text-neutral-800 shadow-sm backdrop-blur-md dark:border-neutral-800 dark:bg-black/60 dark:text-neutral-200">
+          <div className="inline-flex items-center gap-2 rounded-full border border-neutral-200/80 bg-white/70 px-4 py-1.5 text-xs font-medium text-neutral-800 shadow-sm backdrop-blur-sm dark:border-neutral-800 dark:bg-black/60 dark:text-neutral-200">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -41,9 +41,9 @@ export default function Hero() {
           </div>
         </SlideEffect>
 
-        {/* Headline */}
-        <h1 className="text-neutral-900 dark:text-white text-6xl md:text-8xl lg:text-9xl xl:text-[9.5rem] font-medium tracking-[-0.06em] leading-none xl:max-w-none drop-shadow-sm select-none">
-          <TextBlurEffect className="text-neutral-900 dark:text-white">{settings.headline}</TextBlurEffect>
+        {/* 4D Water Drop Fluid Headline */}
+        <h1 className="text-6xl md:text-8xl lg:text-9xl xl:text-[9.5rem] font-black tracking-[-0.04em] leading-none xl:max-w-none select-none">
+          <WaterDrop4DText text={settings.headline} />
         </h1>
 
         {/* Clean Call To Action Buttons */}
@@ -62,11 +62,11 @@ export default function Hero() {
             </Link>
 
             <Link href={settings.secondaryCTA.href} className="w-full">
-              <Button size='lg' className="capitalize w-full hidden lg:flex rounded-full px-8 backdrop-blur-md bg-white/80 dark:bg-neutral-900/80 border border-neutral-200 dark:border-neutral-800" variant='secondary'>
+              <Button size='lg' className="capitalize w-full hidden lg:flex rounded-full px-8 backdrop-blur-sm bg-white/80 dark:bg-neutral-900/80 border border-neutral-200 dark:border-neutral-800" variant='secondary'>
                 {settings.secondaryCTA.content}
               </Button>
 
-              <Button size='default' className="capitalize w-full flex lg:hidden rounded-full px-6 backdrop-blur-md bg-white/80 dark:bg-neutral-900/80 border border-neutral-200 dark:border-neutral-800" variant='secondary'>
+              <Button size='default' className="capitalize w-full flex lg:hidden rounded-full px-6 backdrop-blur-sm bg-white/80 dark:bg-neutral-900/80 border border-neutral-200 dark:border-neutral-800" variant='secondary'>
                 {settings.secondaryCTA.content}
               </Button>
             </Link>

@@ -145,7 +145,8 @@ export const UnifiedLabSidebar: React.FC<UnifiedLabSidebarProps> = ({
     setAgentPrompt('');
 
     try {
-      const res = await api.askAgent(q, {
+      const res = await api.consultAgent({
+        prompt: q,
         current_temp: experiment.temperature,
         current_volume: experiment.liquidVolume,
         current_state: experiment.waterState,
