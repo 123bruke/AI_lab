@@ -1,18 +1,17 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, Suspense } from 'react';
 import * as THREE from 'three';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Float, Environment } from '@react-three/drei';
+import { Float } from '@react-three/drei';
 
 interface BallProps {
   position: [number, number, number];
   color: string;
   size: number;
   speed: number;
-  distort?: number;
   roughness?: number;
   metalness?: number;
-  transmission?: number;
-  ior?: number;
+  clearcoat?: number;
+  opacity?: number;
 }
 
 const QuantumOrb: React.FC<BallProps> = ({
@@ -22,8 +21,8 @@ const QuantumOrb: React.FC<BallProps> = ({
   speed,
   roughness = 0.1,
   metalness = 0.2,
-  transmission = 0.85,
-  ior = 1.45,
+  clearcoat = 1.0,
+  opacity = 0.9,
 }) => {
   const meshRef = useRef<THREE.Mesh>(null);
   const initialPos = useMemo(() => new THREE.Vector3(...position), [position]);
@@ -46,12 +45,11 @@ const QuantumOrb: React.FC<BallProps> = ({
           color={color}
           roughness={roughness}
           metalness={metalness}
-          transmission={transmission}
-          ior={ior}
-          thickness={0.8}
-          clearcoat={1.0}
-          clearcoatRoughness={0.05}
+          clearcoat={clearcoat}
+          clearcoatRoughness={0.08}
           reflectivity={0.9}
+          transparent={opacity < 1}
+          opacity={opacity}
         />
       </mesh>
     </Float>
@@ -61,84 +59,87 @@ const QuantumOrb: React.FC<BallProps> = ({
 export const Floating4DBackground: React.FC<{ isDarkMode?: boolean }> = ({ isDarkMode = true }) => {
   return (
     <div className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden z-0">
-      <Canvas
-        camera={{ position: [0, 0, 8], fov: 45 }}
-        gl={{ antialias: true, alpha: true }}
-      >
-        <ambientLight intensity={isDarkMode ? 0.7 : 1.2} />
-        <directionalLight position={[10, 10, 5]} intensity={isDarkMode ? 1.8 : 2.5} color="#ffffff" />
-        <directionalLight position={[-10, -5, -5]} intensity={0.9} color="#38bdf8" />
-        <pointLight position={[0, 0, 2]} intensity={isDarkMode ? 1.5 : 2.0} color="#818cf8" />
+      <Suspense fallback={null}>
+        <Canvas
+          camera={{ position: [0, 0, 8], fov: 45 }}
+          gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
+        >
+          {/* Cinema 4D Studio Lighting Rig (Self-contained, zero external network downloads) */}
+          <ambientLight intensity={isDarkMode ? 0.9 : 1.4} />
+          <directionalLight position={[10, 10, 5]} intensity={isDarkMode ? 2.5 : 3.0} color="#ffffff" />
+          <directionalLight position={[-10, -5, -5]} intensity={1.2} color="#38bdf8" />
+          <pointLight position={[0, 0, 4]} intensity={isDarkMode ? 2.0 : 2.5} color="#818cf8" />
+          <pointLight position={[-4, 3, 2]} intensity={1.5} color="#38bdf8" />
+          <pointLight position={[4, -3, 2]} intensity={1.5} color="#c084fc" />
 
-        {/* 4D Chromatic & Refractive Floating Spheres */}
-        <QuantumOrb
-          position={[-3.2, 1.8, -1]}
-          size={1.6}
-          color={isDarkMode ? "#38bdf8" : "#0284c7"}
-          speed={0.4}
-          transmission={0.88}
-          metalness={0.1}
-          roughness={0.08}
-        />
-        <QuantumOrb
-          position={[3.4, -1.2, -0.5]}
-          size={1.9}
-          color={isDarkMode ? "#c084fc" : "#9333ea"}
-          speed={0.35}
-          transmission={0.82}
-          metalness={0.15}
-          roughness={0.12}
-        />
-        <QuantumOrb
-          position={[2.0, 2.2, -2]}
-          size={1.2}
-          color={isDarkMode ? "#34d399" : "#059669"}
-          speed={0.45}
-          transmission={0.9}
-          metalness={0.05}
-          roughness={0.06}
-        />
-        <QuantumOrb
-          position={[-2.4, -2.2, -1.5]}
-          size={1.4}
-          color={isDarkMode ? "#f43f5e" : "#e11d48"}
-          speed={0.5}
-          transmission={0.85}
-          metalness={0.2}
-          roughness={0.1}
-        />
-        <QuantumOrb
-          position={[0, 0, -3]}
-          size={2.5}
-          color={isDarkMode ? "#3b82f6" : "#2563eb"}
-          speed={0.2}
-          transmission={0.92}
-          metalness={0.08}
-          roughness={0.04}
-        />
+          {/* 4D Chromatic & Refractive Floating Spheres */}
+          <QuantumOrb
+            position={[-3.2, 1.8, -1]}
+            size={1.6}
+            color={isDarkMode ? "#38bdf8" : "#0284c7"}
+            speed={0.4}
+            metalness={0.15}
+            roughness={0.1}
+            opacity={0.85}
+          />
+          <QuantumOrb
+            position={[3.4, -1.2, -0.5]}
+            size={1.9}
+            color={isDarkMode ? "#c084fc" : "#9333ea"}
+            speed={0.35}
+            metalness={0.2}
+            roughness={0.12}
+            opacity={0.88}
+          />
+          <QuantumOrb
+            position={[2.0, 2.2, -2]}
+            size={1.2}
+            color={isDarkMode ? "#34d399" : "#059669"}
+            speed={0.45}
+            metalness={0.1}
+            roughness={0.08}
+            opacity={0.9}
+          />
+          <QuantumOrb
+            position={[-2.4, -2.2, -1.5]}
+            size={1.4}
+            color={isDarkMode ? "#f43f5e" : "#e11d48"}
+            speed={0.5}
+            metalness={0.25}
+            roughness={0.12}
+            opacity={0.85}
+          />
+          <QuantumOrb
+            position={[0, 0, -3]}
+            size={2.5}
+            color={isDarkMode ? "#3b82f6" : "#2563eb"}
+            speed={0.2}
+            metalness={0.12}
+            roughness={0.06}
+            opacity={0.8}
+          />
 
-        {/* Chrome metallic 4D accent spheres */}
-        <QuantumOrb
-          position={[-4.0, -0.5, 0.5]}
-          size={0.65}
-          color="#e2e8f0"
-          speed={0.6}
-          transmission={0.0}
-          metalness={0.95}
-          roughness={0.05}
-        />
-        <QuantumOrb
-          position={[4.2, 1.5, 0]}
-          size={0.75}
-          color="#cbd5e1"
-          speed={0.55}
-          transmission={0.0}
-          metalness={0.98}
-          roughness={0.04}
-        />
-
-        <Environment preset="studio" />
-      </Canvas>
+          {/* Chrome metallic 4D accent spheres */}
+          <QuantumOrb
+            position={[-4.0, -0.5, 0.5]}
+            size={0.65}
+            color="#e2e8f0"
+            speed={0.6}
+            metalness={0.95}
+            roughness={0.05}
+            opacity={1.0}
+          />
+          <QuantumOrb
+            position={[4.2, 1.5, 0]}
+            size={0.75}
+            color="#cbd5e1"
+            speed={0.55}
+            metalness={0.98}
+            roughness={0.04}
+            opacity={1.0}
+          />
+        </Canvas>
+      </Suspense>
 
       {/* Frosted Depth-of-Field Blur Separator Layer */}
       <div
@@ -151,4 +152,3 @@ export const Floating4DBackground: React.FC<{ isDarkMode?: boolean }> = ({ isDar
     </div>
   );
 };
-

@@ -1,7 +1,7 @@
-import React, { useRef } from 'react';
+import React, { useRef, Suspense } from 'react';
 import * as THREE from 'three';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Environment, ContactShadows } from '@react-three/drei';
+import { ContactShadows } from '@react-three/drei';
 import { Laboratory } from '../environment/Laboratory';
 import { InteractiveBench } from './InteractiveBench';
 import { CameraManager } from './CameraManager';
@@ -78,76 +78,89 @@ export const LabScene: React.FC<LabSceneProps> = ({
 
   return (
     <div id="canvas-container" className="w-full h-full relative cursor-grab active:cursor-grabbing">
-      <Canvas
-        shadows="soft"
-        dpr={[1, 2]}
-        camera={{
-          position: [0.35, 1.48, 1.35],
-          fov: 44,
-          near: 0.1,
-          far: 35,
-        }}
-        gl={{
-          antialias: true,
-          alpha: false,
-          powerPreference: 'high-performance',
-          stencil: false,
-          toneMapping: THREE.ACESFilmicToneMapping,
-          toneMappingExposure: 1.2,
-        }}
-      >
-        {/* Soft atmospheric lab depth fog */}
-        <color attach="background" args={['#090d16']} />
-        <fog attach="fog" args={['#090d16', 5, 20]} />
-
-        {/* Cinema 4D Studio PBR Environment Map for realistic physical reflections */}
-        <Environment preset="studio" environmentIntensity={0.65} />
-
-        {/* 1. Cinematic Camera Management */}
-        <CameraManager
-          viewPreset={cameraPreset}
-          isDraggingItem={isDraggingItem}
-        />
-
-        {/* 2. Physics & Thermodynamics Loop */}
-        <SimulationLoop
-          experiment={experiment}
-          setExperiment={setExperiment}
-          burnerPos={burnerPos}
-          beakerPos={beakerPos}
-        />
-
-        {/* 3. 3D Architectural Laboratory Room & Lighting */}
-        <Laboratory lighting={lighting} />
-
-        {/* 4. Realistic Ambient Occlusion Soft Contact Shadows directly on the benchtop */}
-        <ContactShadows
-          position={[0, 0.882, 0]}
-          opacity={0.65}
-          scale={4.2}
-          blur={1.6}
-          far={1.4}
-          resolution={1024}
-          color="#05070a"
-        />
-
-        {/* 5. Interactive Workbench & Equipment Apparatus */}
-        <InteractiveBench
-          experiment={experiment}
-          selectedId={selectedId}
-          onSelectItem={onSelectItem}
-          onBurnerPosChange={(pos) => {
-            burnerPos.current = pos;
+      <Suspense fallback={null}>
+        <Canvas
+          shadows="soft"
+          dpr={[1, 2]}
+          camera={{
+            position: [0.35, 1.48, 1.35],
+            fov: 44,
+            near: 0.1,
+            far: 35,
           }}
-          onBeakerPosChange={(pos) => {
-            beakerPos.current = pos;
+          gl={{
+            antialias: true,
+            alpha: false,
+            powerPreference: 'high-performance',
+            stencil: false,
+            toneMapping: THREE.ACESFilmicToneMapping,
+            toneMappingExposure: 1.2,
           }}
-          onAddIce={onAddIce}
-          onAddChemical={onAddChemical}
-          isDraggingItem={isDraggingItem}
-          setIsDraggingItem={setIsDraggingItem}
-        />
-      </Canvas>
+        >
+          {/* Soft atmospheric lab depth fog */}
+          <color attach="background" args={['#090d16']} />
+          <fog attach="fog" args={['#090d16', 5, 20]} />
+
+          {/* Self-contained Cinema 4D Studio Lighting (No external HDR download) */}
+          <ambientLight intensity={0.8} color="#e0f2fe" />
+          <directionalLight
+            position={[5, 8, 4]}
+            intensity={2.2}
+            color="#ffffff"
+            castShadow
+            shadow-mapSize={[2048, 2048]}
+            shadow-bias={-0.0001}
+          />
+          <directionalLight position={[-4, 6, -3]} intensity={1.2} color="#93c5fd" />
+          <pointLight position={[0, 2.5, 0]} intensity={1.8} color="#ffffff" distance={6} />
+          <pointLight position={[-2, 1.5, 1]} intensity={0.9} color="#38bdf8" distance={4} />
+
+          {/* 1. Cinematic Camera Management */}
+          <CameraManager
+            viewPreset={cameraPreset}
+            isDraggingItem={isDraggingItem}
+          />
+
+          {/* 2. Physics & Thermodynamics Loop */}
+          <SimulationLoop
+            experiment={experiment}
+            setExperiment={setExperiment}
+            burnerPos={burnerPos}
+            beakerPos={beakerPos}
+          />
+
+          {/* 3. 3D Architectural Laboratory Room & Lighting */}
+          <Laboratory lighting={lighting} />
+
+          {/* 4. Realistic Ambient Occlusion Soft Contact Shadows directly on the benchtop */}
+          <ContactShadows
+            position={[0, 0.882, 0]}
+            opacity={0.65}
+            scale={4.2}
+            blur={1.6}
+            far={1.4}
+            resolution={1024}
+            color="#05070a"
+          />
+
+          {/* 5. Interactive Workbench & Equipment Apparatus */}
+          <InteractiveBench
+            experiment={experiment}
+            selectedId={selectedId}
+            onSelectItem={onSelectItem}
+            onBurnerPosChange={(pos) => {
+              burnerPos.current = pos;
+            }}
+            onBeakerPosChange={(pos) => {
+              beakerPos.current = pos;
+            }}
+            onAddIce={onAddIce}
+            onAddChemical={onAddChemical}
+            isDraggingItem={isDraggingItem}
+            setIsDraggingItem={setIsDraggingItem}
+          />
+        </Canvas>
+      </Suspense>
     </div>
   );
 };

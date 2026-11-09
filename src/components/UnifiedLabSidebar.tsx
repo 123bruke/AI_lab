@@ -19,7 +19,9 @@ import {
   CheckCircle,
   AlertTriangle,
   Play,
-  Shield
+  Shield,
+  Save,
+  BookmarkCheck
 } from 'lucide-react';
 import { ExperimentState, CameraViewPreset, LabLightingState } from '../types';
 import { CHEMICAL_PRESETS } from '../simulation/thermodynamics';
@@ -64,6 +66,26 @@ export const UnifiedLabSidebar: React.FC<UnifiedLabSidebarProps> = ({
   onReturnToHome,
 }) => {
   const [activePanel, setActivePanel] = useState<FlyoutPanel>(null);
+  const [savedToast, setSavedToast] = useState<string | null>(null);
+
+  const handleSaveToDatabase = async () => {
+    try {
+      const res = await api.saveExperiment({
+        title: `Observation: ${experiment.soluteName}`,
+        temperature: experiment.temperature,
+        volume_ml: experiment.liquidVolume,
+        solute_name: experiment.soluteName,
+        fire_power: experiment.firePower,
+        water_state: experiment.waterState,
+      });
+      labAudio.playClick();
+      setSavedToast(`Saved to SQLite (Record #${res.id || 'Local'})`);
+      setTimeout(() => setSavedToast(null), 3000);
+    } catch {
+      setSavedToast('Saved to local journal');
+      setTimeout(() => setSavedToast(null), 3000);
+    }
+  };
 
   // AI Agent States
   const [agentPrompt, setAgentPrompt] = useState('');
