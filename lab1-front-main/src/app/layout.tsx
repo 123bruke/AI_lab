@@ -10,8 +10,8 @@ const dmSans = DM_Sans({
 
 
 export const metadata: Metadata = {
-  title: "AFRO AI CONTEXT MANAGER",
-  description: "Build, deploy, and connect AI agents with AFROLAB."
+  title: "AFRO Lab • AI Context Manager & Virtual Laboratory",
+  description: "Build, deploy, and connect AI agents and 4D virtual laboratory simulations with AFRO Lab."
 };
 
 export default function RootLayout({

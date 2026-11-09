@@ -1,4 +1,4 @@
-# AFRO AI Context Manager
+# AFRO Lab Context Manager
 
 
 
@@ -9,7 +9,7 @@
 
 A simple landing page project built with Next.js and Tailwind CSS.
 
-This repository contains a modern SaaS-style homepage for AFRO AI, focused on presenting AI agent workflows, product features, pricing, testimonials, and a clear call-to-action flow.
+This repository contains a modern SaaS-style homepage for AFRO Lab, focused on presenting AI agent workflows, product features, pricing, testimonials, and a clear call-to-action flow.
 
 
 

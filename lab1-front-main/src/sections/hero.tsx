@@ -5,12 +5,13 @@ import SlideEffect from "@/components/slide-effect";
 import TextBlurEffect from "@/components/text-blur-effect";
 import AIWorkspace from "@/components/ai-workspace"
 import HeroBackgroundCarousel from "@/components/hero-background-carousel"
+import ThreeDBackgroundDesign from "@/components/three-d-background"
 import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
 import Link from "next/link";
 
 const settings = {
-  headline: 'AFRO AI',
+  headline: 'AFRO Lab',
   mainCTA: {
     content: 'Explore the workspace',
     href: '#features'
@@ -27,6 +28,7 @@ export default function Hero() {
       <Navbar />
 
       <section className="hero-content relative isolate flex flex-col gap-8 items-center text-center lg:gap-11">
+        <ThreeDBackgroundDesign />
         <HeroBackgroundCarousel />
         {/* Headline */}
         <h1 className="text-black text-6xl md:text-8xl lg:text-9xl xl:text-[10rem] font-medium tracking-[-0.06em] leading-none xl:max-w-none">

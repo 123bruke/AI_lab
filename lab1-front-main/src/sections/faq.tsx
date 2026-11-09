@@ -12,8 +12,8 @@ const settings = {
   title: 'Frequently asked questions',
   faqs: [
     {
-      question: 'What is AFRO AI Context Manager?',
-      answer: 'AFRO AI Context Manager is an AI workspace for bringing project context, coding agents, and connected tools together.',
+      question: 'What is AFRO Lab Context Manager?',
+      answer: 'AFRO Lab Context Manager is an AI workspace for bringing project context, coding agents, and connected virtual lab tools together.',
     },
     {
       question: 'Can I use different AI models?',
