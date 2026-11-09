@@ -1,8 +1,9 @@
 # Dependencies
 node_modules/
+lab1-front-main/node_modules/
+lab1-front-main/.next/
 .pnp
 .pnp.js
-lab1-front-main/
 temp_zip_extract/
 
 # Production / Build output

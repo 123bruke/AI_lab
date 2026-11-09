@@ -1,0 +1,210 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme {
+  --color-background: #ffffff;
+  --color-foreground: #707070;
+  --color-primary: #6ECE9D;
+  --color-secondary: #F8F5ED;
+  --color-accent: #FFDA6E;
+  --color-muted: #F0F0F0;
+  --color-border: rgba(0, 0, 0, 0.1);
+
+  --text-base: 18px;
+  --text-link: 16px;
+  --text-header: 64px;
+  --text-title: 28px;
+  --text-hero: 96px;
+}
+
+:root {
+  color-scheme: light;
+  color: var(--color-foreground);
+  background: var(--color-background);
+  font-size: var(--text-base);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.hero-content {
+  isolation: isolate;
+}
+
+.hero-image-carousel {
+  position: absolute;
+  z-index: -1;
+  inset: -2rem -18vw 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.hero-image-carousel::before {
+  position: absolute;
+  inset: -20%;
+  z-index: 2;
+  content: "";
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 24% 34%, rgb(110 206 157 / 24%), transparent 42%),
+    radial-gradient(ellipse at 78% 68%, rgb(255 218 110 / 18%), transparent 40%);
+  background-size: 140% 140%;
+  animation: hero-gradient-drift 14s ease-in-out infinite alternate;
+  mix-blend-mode: screen;
+}
+
+.hero-image-carousel::after {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  content: "";
+  background: linear-gradient(
+    to bottom,
+    rgb(0 0 0 / 10%) 0%,
+    rgb(0 0 0 / 2%) 36%,
+    rgb(0 0 0 / 14%) 100%
+  );
+}
+
+.hero-image-carousel img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  padding-top: 0;
+  padding-bottom: 0;
+  opacity: 0;
+  filter: grayscale(1);
+  transform: scale(1.22);
+  transition:
+    opacity 1200ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1600ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 1200ms ease;
+}
+
+.hero-image-carousel img.is-active {
+  opacity: 0.3;
+  filter: grayscale(0.35);
+  transform: scale(1.08);
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  transition: background-color 240ms ease, color 240ms ease;
+}
+
+.theme-dark {
+  color-scheme: dark;
+  --color-background: #0b1110;
+  --color-foreground: #b5c2bd;
+  --color-secondary: #141e1b;
+  --color-muted: #1d2925;
+  --color-border: rgba(225, 245, 236, 0.14);
+}
+
+.theme-dark .hero-image-carousel img.is-active {
+  opacity: 0.24;
+}
+
+.glass-hover {
+  transition:
+    background-color 240ms ease,
+    border-color 240ms ease,
+    box-shadow 240ms ease,
+    backdrop-filter 240ms ease,
+    transform 240ms ease;
+}
+
+.glass-hover:hover {
+  background-color: rgb(255 255 255 / 46%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 12px 32px rgb(11 17 16 / 10%);
+}
+
+.theme-dark .glass-hover:hover {
+  background-color: rgb(255 255 255 / 10%);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 24%);
+}
+
+.theme-dark nav button[aria-label] svg {
+  color: #fff !important;
+}
+
+@media (max-width: 640px) {
+  .hero-image-carousel {
+    inset: -1rem -22vw 1rem;
+  }
+
+  .hero-image-carousel img {
+    transform: scale(1.2);
+  }
+
+  .hero-image-carousel img.is-active {
+    opacity: 0.24;
+    transform: scale(1.08);
+  }
+}
+
+.theme-dark .text-black {
+  color: #f4faf7 !important;
+}
+
+.theme-dark .text-gray-500 {
+  color: #a3b2ac !important;
+}
+
+.theme-dark .bg-white {
+  background-color: #141e1b !important;
+}
+
+.theme-dark .to-white {
+  --tw-gradient-to: var(--color-background) var(--tw-gradient-to-position) !important;
+}
+
+.theme-dark .text-transparent.bg-clip-text {
+  background-image: linear-gradient(to bottom, #f4faf7, rgb(244 250 247 / 65%)) !important;
+}
+
+.theme-dark nav .bg-white {
+  background-color: transparent !important;
+}
+
+::selection {
+  color: #0b1110;
+  background: #6ece9d;
+}
+
+@keyframes code-caret {
+  50% { opacity: 0; }
+}
+
+.code-caret {
+  animation: code-caret 850ms steps(2, start) infinite;
+}
+
+@keyframes hero-gradient-drift {
+  from {
+    transform: translate3d(-3%, -2%, 0) scale(0.96);
+  }
+  to {
+    transform: translate3d(3%, 2%, 0) scale(1.06);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
