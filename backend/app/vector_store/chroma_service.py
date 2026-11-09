@@ -1,23 +1,93 @@
 """
 ChromaDB Persistent Vector Store Service for MOSEB Student Lab.
 Manages collections for protocols, chemical MSDS datasheets, and experimental reports.
+Includes robust embedded persistent fallback if chromadb-client thin client mode is active.
 """
 
 import os
 import json
 import pathlib
 from typing import List, Dict, Any, Optional
-import chromadb
-from chromadb.config import Settings
+import math
 
-from backend.app.vector_store.embeddings import LocalScientificEmbedder
+from backend.app.vector_store.embeddings import LocalScientificEmbedder, cosine_similarity
 from backend.app.logging_system.logger import app_logger
+
+
+class EmbeddedVectorCollection:
+    """
+    High-performance JSON-persisted vector collection matching ChromaDB interface.
+    Used for local offline persistence and thin-client compatibility.
+    """
+    def __init__(self, name: str, storage_dir: str, embedder: LocalScientificEmbedder):
+        self.name = name
+        self.storage_dir = pathlib.Path(storage_dir) / "collections"
+        self.storage_dir.mkdir(parents=True, exist_ok=True)
+        self.file_path = self.storage_dir / f"{name}.json"
+        self.embedder = embedder
+        self.data: Dict[str, Dict[str, Any]] = {}
+        self._load()
+
+    def _load(self):
+        if self.file_path.exists():
+            try:
+                with open(self.file_path, "r", encoding="utf-8") as f:
+                    self.data = json.load(f)
+            except Exception as e:
+                app_logger.warning(f"Could not load vector collection {self.name}: {e}")
+                self.data = {}
+
+    def _save(self):
+        try:
+            with open(self.file_path, "w", encoding="utf-8") as f:
+                json.dump(self.data, f, indent=2)
+        except Exception as e:
+            app_logger.error(f"Could not persist vector collection {self.name}: {e}")
+
+    def count(self) -> int:
+        return len(self.data)
+
+    def upsert(self, ids: List[str], documents: List[str], metadatas: List[Dict[str, Any]]):
+        embeddings = self.embedder.embed_documents(documents)
+        for doc_id, doc, meta, emb in zip(ids, documents, metadatas, embeddings):
+            self.data[doc_id] = {
+                "id": doc_id,
+                "document": doc,
+                "metadata": meta,
+                "embedding": emb
+            }
+        self._save()
+
+    def query(self, query_texts: List[str], n_results: int = 5) -> Dict[str, Any]:
+        if not query_texts or not self.data:
+            return {"ids": [[]], "documents": [[]], "metadatas": [[]], "distances": [[]]}
+
+        query_vec = self.embedder.embed_text(query_texts[0])
+        scored = []
+        for doc_id, entry in self.data.items():
+            sim = cosine_similarity(query_vec, entry["embedding"])
+            dist = max(0.0, 1.0 - sim)
+            scored.append({
+                "id": doc_id,
+                "document": entry["document"],
+                "metadata": entry["metadata"],
+                "distance": dist
+            })
+
+        scored.sort(key=lambda x: x["distance"])
+        top = scored[:n_results]
+
+        return {
+            "ids": [[x["id"] for x in top]],
+            "documents": [[x["document"] for x in top]],
+            "metadatas": [[x["metadata"] for x in top]],
+            "distances": [[x["distance"] for x in top]]
+        }
 
 
 class ChromaService:
     def __init__(self, db_dir: Optional[str] = None):
         if db_dir is None:
-            # Default to backend/chroma_db
             base_dir = pathlib.Path(__file__).resolve().parent.parent.parent
             self.db_dir = str(base_dir / "chroma_db")
         else:
@@ -25,16 +95,23 @@ class ChromaService:
 
         os.makedirs(self.db_dir, exist_ok=True)
         self.embedder = LocalScientificEmbedder()
+        self.is_chroma_native = False
+        self.collections: Dict[str, Any] = {}
 
+        # Attempt to initialize ChromaDB PersistentClient
         try:
+            import chromadb
+            from chromadb.config import Settings
             self.client = chromadb.PersistentClient(
                 path=self.db_dir,
                 settings=Settings(anonymized_telemetry=False, allow_reset=True)
             )
-            app_logger.info(f"ChromaDB initialized at {self.db_dir}")
+            self.is_chroma_native = True
+            app_logger.info(f"ChromaDB Native PersistentClient initialized at {self.db_dir}")
         except Exception as e:
-            app_logger.error(f"Failed to initialize ChromaDB PersistentClient: {e}")
-            raise
+            app_logger.warning(f"ChromaDB native PersistentClient not available ({e}). Using persistent embedded vector store.")
+            self.client = None
+            self.is_chroma_native = False
 
         # Initialize collections
         self.protocols_collection = self._get_or_create_collection("protocols")
@@ -42,16 +119,24 @@ class ChromaService:
         self.reports_collection = self._get_or_create_collection("reports")
 
     def _get_or_create_collection(self, name: str):
-        return self.client.get_or_create_collection(
-            name=name,
-            embedding_function=self.embedder,
-            metadata={"description": f"MOSEB Student Lab {name} knowledge base"}
-        )
+        if self.is_chroma_native and self.client:
+            try:
+                return self.client.get_or_create_collection(
+                    name=name,
+                    embedding_function=self.embedder,
+                    metadata={"description": f"MOSEB Student Lab {name} knowledge base"}
+                )
+            except Exception:
+                pass
+
+        # Embedded Persistent Vector Collection
+        if name not in self.collections:
+            self.collections[name] = EmbeddedVectorCollection(name, self.db_dir, self.embedder)
+        return self.collections[name]
 
     def add_document(self, collection_name: str, doc_id: str, text: str, metadata: Dict[str, Any]):
         """Add or update a document in the specified collection."""
-        collection = self.client.get_or_create_collection(name=collection_name, embedding_function=self.embedder)
-        # Chroma metadata values must be str, int, float, or bool
+        collection = self._get_or_create_collection(collection_name)
         sanitized_meta = {}
         for k, v in metadata.items():
             if isinstance(v, (str, int, float, bool)):
@@ -68,7 +153,7 @@ class ChromaService:
 
     def query_collection(self, collection_name: str, query_text: str, top_k: int = 5) -> List[Dict[str, Any]]:
         """Query a single collection using vector similarity."""
-        collection = self.client.get_or_create_collection(name=collection_name, embedding_function=self.embedder)
+        collection = self._get_or_create_collection(collection_name)
         count = collection.count()
         if count == 0:
             return []
@@ -87,9 +172,7 @@ class ChromaService:
             dists = results["distances"][0] if "distances" in results else [0.0] * len(ids)
 
             for doc_id, doc, meta, dist in zip(ids, docs, metas, dists):
-                # Cosine distance to similarity conversion
                 similarity = max(0.0, 1.0 - (dist / 2.0))
-                # Unserialize json in metadata if needed
                 clean_meta = {}
                 for k, v in meta.items():
                     try:
@@ -119,7 +202,7 @@ class ChromaService:
         base_dir = pathlib.Path(__file__).resolve().parent.parent.parent
         test_data_dir = base_dir / "test_data"
         if not test_data_dir.exists():
-            return
+            return {"protocols": 0, "msds": 0, "reports": 0}
 
         counts = {"protocols": 0, "msds": 0, "reports": 0}
 
@@ -183,7 +266,7 @@ class ChromaService:
                 except Exception as e:
                     app_logger.warning(f"Error seeding report {r.name}: {e}")
 
-        app_logger.info(f"ChromaDB seeded successfully: {counts}")
+        app_logger.info(f"Vector Store seeded successfully: {counts}")
         return counts
 
 

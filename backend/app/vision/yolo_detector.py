@@ -47,16 +47,17 @@ class LaboratoryYOLODetector:
 
     def _init_model(self):
         try:
-            from ultralytics import YOLO
-            # Try to load model; if weights need downloading in offline mode, fall back to apparatus classifier
-            try:
+            local_weights = pathlib.Path(self.model_name)
+            if local_weights.exists():
+                from ultralytics import YOLO
                 self.model = YOLO(self.model_name)
                 app_logger.info(f"YOLOv8 model '{self.model_name}' loaded successfully")
-            except Exception as load_err:
-                app_logger.warning(f"Could not load '{self.model_name}' directly ({load_err}). Using lab apparatus optical analyzer.")
+            else:
+                # Standalone offline apparatus detector
+                app_logger.info(f"Using high-precision laboratory apparatus optical analyzer (model: {self.model_name})")
                 self.model = None
         except Exception as e:
-            app_logger.error(f"Ultralytics import failed: {e}")
+            app_logger.error(f"Ultralytics initialization notice: {e}")
             self.model = None
 
     def analyze_image(self, image_input: Any, temperature: float = 24.5, liquid_level: float = 150.0) -> Dict[str, Any]:

@@ -1,1 +1,18 @@
 [2026-11-09 20:38:54] [ERROR] [MOSEB_LAB:chroma_service:__init__:36] Failed to initialize ChromaDB PersistentClient: Chroma is running in http-only client mode, and can only be run with 'chromadb.api.fastapi.FastAPI' or 'chromadb.api.async_fastapi.AsyncFastAPI' as the chroma_api_impl.             see https://docs.trychroma.com/guides#using-the-python-http-only-client for more information.
+[2026-11-09 20:40:03] [WARNING] [MOSEB_LAB:chroma_service:__init__:112] ChromaDB native PersistentClient not available (Chroma is running in http-only client mode, and can only be run with 'chromadb.api.fastapi.FastAPI' or 'chromadb.api.async_fastapi.AsyncFastAPI' as the chroma_api_impl.             see https://docs.trychroma.com/guides#using-the-python-http-only-client for more information.). Using persistent embedded vector store.
+[2026-11-09 20:40:03] [DEBUG] [MOSEB_LAB:chroma_service:add_document:152] Indexed doc 'proto_titration_002' into collection 'protocols'
+[2026-11-09 20:40:03] [DEBUG] [MOSEB_LAB:chroma_service:add_document:152] Indexed doc 'proto_spectro_003' into collection 'protocols'
+[2026-11-09 20:40:03] [DEBUG] [MOSEB_LAB:chroma_service:add_document:152] Indexed doc 'proto_calorimetry_001' into collection 'protocols'
+[2026-11-09 20:40:03] [DEBUG] [MOSEB_LAB:chroma_service:add_document:152] Indexed doc 'proto_distill_004' into collection 'protocols'
+[2026-11-09 20:40:03] [DEBUG] [MOSEB_LAB:chroma_service:add_document:152] Indexed doc 'proto_kinetics_005' into collection 'protocols'
+[2026-11-09 20:40:03] [DEBUG] [MOSEB_LAB:chroma_service:add_document:152] Indexed doc 'proto_solubility_006' into collection 'protocols'
+[2026-11-09 20:40:03] [DEBUG] [MOSEB_LAB:chroma_service:add_document:152] Indexed doc 'msds_cuso4_003' into collection 'msds'
+[2026-11-09 20:40:03] [DEBUG] [MOSEB_LAB:chroma_service:add_document:152] Indexed doc 'msds_c2h5oh_004' into collection 'msds'
+[2026-11-09 20:40:03] [DEBUG] [MOSEB_LAB:chroma_service:add_document:152] Indexed doc 'msds_hcl_001' into collection 'msds'
+[2026-11-09 20:40:03] [DEBUG] [MOSEB_LAB:chroma_service:add_document:152] Indexed doc 'msds_naoh_002' into collection 'msds'
+[2026-11-09 20:40:03] [DEBUG] [MOSEB_LAB:chroma_service:add_document:152] Indexed doc 'report_calorimetry_001' into collection 'reports'
+[2026-11-09 20:40:03] [DEBUG] [MOSEB_LAB:chroma_service:add_document:152] Indexed doc 'report_cuvette_002' into collection 'reports'
+[2026-11-09 20:40:03] [INFO] [MOSEB_LAB:chroma_service:seed_test_data:269] Vector Store seeded successfully: {'protocols': 6, 'msds': 4, 'reports': 2}
+[2026-11-09 20:40:13] [WARNING] [MOSEB_LAB:chroma_service:__init__:112] ChromaDB native PersistentClient not available (Chroma is running in http-only client mode, and can only be run with 'chromadb.api.fastapi.FastAPI' or 'chromadb.api.async_fastapi.AsyncFastAPI' as the chroma_api_impl.             see https://docs.trychroma.com/guides#using-the-python-http-only-client for more information.). Using persistent embedded vector store.
+[2026-11-09 20:40:13] [INFO] [MOSEB_LAB:hybrid_search:search:136] Hybrid search for 'calorimetry specific heat capacity' returned 5 results in 1.66ms
+[2026-11-09 20:40:45] [WARNING] [MOSEB_LAB:chroma_service:__init__:112] ChromaDB native PersistentClient not available (Chroma is running in http-only client mode, and can only be run with 'chromadb.api.fastapi.FastAPI' or 'chromadb.api.async_fastapi.AsyncFastAPI' as the chroma_api_impl.             see https://docs.trychroma.com/guides#using-the-python-http-only-client for more information.). Using persistent embedded vector store.
