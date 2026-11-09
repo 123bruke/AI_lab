@@ -1,0 +1,22 @@
+{
+  "id": "msds_c2h5oh_004",
+  "chemical_name": "Ethanol (Absolute 200 Proof)",
+  "formula": "C2H5OH",
+  "cas_number": "64-17-5",
+  "molecular_weight": 46.07,
+  "physical_state": "Liquid (Colorless Volatile)",
+  "properties": {
+    "density": 0.789,
+    "boiling_point": 78.37,
+    "melting_point": -114.1,
+    "flash_point_c": 13.0,
+    "autoignition_temp_c": 363.0
+  },
+  "hazards": "GHS02 Highly flammable liquid and vapor (Category 2). Flash point 13°C. GHS07 Causes serious eye irritation. Vapors may cause drowsiness and dizziness.",
+  "handling": "Keep away from sparks, heat, open flames, and hot surfaces. Ground/bond container during bulk solvent transfers. Use explosion-proof ventilation.",
+  "first_aid": {
+    "inhalation": "Move subject to fresh air. If breathing difficulty occurs, administer supplemental oxygen.",
+    "fire_fighting": "Use alcohol-resistant foam, carbon dioxide (CO2), or dry chemical extinguisher. Water spray may be ineffective due to low flash point."
+  },
+  "storage": "Store in designated NFPA 30 Flammable Liquids Storage Cabinet at 15-25°C. Segregate from strong oxidizers such as nitric acid or hydrogen peroxide."
+}

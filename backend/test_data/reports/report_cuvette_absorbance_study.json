@@ -1,0 +1,13 @@
+{
+  "id": "report_cuvette_002",
+  "title": "UV-Vis Spectrophotometric Quantification of Aqueous Copper(II) Ions",
+  "experiment_type": "Analytical Spectroscopy",
+  "author": "Marcus Vance, Optical Metrology Lab",
+  "abstract": "The optical absorbance of aqueous copper(II) sulfate was evaluated across the range 0.010 M to 0.100 M at lambda_max = 635 nm. The system obeyed the Beer-Lambert law with linear correlation R^2 = 0.9997 and calculated molar absorptivity epsilon = 12.04 L/(mol·cm).",
+  "hypothesis": "Absorbance of light through a homogeneous solution will be directly proportional to analyte concentration and path length without non-linear deviation below 0.15 M.",
+  "methodology": "Serial dilutions prepared in 50 mL volumetric flasks. Standard 1.00 cm path length quartz cuvette loaded. Spectrophotometer zeroed against blank DI water at 635 nm.",
+  "observations": "Clear blue color intensity increased monotonically with concentration. No precipitation or particulate scattering observed.",
+  "calculations": "Linear regression: A = 12.04 * c + 0.002. At c = 0.050 M, measured A = 0.604 AU, transmittance %T = 24.89%. Calculated epsilon = 12.04 L/(mol·cm).",
+  "conclusion": "The molar absorptivity was determined with high precision. The system serves as an exemplary calibration standard for unknown concentration assays.",
+  "mermaid_diagram": "graph TD\n  Lamp[Halogen Lamp] --> Monochromator[Diffraction Grating 635nm]\n  Monochromator --> Cuvette[CuSO4 Sample b=1.0cm]\n  Cuvette --> Detector[Photodiode Detector A=0.604 AU]"
+}

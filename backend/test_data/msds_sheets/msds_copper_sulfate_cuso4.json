@@ -1,0 +1,22 @@
+{
+  "id": "msds_cuso4_003",
+  "chemical_name": "Copper(II) Sulfate Pentahydrate",
+  "formula": "CuSO4·5H2O",
+  "cas_number": "7758-99-8",
+  "molecular_weight": 249.68,
+  "physical_state": "Solid (Brilliant Azure Blue Triclinic Crystals)",
+  "properties": {
+    "density": 2.284,
+    "boiling_point": 650.0,
+    "melting_point": 110.0,
+    "solubility_g_100ml": 31.6,
+    "optical_absorption_lambda_max": 635.0
+  },
+  "hazards": "GHS07 Harmful if swallowed (Oral LD50: 300 mg/kg rat). GHS09 Very toxic to aquatic life with long-lasting ecological effects. Causes serious eye damage.",
+  "handling": "Avoid dust formation. Do not discharge into laboratory sewage systems. Use dedicated heavy metal inorganic collection containers.",
+  "first_aid": {
+    "ingestion": "Administer egg whites or milk if conscious to precipitate protein-copper complex and seek hospital treatment.",
+    "eye_contact": "Flush eyes with physiological saline or distilled water for 15 minutes."
+  },
+  "storage": "Store in general inorganic chemical shelving. Segregate from acetylene, hydroxylamine, and magnesium powder."
+}
