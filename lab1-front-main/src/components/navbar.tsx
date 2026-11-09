@@ -9,14 +9,13 @@ import { motion, AnimatePresence } from "framer-motion"
 const settings = {
   navLinks: [
     { name: 'features', href: '#features' },
-    { name: 'atomic space', href: '#atomic-space' },
     { name: 'pricing', href: '#pricing' },
     { name: 'testimonials', href: '#testimonials' },
     { name: 'FAQ', href: '#faq' },
   ],
   cta: {
     content: 'Virtual Lab',
-    href: '#atomic-space'
+    href: '/'
   }
 }
 
