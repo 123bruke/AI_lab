@@ -6,6 +6,7 @@ import { LandingPage } from './components/LandingPage';
 import { INITIAL_EXPERIMENT_STATE } from './simulation/thermodynamics';
 import { ExperimentState, CameraViewPreset, LabToolType, LabLightingState } from './types';
 import { labAudio } from './utils/audio';
+import { initGlobalErrorHandling } from './services/telemetry';
 
 export default function App() {
   const [currentView, setCurrentView] = useState<'landing' | 'lab'>('landing');

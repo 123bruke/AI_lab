@@ -567,6 +567,19 @@ export const UnifiedLabSidebar: React.FC<UnifiedLabSidebarProps> = ({
                 <span>Safety Audit</span>
               </button>
             </div>
+
+            {/* Launch 10+ Multi-Agent Command Deck */}
+            <button
+              onClick={() => {
+                setIsMultiAgentDeckOpen(true);
+                setActivePanel(null);
+                labAudio.playClick();
+              }}
+              className="w-full mt-2.5 py-2 px-3 rounded-xl bg-white text-black font-bold text-xs flex items-center justify-center gap-2 hover:bg-neutral-200 transition-all cursor-pointer shadow-lg shadow-white/10"
+            >
+              <Bot size={15} />
+              <span>Launch 10+ Multi-Agent Command Deck</span>
+            </button>
           </div>
 
           {/* Chat / Diagnostic Conversation Stream */}
@@ -623,6 +636,26 @@ export const UnifiedLabSidebar: React.FC<UnifiedLabSidebarProps> = ({
           </form>
         </div>
       )}
+
+      {/* 3. Autonomous Multi-Agent Command Deck Modal */}
+      <MultiAgentCenter
+        isOpen={isMultiAgentDeckOpen}
+        onClose={() => setIsMultiAgentDeckOpen(false)}
+        currentTemp={experiment.temperature}
+        currentVolume={experiment.liquidVolume}
+        isBurnerLit={experiment.isBurnerLit}
+        soluteName={experiment.soluteName}
+        onApplyApparatusAction={(action, payload) => {
+          if (action === 'IGNITE_BURNER') {
+            if (!experiment.isBurnerLit) onToggleBurner();
+            onFirePowerChange(1.0);
+          } else if (action === 'ADD_ICE') {
+            onAddIce();
+          } else if (action === 'REFILL_WATER') {
+            onRefillWater();
+          }
+        }}
+      />
     </>
   );
 };
