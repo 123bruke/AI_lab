@@ -38,13 +38,23 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   isDarkMode,
   onToggleDarkMode,
 }) => {
-  const [currentUser, setCurrentUser] = useState<User | null>(api.getUser());
+  const [currentUser, setCurrentUser] = useState<User | null>(() => {
+    try {
+      return api?.getUser ? api.getUser() : null;
+    } catch {
+      return null;
+    }
+  });
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [contactSubmitted, setContactSubmitted] = useState(false);
 
   useEffect(() => {
-    setCurrentUser(api.getUser());
+    try {
+      if (api?.getUser) {
+        setCurrentUser(api.getUser());
+      }
+    } catch { }
   }, []);
 
   const handleOpenAuth = (mode: 'login' | 'register') => {

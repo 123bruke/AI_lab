@@ -180,7 +180,7 @@ export const MultiAgentCenter: React.FC<MultiAgentCenterProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-xl animate-in fade-in duration-200">
       <div className="relative w-full max-w-6xl h-[90vh] bg-neutral-950/95 border border-white/15 rounded-3xl shadow-2xl flex flex-col overflow-hidden text-white font-sans">
-        
+
         {/* ========================================================= */}
         {/* TOP CINEMA 4D OBSIDIAN HEADER BAR                        */}
         {/* ========================================================= */}
@@ -243,11 +243,10 @@ export const MultiAgentCenter: React.FC<MultiAgentCenterProps> = ({
                   setActiveTab(tab.id as TabType);
                   labAudio.playClick();
                 }}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
-                  active
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${active
                     ? 'bg-white text-black shadow-md shadow-white/10'
                     : 'text-neutral-400 hover:text-white hover:bg-neutral-800/60'
-                }`}
+                  }`}
               >
                 <Icon size={14} />
                 <span>{tab.label}</span>
@@ -260,7 +259,7 @@ export const MultiAgentCenter: React.FC<MultiAgentCenterProps> = ({
         {/* TAB CONTENTS                                              */}
         {/* ========================================================= */}
         <div className="flex-1 overflow-y-auto p-6">
-          
+
           {/* TAB 1: CONSOLE & ORCHESTRATION */}
           {activeTab === 'console' && (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
@@ -474,11 +473,10 @@ export const MultiAgentCenter: React.FC<MultiAgentCenterProps> = ({
                   <button
                     key={rep.id}
                     onClick={() => setSelectedReport(rep)}
-                    className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col gap-1 ${
-                      selectedReport?.id === rep.id
+                    className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col gap-1 ${selectedReport?.id === rep.id
                         ? 'bg-white text-black border-white shadow-lg'
                         : 'bg-neutral-900/60 text-white border-white/10 hover:border-white/30'
-                    }`}
+                      }`}
                   >
                     <span className="text-xs font-bold line-clamp-1">{rep.title}</span>
                     <span className="text-[10px] font-mono opacity-70">{rep.experiment_type}</span>
