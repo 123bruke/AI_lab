@@ -1,0 +1,6 @@
+{
+  "name": "3D Virtual Chemistry Laboratory",
+  "description": "An interactive, photorealistic 3D virtual chemistry laboratory simulation with real-time thermodynamic heating, dynamic fluids, volumetric steam, Bunsen burner flames, and draggable laboratory equipment.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
