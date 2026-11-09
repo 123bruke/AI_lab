@@ -1,6 +1,7 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef } from 'react';
 import * as THREE from 'three';
 import { Canvas, useFrame } from '@react-three/fiber';
+import { Environment, ContactShadows } from '@react-three/drei';
 import { Laboratory } from '../environment/Laboratory';
 import { InteractiveBench } from './InteractiveBench';
 import { CameraManager } from './CameraManager';
@@ -33,14 +34,12 @@ const SimulationLoop: React.FC<{
   const timeAccumulator = useRef(0);
 
   useFrame((_, delta) => {
-    // Limit delta to prevent huge jumps on tab switch
     const clampedDelta = Math.min(delta, 0.1);
 
     // Audio frequency & gain updates
     labAudio.updateBurnerSound(lastStateRef.current.isBurnerLit, lastStateRef.current.firePower);
     labAudio.updateBoilingSound(lastStateRef.current.temperature);
 
-    // If simulation is running or water needs natural ambient cooling
     const needsUpdate =
       lastStateRef.current.isSimulating ||
       lastStateRef.current.isBurnerLit ||
@@ -49,7 +48,7 @@ const SimulationLoop: React.FC<{
     if (needsUpdate) {
       timeAccumulator.current += clampedDelta;
 
-      // Throttle React state dispatch to ~16-20 FPS to keep main thread completely free for 60+ FPS WebGL
+      // Throttle React state dispatch to ~16-20 FPS for silky 60+ FPS WebGL render
       if (timeAccumulator.current >= 0.055) {
         setExperiment((prev) =>
           updateThermodynamics(prev, timeAccumulator.current, burnerPos.current, beakerPos.current)
@@ -74,15 +73,14 @@ export const LabScene: React.FC<LabSceneProps> = ({
   setIsDraggingItem,
   lighting,
 }) => {
-  // Track dynamic positions for thermodynamics
   const burnerPos = useRef<[number, number, number]>([0, 0.88, 0]);
   const beakerPos = useRef<[number, number, number]>([0, 1.24, 0]);
 
   return (
     <div id="canvas-container" className="w-full h-full relative cursor-grab active:cursor-grabbing">
       <Canvas
-        shadows
-        dpr={[1, 1.5]}
+        shadows="soft"
+        dpr={[1, 2]}
         camera={{
           position: [0.35, 1.48, 1.35],
           fov: 44,
@@ -95,12 +93,15 @@ export const LabScene: React.FC<LabSceneProps> = ({
           powerPreference: 'high-performance',
           stencil: false,
           toneMapping: THREE.ACESFilmicToneMapping,
-          toneMappingExposure: 1.15,
+          toneMappingExposure: 1.2,
         }}
       >
         {/* Soft atmospheric lab depth fog */}
-        <color attach="background" args={['#0f172a']} />
-        <fog attach="fog" args={['#0f172a', 6, 22]} />
+        <color attach="background" args={['#090d16']} />
+        <fog attach="fog" args={['#090d16', 5, 20]} />
+
+        {/* Cinema 4D Studio PBR Environment Map for realistic physical reflections */}
+        <Environment preset="studio" environmentIntensity={0.65} />
 
         {/* 1. Cinematic Camera Management */}
         <CameraManager
@@ -119,7 +120,18 @@ export const LabScene: React.FC<LabSceneProps> = ({
         {/* 3. 3D Architectural Laboratory Room & Lighting */}
         <Laboratory lighting={lighting} />
 
-        {/* 4. Interactive Workbench & Equipment Apparatus */}
+        {/* 4. Realistic Ambient Occlusion Soft Contact Shadows directly on the benchtop */}
+        <ContactShadows
+          position={[0, 0.882, 0]}
+          opacity={0.65}
+          scale={4.2}
+          blur={1.6}
+          far={1.4}
+          resolution={1024}
+          color="#05070a"
+        />
+
+        {/* 5. Interactive Workbench & Equipment Apparatus */}
         <InteractiveBench
           experiment={experiment}
           selectedId={selectedId}

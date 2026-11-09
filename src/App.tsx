@@ -1,12 +1,15 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { LabScene } from './components/LabScene';
-import { ExperimentUI } from './components/ExperimentUI';
+import { UnifiedLabSidebar } from './components/UnifiedLabSidebar';
 import { ObjectInspector } from './components/ObjectInspector';
+import { LandingPage } from './components/LandingPage';
 import { INITIAL_EXPERIMENT_STATE } from './simulation/thermodynamics';
 import { ExperimentState, CameraViewPreset, LabToolType, LabLightingState } from './types';
 import { labAudio } from './utils/audio';
 
 export default function App() {
+  const [currentView, setCurrentView] = useState<'landing' | 'lab'>('landing');
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
   const [experiment, setExperiment] = useState<ExperimentState>(INITIAL_EXPERIMENT_STATE);
   const [selectedId, setSelectedId] = useState<string | null>('beaker');
   const [selectedToolType, setSelectedToolType] = useState<LabToolType | null>('beaker');
@@ -22,10 +25,9 @@ export default function App() {
   });
 
   useEffect(() => {
-    // Smooth transition once WebGL context & shaders initialize
     const timer = setTimeout(() => {
       setIsReady(true);
-    }, 750);
+    }, 500);
     return () => clearTimeout(timer);
   }, []);
 
@@ -49,22 +51,6 @@ export default function App() {
     labAudio.playClick();
   }, []);
 
-  // Toggle experiment start/stop
-  const handleToggleExperiment = useCallback(() => {
-    setExperiment((prev) => {
-      const nextSim = !prev.isSimulating;
-      if (nextSim) {
-        labAudio.playIgnite();
-      }
-      return {
-        ...prev,
-        isSimulating: nextSim,
-        isBurnerLit: nextSim ? true : prev.isBurnerLit,
-      };
-    });
-  }, []);
-
-  // Quick ignition toggle
   const handleToggleBurner = useCallback(() => {
     setExperiment((prev) => {
       const nextLit = !prev.isBurnerLit;
@@ -74,11 +60,11 @@ export default function App() {
       return {
         ...prev,
         isBurnerLit: nextLit,
+        isSimulating: true,
       };
     });
   }, []);
 
-  // Fire power adjustment
   const handleFirePowerChange = useCallback((power: number) => {
     setExperiment((prev) => ({
       ...prev,
@@ -86,15 +72,6 @@ export default function App() {
     }));
   }, []);
 
-  // Sim speed multiplier
-  const handleSpeedChange = useCallback((speed: number) => {
-    setExperiment((prev) => ({
-      ...prev,
-      simSpeed: speed,
-    }));
-  }, []);
-
-  // Reset experiment back to room temperature
   const handleReset = useCallback(() => {
     setExperiment({
       ...INITIAL_EXPERIMENT_STATE,
@@ -104,7 +81,6 @@ export default function App() {
     labAudio.playClick();
   }, [experiment.liquidColor, experiment.soluteName]);
 
-  // Drop cryogenic ice cube into beaker
   const handleAddIce = useCallback(() => {
     setExperiment((prev) => {
       const cooledTemp = Math.max(0.5, prev.temperature - 20);
@@ -117,7 +93,6 @@ export default function App() {
     labAudio.playGlassClink();
   }, []);
 
-  // Refill evaporated water
   const handleRefillWater = useCallback(() => {
     setExperiment((prev) => ({
       ...prev,
@@ -127,7 +102,6 @@ export default function App() {
     labAudio.playGlassClink();
   }, []);
 
-  // Select chemical solute
   const handleSelectChemical = useCallback((color: string, name: string) => {
     setExperiment((prev) => ({
       ...prev,
@@ -137,7 +111,6 @@ export default function App() {
     labAudio.playGlassClink();
   }, []);
 
-  // Selection handler
   const handleSelectItem = useCallback(
     (id: string | null, type: LabToolType | null) => {
       setSelectedId(id);
@@ -146,89 +119,110 @@ export default function App() {
     []
   );
 
-  // Audio mute toggle
   const handleToggleMute = useCallback(() => {
     const muted = labAudio.toggleMute();
     setIsMuted(muted);
   }, []);
 
-  // Rotate selected item
   const handleRotateItem = useCallback(() => {
     rotateCounter.current += 1;
-    // Dispatch a simulated keydown event for 'R'
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'r' }));
+  }, []);
+
+  // Enter lab from landing page with optional chemical solute preset
+  const handleEnterLab = useCallback((presetSolute?: { name: string; color: string }) => {
+    if (presetSolute) {
+      setExperiment((prev) => ({
+        ...prev,
+        soluteName: presetSolute.name,
+        liquidColor: presetSolute.color,
+      }));
+    }
+    setCurrentView('lab');
+    labAudio.playClick();
   }, []);
 
   return (
     <main className="w-screen h-screen relative overflow-hidden bg-neutral-950 font-sans">
-      {/* 3D WebGL Canvas Layer */}
-      <LabScene
-        experiment={experiment}
-        setExperiment={setExperiment}
-        selectedId={selectedId}
-        onSelectItem={handleSelectItem}
-        cameraPreset={cameraPreset}
-        onAddIce={handleAddIce}
-        onAddChemical={handleSelectChemical}
-        isDraggingItem={isDraggingItem}
-        setIsDraggingItem={setIsDraggingItem}
-        lighting={lighting}
-      />
-
-      {/* Modern Scientific HUD & Controls */}
-      <ExperimentUI
-        experiment={experiment}
-        onToggleExperiment={handleToggleExperiment}
-        onToggleBurner={handleToggleBurner}
-        onFirePowerChange={handleFirePowerChange}
-        onSpeedChange={handleSpeedChange}
-        onReset={handleReset}
-        onAddIce={handleAddIce}
-        onRefillWater={handleRefillWater}
-        onSelectChemical={handleSelectChemical}
-        cameraPreset={cameraPreset}
-        onSetCameraPreset={setCameraPreset}
-        isMuted={isMuted}
-        onToggleMute={handleToggleMute}
-        lighting={lighting}
-        onToggleLight={handleToggleLight}
-        onSetAllLights={handleSetAllLights}
-      />
-
-      {/* Floating Scientific Object Inspector */}
-      {selectedToolType && (
-        <ObjectInspector
-          toolType={selectedToolType}
-          onClose={() => {
-            setSelectedId(null);
-            setSelectedToolType(null);
-          }}
-          onRotateItem={handleRotateItem}
-          onAddIce={handleAddIce}
-          onSelectChemical={handleSelectChemical}
-          onRefillWater={handleRefillWater}
+      {/* 1. Landing Page View */}
+      {currentView === 'landing' ? (
+        <LandingPage
+          onEnterLab={handleEnterLab}
+          isDarkMode={isDarkMode}
+          onToggleDarkMode={() => setIsDarkMode((prev) => !prev)}
         />
-      )}
+      ) : (
+        /* 2. 3D Virtual Chemistry Lab View */
+        <div className="w-full h-full relative">
+          {/* Cinema 4D Optical WebGL Canvas */}
+          <LabScene
+            experiment={experiment}
+            setExperiment={setExperiment}
+            selectedId={selectedId}
+            onSelectItem={handleSelectItem}
+            cameraPreset={cameraPreset}
+            onAddIce={handleAddIce}
+            onAddChemical={handleSelectChemical}
+            isDraggingItem={isDraggingItem}
+            setIsDraggingItem={setIsDraggingItem}
+            lighting={lighting}
+          />
 
-      {/* Laboratory Initialization Overlay */}
-      <div
-        id="lab-loader-overlay"
-        className={`absolute inset-0 bg-slate-950 flex flex-col items-center justify-center pointer-events-none transition-opacity duration-700 z-50 ${
-          isReady ? 'opacity-0' : 'opacity-100'
-        }`}
-      >
-        <div className="flex flex-col items-center space-y-4 max-w-sm px-6 text-center">
-          <div className="w-12 h-12 rounded-full border-2 border-cyan-500/20 border-t-cyan-400 animate-spin" />
-          <div>
-            <h1 className="text-sm font-mono tracking-widest text-cyan-300 font-bold uppercase">
-              Virtual Chemistry Lab
-            </h1>
-            <p className="text-xs text-slate-400 mt-1 font-mono">
-              Calibrating thermodynamic solvers & WebGL optics...
-            </p>
+          {/* Unified Black & White Minimalist Sidebar & Autonomous AI Agent */}
+          <UnifiedLabSidebar
+            experiment={experiment}
+            onToggleBurner={handleToggleBurner}
+            onFirePowerChange={handleFirePowerChange}
+            onReset={handleReset}
+            onAddIce={handleAddIce}
+            onRefillWater={handleRefillWater}
+            onSelectChemical={handleSelectChemical}
+            cameraPreset={cameraPreset}
+            onSetCameraPreset={setCameraPreset}
+            isMuted={isMuted}
+            onToggleMute={handleToggleMute}
+            lighting={lighting}
+            onToggleLight={handleToggleLight}
+            onSetAllLights={handleSetAllLights}
+            onReturnToHome={() => setCurrentView('landing')}
+          />
+
+          {/* Floating Scientific Object Inspector on item click */}
+          {selectedToolType && (
+            <ObjectInspector
+              toolType={selectedToolType}
+              onClose={() => {
+                setSelectedId(null);
+                setSelectedToolType(null);
+              }}
+              onRotateItem={handleRotateItem}
+              onAddIce={handleAddIce}
+              onSelectChemical={handleSelectChemical}
+              onRefillWater={handleRefillWater}
+            />
+          )}
+
+          {/* Laboratory Initialization Overlay */}
+          <div
+            id="lab-loader-overlay"
+            className={`absolute inset-0 bg-neutral-950 flex flex-col items-center justify-center pointer-events-none transition-opacity duration-700 z-50 ${
+              isReady ? 'opacity-0' : 'opacity-100'
+            }`}
+          >
+            <div className="flex flex-col items-center space-y-4 max-w-sm px-6 text-center">
+              <div className="w-12 h-12 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+              <div>
+                <h1 className="text-sm font-mono tracking-widest text-white font-bold uppercase">
+                  MOSEB_STUDENT_LAB
+                </h1>
+                <p className="text-xs text-neutral-400 mt-1 font-mono">
+                  Initializing Cinema 4D PBR Shaders & Numerical Solvers...
+                </p>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </main>
   );
 }
