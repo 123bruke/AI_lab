@@ -73,7 +73,7 @@ class ApiService {
     try {
       localStorage.setItem('moseb_token', token);
       localStorage.setItem('moseb_user', JSON.stringify(user));
-    } catch {}
+    } catch { }
   }
 
   logout() {
@@ -82,7 +82,7 @@ class ApiService {
     try {
       localStorage.removeItem('moseb_token');
       localStorage.removeItem('moseb_user');
-    } catch {}
+    } catch { }
   }
 
   async register(data: { username: string; email: string; password: string; full_name?: string; role?: string }): Promise<AuthResponse> {
