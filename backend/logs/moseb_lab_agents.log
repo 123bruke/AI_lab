@@ -85,3 +85,6 @@
 [2026-11-09 22:21:33] [DEBUG] [MOSEB_LAB:chroma_service:add_document:152] Indexed doc 'report_cuvette_002' into collection 'reports'
 [2026-11-09 22:21:33] [INFO] [MOSEB_LAB:chroma_service:seed_test_data:269] Vector Store seeded successfully: {'protocols': 6, 'msds': 4, 'reports': 2}
 [2026-11-09 22:21:33] [INFO] [MOSEB_LAB:main:lifespan:27] ChromaDB knowledge base seeded: {'protocols': 6, 'msds': 4, 'reports': 2}
+[2026-11-09 23:27:12] [WARNING] [MOSEB_LAB:chroma_service:__init__:112] ChromaDB native PersistentClient not available (Chroma is running in http-only client mode, and can only be run with 'chromadb.api.fastapi.FastAPI' or 'chromadb.api.async_fastapi.AsyncFastAPI' as the chroma_api_impl.             see https://docs.trychroma.com/guides#using-the-python-http-only-client for more information.). Using persistent embedded vector store.
+[2026-11-09 23:27:12] [INFO] [MOSEB_LAB:yolo_detector:_init_model:57] Using high-precision laboratory apparatus optical analyzer (model: yolov8n.pt)
+[2026-11-09 23:27:12] [INFO] [MOSEB_LAB:orchestrator:_register_default_agents:52] Master Agent Orchestrator initialized with 10 specialized agents
