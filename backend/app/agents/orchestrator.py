@@ -193,3 +193,6 @@ class MasterAgentOrchestrator:
 # Global Orchestrator Instance
 master_orchestrator = MasterAgentOrchestrator()
 
+
+# Backward compatibility alias
+MultiAgentOrchestrator = MasterAgentOrchestrator
