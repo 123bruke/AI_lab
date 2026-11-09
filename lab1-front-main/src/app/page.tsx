@@ -8,6 +8,7 @@ import Footer from "@/sections/footer";
 import Hero from "@/sections/hero";
 import Pricing from "@/sections/pricing";
 import Testimonials from "@/sections/testimonials";
+import ChatAssistant from "@/components/chat-assistant";
 
 export default function HomePage() {
   return (
@@ -22,6 +23,7 @@ export default function HomePage() {
       <FAQ />
       <CTA />
       <Footer />
+      <ChatAssistant />
     </div>
   )
 }
