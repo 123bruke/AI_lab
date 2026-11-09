@@ -110,9 +110,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
   return (
     <div
-      className={`min-h-screen w-full relative transition-colors duration-500 overflow-y-auto overflow-x-hidden ${
-        isDarkMode ? 'bg-neutral-950 text-neutral-100' : 'bg-slate-50 text-neutral-900'
-      }`}
+      className={`min-h-screen w-full relative transition-colors duration-500 overflow-y-auto overflow-x-hidden ${isDarkMode ? 'bg-neutral-950 text-neutral-100' : 'bg-slate-50 text-neutral-900'
+        }`}
     >
       {/* 1. 4D Interactive Refractive Balls Background with Frosted Blur Separator */}
       <Floating4DBackground isDarkMode={isDarkMode} />
@@ -121,11 +120,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <div className="relative z-10 flex flex-col min-h-screen">
         {/* Navigation Bar */}
         <header
-          className={`sticky top-0 z-40 w-full px-6 py-4 border-b backdrop-blur-xl transition-all ${
-            isDarkMode
+          className={`sticky top-0 z-40 w-full px-6 py-4 border-b backdrop-blur-xl transition-all ${isDarkMode
               ? 'bg-neutral-950/80 border-neutral-800/80'
               : 'bg-white/80 border-neutral-200/80'
-          }`}
+            }`}
         >
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             {/* Logo */}
@@ -159,11 +157,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <button
                 onClick={onToggleDarkMode}
                 title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-                className={`p-2 rounded-xl border transition-all cursor-pointer ${
-                  isDarkMode
+                className={`p-2 rounded-xl border transition-all cursor-pointer ${isDarkMode
                     ? 'border-neutral-800 bg-neutral-900 text-neutral-300 hover:text-white'
                     : 'border-neutral-200 bg-white text-neutral-700 hover:text-black'
-                }`}
+                  }`}
               >
                 {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
               </button>
@@ -172,11 +169,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               {currentUser ? (
                 <div className="flex items-center gap-2">
                   <div
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-medium ${
-                      isDarkMode
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-medium ${isDarkMode
                         ? 'border-neutral-800 bg-neutral-900 text-neutral-200'
                         : 'border-neutral-200 bg-white text-neutral-800'
-                    }`}
+                      }`}
                   >
                     <UserIcon size={14} className="text-cyan-400" />
                     <span>{currentUser.username}</span>
@@ -199,11 +195,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   </button>
                   <button
                     onClick={() => handleOpenAuth('register')}
-                    className={`hidden sm:inline-flex px-3.5 py-1.5 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${
-                      isDarkMode
+                    className={`hidden sm:inline-flex px-3.5 py-1.5 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${isDarkMode
                         ? 'border-neutral-700 hover:border-neutral-500 text-white'
                         : 'border-neutral-300 hover:border-neutral-400 text-black'
-                    }`}
+                      }`}
                   >
                     Register
                   </button>
@@ -257,11 +252,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
             <a
               href="#curriculum"
-              className={`flex items-center gap-2 px-6 py-4 rounded-2xl border font-semibold text-sm transition-all cursor-pointer ${
-                isDarkMode
+              className={`flex items-center gap-2 px-6 py-4 rounded-2xl border font-semibold text-sm transition-all cursor-pointer ${isDarkMode
                   ? 'border-neutral-800 bg-neutral-900/60 hover:bg-neutral-800 text-neutral-200'
                   : 'border-neutral-300 bg-white hover:bg-neutral-100 text-neutral-800'
-              }`}
+                }`}
             >
               <FlaskConical size={18} className="text-cyan-400" />
               <span>Explore Curriculum</span>
@@ -278,11 +272,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             ].map((metric, i) => (
               <div
                 key={i}
-                className={`p-5 rounded-2xl border backdrop-blur-xl text-left transition-all ${
-                  isDarkMode
+                className={`p-5 rounded-2xl border backdrop-blur-xl text-left transition-all ${isDarkMode
                     ? 'border-neutral-800/80 bg-black/40 hover:border-neutral-700'
                     : 'border-neutral-200/90 bg-white/70 hover:border-neutral-300'
-                }`}
+                  }`}
               >
                 <div className="text-xl md:text-2xl font-bold font-mono tracking-tight text-white">
                   {metric.val}
@@ -334,11 +327,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
             {/* Visual Glass Showcase Card */}
             <div
-              className={`p-8 rounded-3xl border backdrop-blur-2xl relative overflow-hidden ${
-                isDarkMode
+              className={`p-8 rounded-3xl border backdrop-blur-2xl relative overflow-hidden ${isDarkMode
                   ? 'border-neutral-800 bg-neutral-900/40 text-neutral-100 shadow-2xl'
                   : 'border-neutral-200 bg-white/80 text-neutral-900 shadow-lg'
-              }`}
+                }`}
             >
               <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
               <div className="flex items-center justify-between border-b border-neutral-800/80 pb-4 mb-6">
@@ -399,11 +391,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {curriculumModules.map((item) => (
               <div
                 key={item.id}
-                className={`p-6 rounded-2xl border backdrop-blur-xl flex flex-col justify-between transition-all duration-300 group hover:translate-y-[-2px] ${
-                  isDarkMode
+                className={`p-6 rounded-2xl border backdrop-blur-xl flex flex-col justify-between transition-all duration-300 group hover:translate-y-[-2px] ${isDarkMode
                     ? 'border-neutral-800/80 bg-neutral-900/30 hover:border-neutral-700 hover:bg-neutral-900/50'
                     : 'border-neutral-200 bg-white/70 hover:border-neutral-300'
-                }`}
+                  }`}
               >
                 <div>
                   <div className="flex items-center justify-between mb-4">
@@ -469,9 +460,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             ].map((feature, i) => (
               <div
                 key={i}
-                className={`p-6 rounded-2xl border backdrop-blur-xl ${
-                  isDarkMode ? 'border-neutral-800/80 bg-neutral-900/30' : 'border-neutral-200 bg-white/70'
-                }`}
+                className={`p-6 rounded-2xl border backdrop-blur-xl ${isDarkMode ? 'border-neutral-800/80 bg-neutral-900/30' : 'border-neutral-200 bg-white/70'
+                  }`}
               >
                 <div className="w-10 h-10 rounded-xl bg-neutral-800 text-cyan-400 flex items-center justify-center mb-4">
                   <feature.icon size={20} />
@@ -514,9 +504,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             <div
-              className={`p-6 rounded-2xl border backdrop-blur-2xl ${
-                isDarkMode ? 'border-neutral-800 bg-black/50' : 'border-neutral-200 bg-white'
-              }`}
+              className={`p-6 rounded-2xl border backdrop-blur-2xl ${isDarkMode ? 'border-neutral-800 bg-black/50' : 'border-neutral-200 bg-white'
+                }`}
             >
               <div className="flex items-center justify-between mb-4 pb-3 border-b border-neutral-800">
                 <span className="text-xs font-mono font-bold uppercase text-neutral-400">Community Activity</span>
@@ -555,9 +544,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           <div
-            className={`max-w-xl mx-auto p-8 rounded-3xl border backdrop-blur-2xl ${
-              isDarkMode ? 'border-neutral-800 bg-neutral-900/40' : 'border-neutral-200 bg-white'
-            }`}
+            className={`max-w-xl mx-auto p-8 rounded-3xl border backdrop-blur-2xl ${isDarkMode ? 'border-neutral-800 bg-neutral-900/40' : 'border-neutral-200 bg-white'
+              }`}
           >
             {contactSubmitted ? (
               <div className="text-center py-8">
@@ -587,11 +575,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     type="text"
                     required
                     placeholder="Biruk Ahmye"
-                    className={`w-full px-3 py-2.5 rounded-lg border outline-none ${
-                      isDarkMode
+                    className={`w-full px-3 py-2.5 rounded-lg border outline-none ${isDarkMode
                         ? 'bg-neutral-900 border-neutral-800 focus:border-cyan-500 text-white'
                         : 'bg-neutral-50 border-neutral-200 text-black'
-                    }`}
+                      }`}
                   />
                 </div>
                 <div>
@@ -600,11 +587,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     type="email"
                     required
                     placeholder="researcher@university.edu"
-                    className={`w-full px-3 py-2.5 rounded-lg border outline-none ${
-                      isDarkMode
+                    className={`w-full px-3 py-2.5 rounded-lg border outline-none ${isDarkMode
                         ? 'bg-neutral-900 border-neutral-800 focus:border-cyan-500 text-white'
                         : 'bg-neutral-50 border-neutral-200 text-black'
-                    }`}
+                      }`}
                   />
                 </div>
                 <div>
@@ -613,11 +599,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     rows={4}
                     required
                     placeholder="Inquiry regarding 4D virtual laboratory deployment..."
-                    className={`w-full px-3 py-2.5 rounded-lg border outline-none resize-none ${
-                      isDarkMode
+                    className={`w-full px-3 py-2.5 rounded-lg border outline-none resize-none ${isDarkMode
                         ? 'bg-neutral-900 border-neutral-800 focus:border-cyan-500 text-white'
                         : 'bg-neutral-50 border-neutral-200 text-black'
-                    }`}
+                      }`}
                   />
                 </div>
                 <button

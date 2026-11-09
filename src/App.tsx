@@ -205,9 +205,8 @@ export default function App() {
           {/* Laboratory Initialization Overlay */}
           <div
             id="lab-loader-overlay"
-            className={`absolute inset-0 bg-neutral-950 flex flex-col items-center justify-center pointer-events-none transition-opacity duration-700 z-50 ${
-              isReady ? 'opacity-0' : 'opacity-100'
-            }`}
+            className={`absolute inset-0 bg-neutral-950 flex flex-col items-center justify-center pointer-events-none transition-opacity duration-700 z-50 ${isReady ? 'opacity-0' : 'opacity-100'
+              }`}
           >
             <div className="flex flex-col items-center space-y-4 max-w-sm px-6 text-center">
               <div className="w-12 h-12 rounded-full border-2 border-white/20 border-t-white animate-spin" />

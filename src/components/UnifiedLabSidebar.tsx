@@ -179,8 +179,8 @@ export const UnifiedLabSidebar: React.FC<UnifiedLabSidebarProps> = ({
             onClick={() => togglePanel('agent')}
             title="MOSEB AI Lab Copilot (Action Assistant)"
             className={`p-3 rounded-xl transition-all cursor-pointer relative ${activePanel === 'agent'
-                ? 'bg-white text-black shadow-lg shadow-white/20'
-                : 'hover:bg-neutral-800 text-cyan-400'
+              ? 'bg-white text-black shadow-lg shadow-white/20'
+              : 'hover:bg-neutral-800 text-cyan-400'
               }`}
           >
             <Sparkles size={20} />
@@ -195,10 +195,10 @@ export const UnifiedLabSidebar: React.FC<UnifiedLabSidebarProps> = ({
             onClick={() => togglePanel('burner')}
             title="Bunsen Burner Heat Controller"
             className={`p-3 rounded-xl transition-all cursor-pointer relative ${activePanel === 'burner'
-                ? 'bg-white text-black'
-                : experiment.isBurnerLit
-                  ? 'text-orange-400 hover:bg-neutral-800'
-                  : 'text-neutral-400 hover:text-white hover:bg-neutral-800'
+              ? 'bg-white text-black'
+              : experiment.isBurnerLit
+                ? 'text-orange-400 hover:bg-neutral-800'
+                : 'text-neutral-400 hover:text-white hover:bg-neutral-800'
               }`}
           >
             <Flame size={20} />
@@ -212,8 +212,8 @@ export const UnifiedLabSidebar: React.FC<UnifiedLabSidebarProps> = ({
             onClick={() => togglePanel('chemicals')}
             title="Chemical Solute Catalog"
             className={`p-3 rounded-xl transition-all cursor-pointer ${activePanel === 'chemicals'
-                ? 'bg-white text-black'
-                : 'text-neutral-400 hover:text-white hover:bg-neutral-800'
+              ? 'bg-white text-black'
+              : 'text-neutral-400 hover:text-white hover:bg-neutral-800'
               }`}
           >
             <FlaskConical size={20} />
@@ -250,8 +250,8 @@ export const UnifiedLabSidebar: React.FC<UnifiedLabSidebarProps> = ({
             onClick={() => togglePanel('lights')}
             title="Cinema 4D Studio Lighting Rig"
             className={`p-3 rounded-xl transition-all cursor-pointer ${activePanel === 'lights'
-                ? 'bg-white text-black'
-                : 'text-neutral-400 hover:text-white hover:bg-neutral-800'
+              ? 'bg-white text-black'
+              : 'text-neutral-400 hover:text-white hover:bg-neutral-800'
               }`}
           >
             <Sun size={20} />
@@ -262,8 +262,8 @@ export const UnifiedLabSidebar: React.FC<UnifiedLabSidebarProps> = ({
             onClick={() => togglePanel('camera')}
             title="Camera Viewpoint Manager"
             className={`p-3 rounded-xl transition-all cursor-pointer ${activePanel === 'camera'
-                ? 'bg-white text-black'
-                : 'text-neutral-400 hover:text-white hover:bg-neutral-800'
+              ? 'bg-white text-black'
+              : 'text-neutral-400 hover:text-white hover:bg-neutral-800'
               }`}
           >
             <Eye size={20} />
@@ -310,8 +310,8 @@ export const UnifiedLabSidebar: React.FC<UnifiedLabSidebarProps> = ({
             <button
               onClick={onToggleBurner}
               className={`w-full py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2 ${experiment.isBurnerLit
-                  ? 'bg-rose-600 text-white hover:bg-rose-500'
-                  : 'bg-white text-black hover:bg-neutral-200'
+                ? 'bg-rose-600 text-white hover:bg-rose-500'
+                : 'bg-white text-black hover:bg-neutral-200'
                 }`}
             >
               <Flame size={16} />
@@ -359,8 +359,8 @@ export const UnifiedLabSidebar: React.FC<UnifiedLabSidebarProps> = ({
                   setActivePanel(null);
                 }}
                 className={`w-full p-2.5 rounded-xl border text-left flex items-center justify-between transition-all cursor-pointer ${experiment.soluteName === chem.name
-                    ? 'border-white bg-white/10 text-white'
-                    : 'border-neutral-800 hover:border-neutral-700 bg-neutral-900/50 text-neutral-300'
+                  ? 'border-white bg-white/10 text-white'
+                  : 'border-neutral-800 hover:border-neutral-700 bg-neutral-900/50 text-neutral-300'
                   }`}
               >
                 <div className="flex items-center gap-2.5">
@@ -452,8 +452,8 @@ export const UnifiedLabSidebar: React.FC<UnifiedLabSidebarProps> = ({
                   setActivePanel(null);
                 }}
                 className={`w-full py-2 px-3 rounded-lg border text-left transition-colors cursor-pointer ${cameraPreset === cam.id
-                    ? 'border-white bg-white text-black font-semibold'
-                    : 'border-neutral-800 hover:border-neutral-700 bg-neutral-900/40 text-neutral-300'
+                  ? 'border-white bg-white text-black font-semibold'
+                  : 'border-neutral-800 hover:border-neutral-700 bg-neutral-900/40 text-neutral-300'
                   }`}
               >
                 {cam.label}
@@ -536,8 +536,8 @@ export const UnifiedLabSidebar: React.FC<UnifiedLabSidebarProps> = ({
               <div
                 key={index}
                 className={`p-3 rounded-2xl ${item.role === 'user'
-                    ? 'bg-neutral-900 border border-neutral-800 ml-6 text-neutral-200'
-                    : 'bg-white/5 border border-white/10 mr-4 text-white'
+                  ? 'bg-neutral-900 border border-neutral-800 ml-6 text-neutral-200'
+                  : 'bg-white/5 border border-white/10 mr-4 text-white'
                   }`}
               >
                 {item.role === 'agent' && (

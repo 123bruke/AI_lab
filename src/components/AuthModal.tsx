@@ -59,18 +59,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in duration-200">
       <div
-        className={`relative w-full max-w-md rounded-2xl border p-8 shadow-2xl transition-all duration-300 ${
-          isDarkMode
+        className={`relative w-full max-w-md rounded-2xl border p-8 shadow-2xl transition-all duration-300 ${isDarkMode
             ? 'bg-neutral-950/95 border-neutral-800 text-neutral-100 shadow-cyan-500/5'
             : 'bg-white border-neutral-200 text-neutral-900 shadow-xl'
-        }`}
+          }`}
       >
         {/* Close Button */}
         <button
           onClick={onClose}
-          className={`absolute top-5 right-5 p-2 rounded-full transition-colors ${
-            isDarkMode ? 'hover:bg-neutral-800 text-neutral-400' : 'hover:bg-neutral-100 text-neutral-500'
-          }`}
+          className={`absolute top-5 right-5 p-2 rounded-full transition-colors ${isDarkMode ? 'hover:bg-neutral-800 text-neutral-400' : 'hover:bg-neutral-100 text-neutral-500'
+            }`}
         >
           <X size={18} />
         </button>
@@ -109,11 +107,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="e.g. alex_researcher"
-                className={`w-full pl-9 pr-3 py-2 text-sm rounded-lg border outline-none transition-all ${
-                  isDarkMode
+                className={`w-full pl-9 pr-3 py-2 text-sm rounded-lg border outline-none transition-all ${isDarkMode
                     ? 'bg-neutral-900 border-neutral-800 focus:border-cyan-500 text-white'
                     : 'bg-neutral-50 border-neutral-200 focus:border-blue-500 text-neutral-900'
-                }`}
+                  }`}
               />
             </div>
           </div>
@@ -129,11 +126,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="e.g. Alex Johnson"
-                    className={`w-full pl-9 pr-3 py-2 text-sm rounded-lg border outline-none transition-all ${
-                      isDarkMode
+                    className={`w-full pl-9 pr-3 py-2 text-sm rounded-lg border outline-none transition-all ${isDarkMode
                         ? 'bg-neutral-900 border-neutral-800 focus:border-cyan-500 text-white'
                         : 'bg-neutral-50 border-neutral-200 focus:border-blue-500 text-neutral-900'
-                    }`}
+                      }`}
                   />
                 </div>
               </div>
@@ -148,11 +144,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="student@university.edu"
-                    className={`w-full pl-9 pr-3 py-2 text-sm rounded-lg border outline-none transition-all ${
-                      isDarkMode
+                    className={`w-full pl-9 pr-3 py-2 text-sm rounded-lg border outline-none transition-all ${isDarkMode
                         ? 'bg-neutral-900 border-neutral-800 focus:border-cyan-500 text-white'
                         : 'bg-neutral-50 border-neutral-200 focus:border-blue-500 text-neutral-900'
-                    }`}
+                      }`}
                   />
                 </div>
               </div>
@@ -162,11 +157,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <select
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
-                  className={`w-full px-3 py-2 text-sm rounded-lg border outline-none transition-all ${
-                    isDarkMode
+                  className={`w-full px-3 py-2 text-sm rounded-lg border outline-none transition-all ${isDarkMode
                       ? 'bg-neutral-900 border-neutral-800 text-white'
                       : 'bg-neutral-50 border-neutral-200 text-neutral-900'
-                  }`}
+                    }`}
                 >
                   <option value="student">Student Researcher</option>
                   <option value="instructor">Academic Instructor / Professor</option>
@@ -186,11 +180,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
-                className={`w-full pl-9 pr-3 py-2 text-sm rounded-lg border outline-none transition-all ${
-                  isDarkMode
+                className={`w-full pl-9 pr-3 py-2 text-sm rounded-lg border outline-none transition-all ${isDarkMode
                     ? 'bg-neutral-900 border-neutral-800 focus:border-cyan-500 text-white'
                     : 'bg-neutral-50 border-neutral-200 focus:border-blue-500 text-neutral-900'
-                }`}
+                  }`}
               />
             </div>
           </div>
