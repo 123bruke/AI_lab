@@ -26,6 +26,7 @@ export default function App() {
   });
 
   useEffect(() => {
+    initGlobalErrorHandling();
     const timer = setTimeout(() => {
       setIsReady(true);
     }, 500);
