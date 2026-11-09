@@ -96,3 +96,4 @@ def require_current_user(token: str = Depends(oauth2_scheme), db: Session = Depe
             headers={"WWW-Authenticate": "Bearer"},
         )
     return user
+

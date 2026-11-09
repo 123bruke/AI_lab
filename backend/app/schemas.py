@@ -77,3 +77,4 @@ class AgentResponse(BaseModel):
     recommended_action: Optional[str] = None
     safety_level: str = "SAFE"
     target_temperature: Optional[float] = None
+

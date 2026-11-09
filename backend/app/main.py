@@ -38,3 +38,4 @@ def root():
 @app.get("/api/health")
 def health_check():
     return {"status": "healthy", "database": "sqlite_connected"}
+

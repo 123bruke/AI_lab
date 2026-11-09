@@ -76,3 +76,4 @@ def consult_ai_lab_agent(query: AgentQuery):
         safety_level=safety,
         target_temperature=target
     )
+

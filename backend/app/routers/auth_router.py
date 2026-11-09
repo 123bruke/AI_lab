@@ -57,3 +57,4 @@ def login(login_data: UserLogin, db: Session = Depends(get_db)):
 @router.get("/me", response_model=UserOut)
 def get_current_user_profile(user: User = Depends(require_current_user)):
     return user
+

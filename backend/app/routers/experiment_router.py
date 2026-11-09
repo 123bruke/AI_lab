@@ -81,3 +81,4 @@ def list_notebook_entries(
     current_user: User = Depends(require_current_user)
 ):
     return db.query(LabNotebook).filter(LabNotebook.user_id == current_user.id).order_by(LabNotebook.created_at.desc()).all()
+

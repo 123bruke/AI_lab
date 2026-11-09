@@ -26,3 +26,4 @@ High-performance Python FastAPI service with SQLite database (SQLAlchemy ORM) an
 
 3. Open Swagger API documentation:
    [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+

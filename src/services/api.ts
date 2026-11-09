@@ -4,8 +4,8 @@
 
 export interface User {
   id: number;
-  username: string;
-  email: string;
+  username: str;
+  email: str;
   full_name?: string;
   role: string;
   created_at: string;
@@ -222,3 +222,4 @@ class ApiService {
 }
 
 export const api = new ApiService();
+
