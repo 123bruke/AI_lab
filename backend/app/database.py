@@ -1,25 +1,13 @@
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-import os
+"""
+Unified Database Module forwarding to backend.app.database.connection.
+"""
 
-# SQLite database file path stored inside backend folder
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-SQLALCHEMY_DATABASE_URL = f"sqlite:///{os.path.join(BASE_DIR, '..', 'moseb_lab.db')}"
-
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False}
+from backend.app.database.connection import (
+    engine,
+    SessionLocal,
+    Base,
+    get_db,
+    SQLALCHEMY_DATABASE_URL
 )
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-Base = declarative_base()
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
+__all__ = ["engine", "SessionLocal", "Base", "get_db", "SQLALCHEMY_DATABASE_URL"]
