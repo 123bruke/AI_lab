@@ -184,9 +184,8 @@ export default function App() {
     <main className="w-screen h-screen relative bg-neutral-950 font-sans overflow-hidden">
       {/* 1. Landing Page View with Smooth Fade Transition */}
       <div
-        className={`w-full h-full absolute inset-0 transition-opacity duration-500 ease-in-out ${
-          currentView === 'landing' ? 'opacity-100 z-10 pointer-events-auto overflow-y-auto overflow-x-hidden' : 'opacity-0 z-0 pointer-events-none'
-        }`}
+        className={`w-full h-full absolute inset-0 transition-opacity duration-500 ease-in-out ${currentView === 'landing' ? 'opacity-100 z-10 pointer-events-auto overflow-y-auto overflow-x-hidden' : 'opacity-0 z-0 pointer-events-none'
+          }`}
       >
         {currentView === 'landing' && (
           <LandingPage
@@ -199,9 +198,8 @@ export default function App() {
 
       {/* 2. 3D Virtual Chemistry Lab View with Clean Single-Sided Dock */}
       <div
-        className={`w-full h-full absolute inset-0 transition-opacity duration-500 ease-in-out ${
-          currentView === 'lab' ? 'opacity-100 z-20 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'
-        }`}
+        className={`w-full h-full absolute inset-0 transition-opacity duration-500 ease-in-out ${currentView === 'lab' ? 'opacity-100 z-20 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'
+          }`}
       >
         {currentView === 'lab' && (
           <div className="w-full h-full relative">
@@ -256,9 +254,8 @@ export default function App() {
             {/* Laboratory Initialization Overlay */}
             <div
               id="lab-loader-overlay"
-              className={`absolute inset-0 bg-neutral-950 flex flex-col items-center justify-center pointer-events-none transition-opacity duration-700 z-50 ${
-                isReady ? 'opacity-0' : 'opacity-100'
-              }`}
+              className={`absolute inset-0 bg-neutral-950 flex flex-col items-center justify-center pointer-events-none transition-opacity duration-700 z-50 ${isReady ? 'opacity-0' : 'opacity-100'
+                }`}
             >
               <div className="flex flex-col items-center space-y-4 max-w-sm px-6 text-center">
                 <div className="w-12 h-12 rounded-full border-2 border-white/20 border-t-white animate-spin" />

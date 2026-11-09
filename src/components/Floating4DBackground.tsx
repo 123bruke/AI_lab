@@ -192,11 +192,10 @@ export const Floating4DBackground: React.FC<{ isDarkMode?: boolean }> = ({ isDar
 
       {/* Frosted Depth-of-Field Blur Separator Layer (Clean Obsidian & White) */}
       <div
-        className={`absolute inset-0 backdrop-blur-md transition-colors duration-500 ${
-          isDarkMode
+        className={`absolute inset-0 backdrop-blur-md transition-colors duration-500 ${isDarkMode
             ? 'bg-neutral-950/70'
             : 'bg-white/75'
-        }`}
+          }`}
       />
     </div>
   );
