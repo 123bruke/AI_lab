@@ -18,8 +18,8 @@ const settings = {
     { name: 'FAQ', href: '#faq' },
   ],
   cta: {
-    content: 'Start building',
-    href: '#features'
+    content: 'Virtual Lab',
+    href: '#lab-workspace'
   }
 }
 
