@@ -152,3 +152,4 @@ def query_rag_assistant(data: RagQuery):
         ],
         topic="MOSEB Virtual Lab Guidance"
     )
+
