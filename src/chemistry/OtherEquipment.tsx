@@ -83,70 +83,70 @@ export const ChemicalJar: React.FC<{
   powderColor = '#0284c7',
   isSelected = false,
 }) => {
-  const height = 0.26;
-  const radius = 0.075;
+    const height = 0.26;
+    const radius = 0.075;
 
-  const amberGlassMat = useMemo(
-    () =>
-      new THREE.MeshPhysicalMaterial({
-        color: '#78350f',
-        roughness: 0.15,
-        metalness: 0.1,
-        reflectivity: 0.85,
-        clearcoat: 0.8,
-        transparent: true,
-        opacity: 0.85,
-      }),
-    []
-  );
+    const amberGlassMat = useMemo(
+      () =>
+        new THREE.MeshPhysicalMaterial({
+          color: '#78350f',
+          roughness: 0.15,
+          metalness: 0.1,
+          reflectivity: 0.85,
+          clearcoat: 0.8,
+          transparent: true,
+          opacity: 0.85,
+        }),
+      []
+    );
 
-  return (
-    <group>
-      {/* Amber glass jar body */}
-      <mesh position={[0, height * 0.42, 0]} castShadow receiveShadow>
-        <cylinderGeometry args={[radius, radius, height * 0.75, 24]} />
-        <primitive object={amberGlassMat} attach="material" />
-      </mesh>
-
-      {/* Shoulder & Neck */}
-      <mesh position={[0, height * 0.85, 0]} castShadow>
-        <cylinderGeometry args={[radius * 0.55, radius, 0.04, 24]} />
-        <primitive object={amberGlassMat} attach="material" />
-      </mesh>
-
-      {/* Neck */}
-      <mesh position={[0, height * 0.94, 0]} castShadow>
-        <cylinderGeometry args={[radius * 0.52, radius * 0.52, 0.03, 20]} />
-        <primitive object={amberGlassMat} attach="material" />
-      </mesh>
-
-      {/* Polypropylene Black Screw Cap */}
-      <mesh position={[0, height + 0.01, 0]} castShadow>
-        <cylinderGeometry args={[radius * 0.56, radius * 0.56, 0.035, 24]} />
-        <meshStandardMaterial color="#0f172a" roughness={0.4} metalness={0.2} />
-      </mesh>
-
-      {/* Reagent Label paper */}
-      <mesh position={[0, height * 0.42, radius + 0.001]} rotation={[0, 0, 0]}>
-        <planeGeometry args={[radius * 1.3, height * 0.45]} />
-        <meshStandardMaterial color="#f8fafc" roughness={0.8} />
-      </mesh>
-
-      {/* Chemical Powder / Crystals inside */}
-      <mesh position={[0, height * 0.28, 0]}>
-        <cylinderGeometry args={[radius * 0.92, radius * 0.92, height * 0.48, 16]} />
-        <meshStandardMaterial color={powderColor} roughness={0.85} />
-      </mesh>
-
-      {isSelected && (
-        <mesh position={[0, height / 2, 0]}>
-          <cylinderGeometry args={[radius + 0.015, radius + 0.015, height + 0.02, 16, 1, true]} />
-          <meshBasicMaterial color="#38bdf8" wireframe transparent opacity={0.4} />
+    return (
+      <group>
+        {/* Amber glass jar body */}
+        <mesh position={[0, height * 0.42, 0]} castShadow receiveShadow>
+          <cylinderGeometry args={[radius, radius, height * 0.75, 24]} />
+          <primitive object={amberGlassMat} attach="material" />
         </mesh>
-      )}
-    </group>
-  );
-};
+
+        {/* Shoulder & Neck */}
+        <mesh position={[0, height * 0.85, 0]} castShadow>
+          <cylinderGeometry args={[radius * 0.55, radius, 0.04, 24]} />
+          <primitive object={amberGlassMat} attach="material" />
+        </mesh>
+
+        {/* Neck */}
+        <mesh position={[0, height * 0.94, 0]} castShadow>
+          <cylinderGeometry args={[radius * 0.52, radius * 0.52, 0.03, 20]} />
+          <primitive object={amberGlassMat} attach="material" />
+        </mesh>
+
+        {/* Polypropylene Black Screw Cap */}
+        <mesh position={[0, height + 0.01, 0]} castShadow>
+          <cylinderGeometry args={[radius * 0.56, radius * 0.56, 0.035, 24]} />
+          <meshStandardMaterial color="#0f172a" roughness={0.4} metalness={0.2} />
+        </mesh>
+
+        {/* Reagent Label paper */}
+        <mesh position={[0, height * 0.42, radius + 0.001]} rotation={[0, 0, 0]}>
+          <planeGeometry args={[radius * 1.3, height * 0.45]} />
+          <meshStandardMaterial color="#f8fafc" roughness={0.8} />
+        </mesh>
+
+        {/* Chemical Powder / Crystals inside */}
+        <mesh position={[0, height * 0.28, 0]}>
+          <cylinderGeometry args={[radius * 0.92, radius * 0.92, height * 0.48, 16]} />
+          <meshStandardMaterial color={powderColor} roughness={0.85} />
+        </mesh>
+
+        {isSelected && (
+          <mesh position={[0, height / 2, 0]}>
+            <cylinderGeometry args={[radius + 0.015, radius + 0.015, height + 0.02, 16, 1, true]} />
+            <meshBasicMaterial color="#38bdf8" wireframe transparent opacity={0.4} />
+          </mesh>
+        )}
+      </group>
+    );
+  };
 
 // 3. Ice Bucket & Realistic Ice Cubes
 export const IceBucket: React.FC<{ isSelected?: boolean; onAddIce?: () => void }> = ({
@@ -218,7 +218,7 @@ export const PetriDish: React.FC<{ isSelected?: boolean }> = ({ isSelected = fal
   const glassMat = useMemo(
     () =>
       new THREE.MeshPhysicalMaterial({
-        color: '#f0f9ff',
+        color: '#2b6c97ff',
         roughness: 0.05,
         metalness: 0.05,
         reflectivity: 0.9,
