@@ -15,7 +15,7 @@ const settings = {
   ],
   cta: {
     content: 'Virtual Lab',
-    href: '/'
+    href: 'https://ai-lab-main1-9vlh.vercel.app/?view=lab'
   }
 }
 
@@ -159,6 +159,15 @@ export default function Navbar() {
                     </Link>
                   </li>
                 ))}
+                <li>
+                  <Link
+                    href={settings.cta.href}
+                    onClick={toggleMenu}
+                    className="block py-1.5 font-semibold text-emerald-500 hover:text-emerald-400"
+                  >
+                    Launch Virtual Lab ↗
+                  </Link>
+                </li>
               </ul>
             </motion.div>
           )}

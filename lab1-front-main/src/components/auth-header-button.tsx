@@ -61,6 +61,7 @@ export default function AuthHeaderButton() {
       } catch {}
       setIsSubmitting(false)
       setIsModalOpen(false)
+      window.location.href = 'https://ai-lab-main1-9vlh.vercel.app/?view=lab'
     }, 600)
   }
 

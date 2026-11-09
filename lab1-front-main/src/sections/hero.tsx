@@ -11,7 +11,7 @@ const settings = {
   headline: 'AFROLAB',
   mainCTA: {
     content: 'Launch Virtual Lab',
-    href: '/'
+    href: 'https://ai-lab-main1-9vlh.vercel.app/?view=lab'
   },
   secondaryCTA: {
     content: 'Explore Features',
