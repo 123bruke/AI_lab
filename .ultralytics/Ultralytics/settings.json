@@ -1,0 +1,19 @@
+{
+  "settings_version": "0.0.8",
+  "datasets_dir": "C:\\Users\\FSC CORE i5\\Downloads\\Ai_lab-main\\datasets",
+  "weights_dir": "weights",
+  "runs_dir": "runs",
+  "uuid": "fd915c9626e8edc2a60a99f10208b87d029d41224d79607c73e097457720b0fc",
+  "sync": true,
+  "api_key": "",
+  "openai_api_key": "",
+  "clearml": true,
+  "comet": true,
+  "dvc": true,
+  "mlflow": true,
+  "raytune": true,
+  "tensorboard": false,
+  "wandb": false,
+  "vscode_msg": true,
+  "openvino_msg": true
+}
