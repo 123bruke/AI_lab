@@ -1,24 +1,26 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { LabScene } from './components/LabScene';
-import { UnifiedLabSidebar } from './components/UnifiedLabSidebar';
+import { AgenticChatbot } from './components/AgenticChatbot';
 import { ObjectInspector } from './components/ObjectInspector';
-import { LandingPage } from './components/LandingPage';
 import { INITIAL_EXPERIMENT_STATE } from './simulation/thermodynamics';
 import { ExperimentState, CameraViewPreset, LabToolType, LabLightingState } from './types';
 import { labAudio } from './utils/audio';
 import { initGlobalErrorHandling } from './services/telemetry';
+import {
+  Volume2,
+  VolumeX,
+  RotateCcw,
+  Sparkles,
+  Flame,
+  Thermometer,
+  Eye,
+  Camera,
+  Layers,
+  FlaskConical,
+  Sun,
+} from 'lucide-react';
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<'landing' | 'lab'>(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get('view') === 'lab' || window.location.pathname === '/lab') {
-        return 'lab';
-      }
-    }
-    return 'landing';
-  });
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
   const [experiment, setExperiment] = useState<ExperimentState>(INITIAL_EXPERIMENT_STATE);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedToolType, setSelectedToolType] = useState<LabToolType | null>(null);
@@ -39,18 +41,8 @@ export default function App() {
       setIsReady(true);
     }, 500);
 
-    const handlePopState = () => {
-      if (typeof window !== 'undefined') {
-        const params = new URLSearchParams(window.location.search);
-        const isLab = params.get('view') === 'lab' || window.location.pathname === '/lab';
-        setCurrentView(isLab ? 'lab' : 'landing');
-      }
-    };
-    window.addEventListener('popstate', handlePopState);
-
     return () => {
       clearTimeout(timer);
-      window.removeEventListener('popstate', handlePopState);
     };
   }, []);
 
@@ -61,16 +53,6 @@ export default function App() {
       ...prev,
       [lightKey]: !prev[lightKey],
     }));
-    labAudio.playClick();
-  }, []);
-
-  const handleSetAllLights = useCallback((state: boolean) => {
-    setLighting({
-      mainCeiling: state,
-      benchSpot: state,
-      fumeHood: state,
-      uvBlacklight: state,
-    });
     labAudio.playClick();
   }, []);
 
@@ -152,125 +134,178 @@ export default function App() {
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'r' }));
   }, []);
 
-  // Enter lab from landing page with optional chemical solute preset
-  const handleEnterLab = useCallback((presetSolute?: { name: string; color: string }) => {
-    if (presetSolute) {
-      setExperiment((prev) => ({
-        ...prev,
-        soluteName: presetSolute.name,
-        liquidColor: presetSolute.color,
-      }));
-    }
-    setCurrentView('lab');
-    try {
-      if (typeof window !== 'undefined') {
-        window.history.pushState({}, '', '?view=lab');
-      }
-    } catch { }
-    labAudio.playClick();
-  }, []);
-
-  const handleReturnHome = useCallback(() => {
-    setCurrentView('landing');
-    try {
-      if (typeof window !== 'undefined') {
-        window.history.pushState({}, '', '/');
-      }
-    } catch { }
-    labAudio.playClick();
-  }, []);
+  // Temperature color indicator
+  const getTempColor = (temp: number) => {
+    if (temp <= 5) return 'text-cyan-400 bg-cyan-500/10 border-cyan-500/30';
+    if (temp < 45) return 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30';
+    if (temp < 80) return 'text-amber-400 bg-amber-500/10 border-amber-500/30';
+    return 'text-rose-400 bg-rose-500/10 border-rose-500/30 animate-pulse';
+  };
 
   return (
-    <main className="w-screen h-screen relative bg-neutral-950 font-sans overflow-hidden">
-      {/* 1. Landing Page View with Smooth Fade Transition */}
-      <div
-        className={`w-full h-full absolute inset-0 transition-opacity duration-500 ease-in-out ${currentView === 'landing' ? 'opacity-100 z-10 pointer-events-auto overflow-y-auto overflow-x-hidden' : 'opacity-0 z-0 pointer-events-none'
-          }`}
-      >
-        {currentView === 'landing' && (
-          <LandingPage
-            onEnterLab={handleEnterLab}
-            isDarkMode={isDarkMode}
-            onToggleDarkMode={() => setIsDarkMode((prev) => !prev)}
-          />
-        )}
+    <main className="w-screen h-screen relative bg-neutral-950 font-sans overflow-hidden select-none">
+      {/* 1. Cinema 4D Optical WebGL Canvas (Full viewport direct 3D laboratory) */}
+      <div className="w-full h-full absolute inset-0 z-0">
+        <LabScene
+          experiment={experiment}
+          setExperiment={setExperiment}
+          selectedId={selectedId}
+          onSelectItem={handleSelectItem}
+          cameraPreset={cameraPreset}
+          onAddIce={handleAddIce}
+          onAddChemical={handleSelectChemical}
+          isDraggingItem={isDraggingItem}
+          setIsDraggingItem={setIsDraggingItem}
+          lighting={lighting}
+        />
       </div>
 
-      {/* 2. 3D Virtual Chemistry Lab View with Clean Single-Sided Dock */}
-      <div
-        className={`w-full h-full absolute inset-0 transition-opacity duration-500 ease-in-out ${currentView === 'lab' ? 'opacity-100 z-20 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'
-          }`}
-      >
-        {currentView === 'lab' && (
-          <div className="w-full h-full relative">
-            {/* Cinema 4D Optical WebGL Canvas */}
-            <LabScene
-              experiment={experiment}
-              setExperiment={setExperiment}
-              selectedId={selectedId}
-              onSelectItem={handleSelectItem}
-              cameraPreset={cameraPreset}
-              onAddIce={handleAddIce}
-              onAddChemical={handleSelectChemical}
-              isDraggingItem={isDraggingItem}
-              setIsDraggingItem={setIsDraggingItem}
-              lighting={lighting}
-            />
-
-            {/* Unified Black & White Minimalist Sidebar & Autonomous AI Agent */}
-            <UnifiedLabSidebar
-              experiment={experiment}
-              onToggleBurner={handleToggleBurner}
-              onFirePowerChange={handleFirePowerChange}
-              onReset={handleReset}
-              onAddIce={handleAddIce}
-              onRefillWater={handleRefillWater}
-              onSelectChemical={handleSelectChemical}
-              cameraPreset={cameraPreset}
-              onSetCameraPreset={setCameraPreset}
-              isMuted={isMuted}
-              onToggleMute={handleToggleMute}
-              lighting={lighting}
-              onToggleLight={handleToggleLight}
-              onSetAllLights={handleSetAllLights}
-              onReturnToHome={handleReturnHome}
-            />
-
-            {/* Floating Scientific Object Inspector on item click */}
-            {selectedToolType && (
-              <ObjectInspector
-                toolType={selectedToolType}
-                onClose={() => {
-                  setSelectedId(null);
-                  setSelectedToolType(null);
-                }}
-                onRotateItem={handleRotateItem}
-                onAddIce={handleAddIce}
-                onSelectChemical={handleSelectChemical}
-                onRefillWater={handleRefillWater}
-              />
-            )}
-
-            {/* Laboratory Initialization Overlay */}
-            <div
-              id="lab-loader-overlay"
-              className={`absolute inset-0 bg-neutral-950 flex flex-col items-center justify-center pointer-events-none transition-opacity duration-700 z-50 ${isReady ? 'opacity-0' : 'opacity-100'
-                }`}
-            >
-              <div className="flex flex-col items-center space-y-4 max-w-sm px-6 text-center">
-                <div className="w-12 h-12 rounded-full border-2 border-white/20 border-t-white animate-spin" />
-                <div>
-                  <h1 className="text-sm font-mono tracking-widest text-white font-bold uppercase">
-                    MOSEB_STUDENT_LAB
-                  </h1>
-                  <p className="text-xs text-neutral-400 mt-1 font-mono">
-                    Initializing Cinema 4D PBR Shaders & Numerical Solvers...
-                  </p>
-                </div>
-              </div>
-            </div>
+      {/* 2. Top Floating Minimal Glassmorphic Telemetry HUD */}
+      <header className="absolute top-4 left-4 right-4 z-30 pointer-events-none flex items-center justify-between">
+        {/* Left: Branding & Active Telemetry Badges */}
+        <div className="flex items-center gap-2 pointer-events-auto flex-wrap">
+          <div className="flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-neutral-950/80 border border-white/10 backdrop-blur-xl shadow-2xl">
+            <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+            <span className="text-xs font-mono font-bold tracking-wider text-white uppercase">
+              MOSEB 4D LAB
+            </span>
           </div>
-        )}
+
+          {/* Current Chemical Solute */}
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-neutral-950/80 border border-white/10 backdrop-blur-xl shadow-lg text-xs font-mono">
+            <span
+              className="w-2.5 h-2.5 rounded-full border border-white/40 shadow-sm"
+              style={{ backgroundColor: experiment.liquidColor }}
+            />
+            <span className="text-neutral-200 font-medium truncate max-w-[140px]">
+              {experiment.soluteName}
+            </span>
+            <span className="text-neutral-500">|</span>
+            <span className="text-neutral-400">{Math.round(experiment.liquidVolume)} mL</span>
+          </div>
+
+          {/* Temperature & Water State Badge */}
+          <div
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-2xl border backdrop-blur-xl shadow-lg text-xs font-mono font-semibold ${getTempColor(
+              experiment.temperature
+            )}`}
+          >
+            <Thermometer size={13} />
+            <span>{experiment.temperature.toFixed(1)}°C</span>
+            <span className="text-[10px] opacity-80 uppercase tracking-tight">
+              ({experiment.waterState.replace('_', ' ')})
+            </span>
+          </div>
+
+          {/* Burner Flame Status */}
+          {experiment.isBurnerLit ? (
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-orange-500/15 border border-orange-500/40 text-orange-400 backdrop-blur-xl text-xs font-mono font-semibold animate-pulse">
+              <Flame size={13} />
+              <span>FLAME {experiment.firePower}%</span>
+            </div>
+          ) : (
+            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-2xl bg-neutral-950/60 border border-white/5 text-neutral-500 backdrop-blur-xl text-xs font-mono">
+              <Flame size={12} />
+              <span>BURNER OFF</span>
+            </div>
+          )}
+        </div>
+
+        {/* Right: Quick Controls Bar */}
+        <div className="flex items-center gap-2 pointer-events-auto">
+          {/* Camera View Switcher */}
+          <div className="flex items-center bg-neutral-950/80 border border-white/10 backdrop-blur-xl rounded-2xl p-1 shadow-lg">
+            {(
+              [
+                { id: 'experiment_focus', label: 'Bench' },
+                { id: 'macro_beaker', label: 'Macro' },
+                { id: 'top_down', label: 'Top' },
+                { id: 'overview', label: 'Wide' },
+              ] as const
+            ).map((preset) => (
+              <button
+                key={preset.id}
+                onClick={() => {
+                  setCameraPreset(preset.id);
+                  labAudio.playClick();
+                }}
+                className={`px-2.5 py-1 rounded-xl text-[11px] font-mono transition-all cursor-pointer ${
+                  cameraPreset === preset.id
+                    ? 'bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-400/30'
+                    : 'text-neutral-400 hover:text-white'
+                }`}
+              >
+                {preset.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Sound Toggle */}
+          <button
+            onClick={handleToggleMute}
+            title={isMuted ? 'Unmute Audio' : 'Mute Audio'}
+            className="p-2 rounded-2xl bg-neutral-950/80 border border-white/10 text-neutral-400 hover:text-white hover:bg-white/10 backdrop-blur-xl shadow-lg transition-all cursor-pointer"
+          >
+            {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
+          </button>
+
+          {/* Reset Bench */}
+          <button
+            onClick={handleReset}
+            title="Reset Laboratory Bench"
+            className="p-2 rounded-2xl bg-neutral-950/80 border border-white/10 text-neutral-400 hover:text-rose-400 hover:bg-white/10 backdrop-blur-xl shadow-lg transition-all cursor-pointer"
+          >
+            <RotateCcw size={15} />
+          </button>
+        </div>
+      </header>
+
+      {/* 3. Modern ChatGPT-Style Agentic AI Copilot (Right-Docked / Expandable) */}
+      <AgenticChatbot
+        experiment={experiment}
+        onToggleBurner={handleToggleBurner}
+        onFirePowerChange={handleFirePowerChange}
+        onSelectChemical={handleSelectChemical}
+        onAddIce={handleAddIce}
+        onRefillWater={handleRefillWater}
+        onSetCameraPreset={setCameraPreset}
+        onToggleLight={handleToggleLight}
+        onReset={handleReset}
+      />
+
+      {/* 4. Floating Scientific Object Inspector (Appears when apparatus item is clicked) */}
+      {selectedToolType && (
+        <ObjectInspector
+          toolType={selectedToolType}
+          onClose={() => {
+            setSelectedId(null);
+            setSelectedToolType(null);
+          }}
+          onRotateItem={handleRotateItem}
+          onAddIce={handleAddIce}
+          onSelectChemical={handleSelectChemical}
+          onRefillWater={handleRefillWater}
+        />
+      )}
+
+      {/* 5. Smooth Laboratory Initialization Loading Screen */}
+      <div
+        id="lab-loader-overlay"
+        className={`absolute inset-0 bg-neutral-950 flex flex-col items-center justify-center pointer-events-none transition-opacity duration-700 z-50 ${
+          isReady ? 'opacity-0' : 'opacity-100'
+        }`}
+      >
+        <div className="flex flex-col items-center space-y-4 max-w-sm px-6 text-center">
+          <div className="w-12 h-12 rounded-full border-2 border-cyan-500/20 border-t-cyan-400 animate-spin" />
+          <div>
+            <h1 className="text-sm font-mono tracking-widest text-white font-bold uppercase">
+              MOSEB 4D VIRTUAL LABORATORY
+            </h1>
+            <p className="text-xs text-neutral-400 mt-1 font-mono">
+              Loading 3D Optical Shaders & Thermodynamic Solvers...
+            </p>
+          </div>
+        </div>
       </div>
     </main>
   );
