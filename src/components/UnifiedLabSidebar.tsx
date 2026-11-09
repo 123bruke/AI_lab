@@ -199,7 +199,21 @@ export const UnifiedLabSidebar: React.FC<UnifiedLabSidebarProps> = ({
       {/* 2. Unified Black & White Vertical Sidebar Dock (Left) */}
       <aside className="absolute left-4 top-20 bottom-20 z-30 pointer-events-auto flex flex-col justify-center">
         <div className="p-2 rounded-2xl bg-black/90 border border-white/15 backdrop-blur-2xl shadow-2xl flex flex-col items-center gap-2 text-white">
-          {/* 1. AI Agent Button (Special Highlight) */}
+          {/* 1. 10+ Autonomous Multi-Agent Command Deck */}
+          <button
+            onClick={() => {
+              setIsMultiAgentDeckOpen(true);
+              setActivePanel(null);
+              labAudio.playClick();
+            }}
+            title="10+ Autonomous Multi-Agent Command Deck"
+            className="p-3 rounded-xl transition-all cursor-pointer relative bg-white/10 hover:bg-white hover:text-black text-cyan-300 border border-cyan-400/30 group"
+          >
+            <Bot size={20} />
+            <span className="absolute -top-1 -right-1 px-1.5 py-0.2 rounded-full bg-cyan-400 text-[8px] font-black text-black">10</span>
+          </button>
+
+          {/* 2. AI Agent Chat Copilot */}
           <button
             onClick={() => togglePanel('agent')}
             title="MOSEB AI Lab Copilot (Action Assistant)"
@@ -209,8 +223,8 @@ export const UnifiedLabSidebar: React.FC<UnifiedLabSidebarProps> = ({
               }`}
           >
             <Sparkles size={20} />
-            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping" />
-            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-cyan-400" />
+            <span className="absolute -top-1 -right-1 w-2 rounded-full bg-cyan-400 animate-ping" />
+            <span className="absolute -top-1 -right-1 w-2 rounded-full bg-cyan-400" />
           </button>
 
           <div className="w-6 h-[1px] bg-neutral-800 my-1" />
