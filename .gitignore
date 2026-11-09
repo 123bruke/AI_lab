@@ -2,6 +2,8 @@
 node_modules/
 .pnp
 .pnp.js
+lab1-front-main/
+temp_zip_extract/
 
 # Production / Build output
 dist/

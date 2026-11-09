@@ -9,7 +9,15 @@ import { labAudio } from './utils/audio';
 import { initGlobalErrorHandling } from './services/telemetry';
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<'landing' | 'lab'>('landing');
+  const [currentView, setCurrentView] = useState<'landing' | 'lab'>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('view') === 'lab' || window.location.pathname === '/lab') {
+        return 'lab';
+      }
+    }
+    return 'landing';
+  });
   const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
   const [experiment, setExperiment] = useState<ExperimentState>(INITIAL_EXPERIMENT_STATE);
   const [selectedId, setSelectedId] = useState<string | null>('beaker');
@@ -141,115 +149,119 @@ export default function App() {
       }));
     }
     setCurrentView('lab');
+    try {
+      if (typeof window !== 'undefined') {
+        window.history.pushState({}, '', '?view=lab');
+      }
+    } catch { }
+    labAudio.playClick();
+  }, []);
+
+  const handleReturnHome = useCallback(() => {
+    setCurrentView('landing');
+    try {
+      if (typeof window !== 'undefined') {
+        window.history.pushState({}, '', '/');
+      }
+    } catch { }
     labAudio.playClick();
   }, []);
 
   return (
     <main className="w-screen h-screen relative bg-neutral-950 font-sans overflow-hidden">
-      {/* Persistent Quick Mode Switcher Dock */}
-      <div className="fixed top-3 right-6 z-50 flex items-center p-1 rounded-xl bg-black/90 border border-white/20 backdrop-blur-2xl shadow-2xl text-xs font-mono">
-        <button
-          onClick={() => setCurrentView('landing')}
-          className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-            currentView === 'landing'
-              ? 'bg-white text-black font-bold shadow'
-              : 'text-neutral-400 hover:text-white'
-          }`}
-        >
-          Landing Page
-        </button>
-        <button
-          onClick={() => setCurrentView('lab')}
-          className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-            currentView === 'lab'
-              ? 'bg-white text-black font-bold shadow'
-              : 'text-neutral-400 hover:text-white'
-          }`}
-        >
-          4D Virtual Lab
-        </button>
-      </div>
-
-      {/* 1. Landing Page View */}
-      {currentView === 'landing' ? (
-        <div className="w-full h-full overflow-y-auto overflow-x-hidden relative">
+      {/* 1. Landing Page View with Smooth Fade Transition */}
+      <div
+        className={`w-full h-full absolute inset-0 transition-opacity duration-500 ease-in-out ${
+          currentView === 'landing' ? 'opacity-100 z-10 pointer-events-auto overflow-y-auto overflow-x-hidden' : 'opacity-0 z-0 pointer-events-none'
+        }`}
+      >
+        {currentView === 'landing' && (
           <LandingPage
             onEnterLab={handleEnterLab}
             isDarkMode={isDarkMode}
             onToggleDarkMode={() => setIsDarkMode((prev) => !prev)}
           />
-        </div>
-      ) : (
-        /* 2. 3D Virtual Chemistry Lab View */
-        <div className="w-full h-full relative">
-          {/* Cinema 4D Optical WebGL Canvas */}
-          <LabScene
-            experiment={experiment}
-            setExperiment={setExperiment}
-            selectedId={selectedId}
-            onSelectItem={handleSelectItem}
-            cameraPreset={cameraPreset}
-            onAddIce={handleAddIce}
-            onAddChemical={handleSelectChemical}
-            isDraggingItem={isDraggingItem}
-            setIsDraggingItem={setIsDraggingItem}
-            lighting={lighting}
-          />
+        )}
+      </div>
 
-          {/* Unified Black & White Minimalist Sidebar & Autonomous AI Agent */}
-          <UnifiedLabSidebar
-            experiment={experiment}
-            onToggleBurner={handleToggleBurner}
-            onFirePowerChange={handleFirePowerChange}
-            onReset={handleReset}
-            onAddIce={handleAddIce}
-            onRefillWater={handleRefillWater}
-            onSelectChemical={handleSelectChemical}
-            cameraPreset={cameraPreset}
-            onSetCameraPreset={setCameraPreset}
-            isMuted={isMuted}
-            onToggleMute={handleToggleMute}
-            lighting={lighting}
-            onToggleLight={handleToggleLight}
-            onSetAllLights={handleSetAllLights}
-            onReturnToHome={() => setCurrentView('landing')}
-          />
-
-          {/* Floating Scientific Object Inspector on item click */}
-          {selectedToolType && (
-            <ObjectInspector
-              toolType={selectedToolType}
-              onClose={() => {
-                setSelectedId(null);
-                setSelectedToolType(null);
-              }}
-              onRotateItem={handleRotateItem}
+      {/* 2. 3D Virtual Chemistry Lab View with Clean Single-Sided Dock */}
+      <div
+        className={`w-full h-full absolute inset-0 transition-opacity duration-500 ease-in-out ${
+          currentView === 'lab' ? 'opacity-100 z-20 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'
+        }`}
+      >
+        {currentView === 'lab' && (
+          <div className="w-full h-full relative">
+            {/* Cinema 4D Optical WebGL Canvas */}
+            <LabScene
+              experiment={experiment}
+              setExperiment={setExperiment}
+              selectedId={selectedId}
+              onSelectItem={handleSelectItem}
+              cameraPreset={cameraPreset}
               onAddIce={handleAddIce}
-              onSelectChemical={handleSelectChemical}
-              onRefillWater={handleRefillWater}
+              onAddChemical={handleSelectChemical}
+              isDraggingItem={isDraggingItem}
+              setIsDraggingItem={setIsDraggingItem}
+              lighting={lighting}
             />
-          )}
 
-          {/* Laboratory Initialization Overlay */}
-          <div
-            id="lab-loader-overlay"
-            className={`absolute inset-0 bg-neutral-950 flex flex-col items-center justify-center pointer-events-none transition-opacity duration-700 z-50 ${isReady ? 'opacity-0' : 'opacity-100'
+            {/* Unified Black & White Minimalist Sidebar & Autonomous AI Agent */}
+            <UnifiedLabSidebar
+              experiment={experiment}
+              onToggleBurner={handleToggleBurner}
+              onFirePowerChange={handleFirePowerChange}
+              onReset={handleReset}
+              onAddIce={handleAddIce}
+              onRefillWater={handleRefillWater}
+              onSelectChemical={handleSelectChemical}
+              cameraPreset={cameraPreset}
+              onSetCameraPreset={setCameraPreset}
+              isMuted={isMuted}
+              onToggleMute={handleToggleMute}
+              lighting={lighting}
+              onToggleLight={handleToggleLight}
+              onSetAllLights={handleSetAllLights}
+              onReturnToHome={handleReturnHome}
+            />
+
+            {/* Floating Scientific Object Inspector on item click */}
+            {selectedToolType && (
+              <ObjectInspector
+                toolType={selectedToolType}
+                onClose={() => {
+                  setSelectedId(null);
+                  setSelectedToolType(null);
+                }}
+                onRotateItem={handleRotateItem}
+                onAddIce={handleAddIce}
+                onSelectChemical={handleSelectChemical}
+                onRefillWater={handleRefillWater}
+              />
+            )}
+
+            {/* Laboratory Initialization Overlay */}
+            <div
+              id="lab-loader-overlay"
+              className={`absolute inset-0 bg-neutral-950 flex flex-col items-center justify-center pointer-events-none transition-opacity duration-700 z-50 ${
+                isReady ? 'opacity-0' : 'opacity-100'
               }`}
-          >
-            <div className="flex flex-col items-center space-y-4 max-w-sm px-6 text-center">
-              <div className="w-12 h-12 rounded-full border-2 border-white/20 border-t-white animate-spin" />
-              <div>
-                <h1 className="text-sm font-mono tracking-widest text-white font-bold uppercase">
-                  MOSEB_STUDENT_LAB
-                </h1>
-                <p className="text-xs text-neutral-400 mt-1 font-mono">
-                  Initializing Cinema 4D PBR Shaders & Numerical Solvers...
-                </p>
+            >
+              <div className="flex flex-col items-center space-y-4 max-w-sm px-6 text-center">
+                <div className="w-12 h-12 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+                <div>
+                  <h1 className="text-sm font-mono tracking-widest text-white font-bold uppercase">
+                    MOSEB_STUDENT_LAB
+                  </h1>
+                  <p className="text-xs text-neutral-400 mt-1 font-mono">
+                    Initializing Cinema 4D PBR Shaders & Numerical Solvers...
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </main>
   );
 }

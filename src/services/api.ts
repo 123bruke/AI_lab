@@ -175,6 +175,25 @@ class ApiService {
     } catch { }
   }
 
+  async queryRagAssistant(message: string): Promise<{ reply: string; sources: string[]; topic: string }> {
+    try {
+      const res = await fetch(`${API_BASE}/api/assistant/query`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message }),
+      });
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch { }
+
+    return {
+      reply: "Welcome to MOSEB 4D Chemistry Lab! Click 'Enter 3D Lab' in the top banner to explore the thermodynamic simulation, heat vessels with the Bunsen burner, or test chemical reaction kinetics.",
+      sources: ["MOSEB Platform Documentation", "Thermodynamics Guide"],
+      topic: "MOSEB Virtual Lab",
+    };
+  }
+
   logout() {
     this.token = null;
     this.currentUser = null;
@@ -501,3 +520,4 @@ class ApiService {
 }
 
 export const api = new ApiService();
+export default api;

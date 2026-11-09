@@ -12,6 +12,7 @@ from backend.app.database.connection import engine, Base
 import backend.app.database.expanded_models  # Ensure all expanded tables are registered
 from backend.app.routers import auth_router, experiment_router, ai_agent_router
 from backend.app.routers.multi_agent_router import router as multi_agent_api_router, telemetry_router
+from backend.app.routers.rag_assistant_router import router as rag_assistant_router
 from backend.app.vector_store.chroma_service import chroma_service
 from backend.app.logging_system.logger import app_logger
 
@@ -51,6 +52,7 @@ app.add_middleware(
 app.include_router(auth_router.router, prefix="/api")
 app.include_router(experiment_router.router, prefix="/api")
 app.include_router(ai_agent_router.router, prefix="/api")
+app.include_router(rag_assistant_router, prefix="/api")
 app.include_router(multi_agent_api_router)
 app.include_router(telemetry_router)
 

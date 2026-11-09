@@ -136,10 +136,11 @@ export const ObjectInspector: React.FC<ObjectInspectorProps> = ({
     return (
       <div
         id="object-inspector-panel-minimized"
-        className="absolute bottom-4 right-4 glass-panel rounded-xl px-3 py-1.5 text-white z-20 shadow-xl flex items-center gap-2 text-xs border border-white/10 cursor-pointer hover:bg-slate-900/80 transition-colors"
+        className="absolute bottom-4 right-4 bg-white/95 backdrop-blur-md rounded-2xl px-4 py-2 text-neutral-900 z-30 shadow-2xl flex items-center gap-3 text-xs border border-neutral-200/90 cursor-pointer hover:bg-white transition-all select-none"
         onClick={() => setIsMinimized(false)}
       >
-        <span className="font-mono text-sky-400 font-medium truncate max-w-[160px]">
+        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+        <span className="font-semibold text-neutral-800 truncate max-w-[170px]">
           {info.name}
         </span>
         <button
@@ -147,10 +148,10 @@ export const ObjectInspector: React.FC<ObjectInspectorProps> = ({
             e.stopPropagation();
             setIsMinimized(false);
           }}
-          className="text-neutral-400 hover:text-white"
+          className="text-neutral-500 hover:text-neutral-900 p-0.5 rounded transition-colors"
           title="Expand Details"
         >
-          <ChevronUp className="w-3.5 h-3.5" />
+          <ChevronUp className="w-4 h-4" />
         </button>
         <button
           onClick={(e) => {
@@ -158,10 +159,10 @@ export const ObjectInspector: React.FC<ObjectInspectorProps> = ({
             labAudio.playClick();
             onClose();
           }}
-          className="text-neutral-400 hover:text-white ml-1"
+          className="text-neutral-400 hover:text-neutral-800 p-0.5 rounded transition-colors"
           title="Deselect"
         >
-          <X className="w-3.5 h-3.5" />
+          <X className="w-4 h-4" />
         </button>
       </div>
     );
@@ -170,69 +171,69 @@ export const ObjectInspector: React.FC<ObjectInspectorProps> = ({
   return (
     <div
       id="object-inspector-panel"
-      className="absolute bottom-4 right-4 w-76 sm:w-80 glass-panel rounded-2xl p-3.5 text-white z-20 shadow-2xl animate-fade-in border border-white/10"
+      className="absolute bottom-5 right-5 w-80 sm:w-88 bg-white/95 backdrop-blur-2xl rounded-3xl p-5 text-neutral-900 z-30 shadow-2xl animate-fade-in border border-neutral-200/80 select-none"
     >
       {/* Header */}
-      <div className="flex items-start justify-between pb-2 border-b border-white/10">
+      <div className="flex items-start justify-between pb-3 border-b border-neutral-100">
         <div className="pr-2">
-          <span className="text-[9px] font-mono tracking-wider uppercase text-sky-400 font-semibold">
+          <span className="inline-block px-2 py-0.5 rounded-full bg-neutral-100 text-[10px] font-medium tracking-wide uppercase text-neutral-600 mb-1">
             {info.category}
           </span>
-          <h3 className="text-xs font-bold text-neutral-100 leading-snug">{info.name}</h3>
+          <h3 className="text-sm font-bold text-neutral-900 leading-snug tracking-tight">{info.name}</h3>
         </div>
         <div className="flex items-center gap-1 shrink-0">
           <button
             onClick={() => setIsMinimized(true)}
-            className="p-1 rounded-lg text-neutral-400 hover:text-white hover:bg-white/10 transition-colors"
+            className="p-1.5 rounded-xl text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors"
             title="Minimize Inspector"
           >
-            <ChevronDown className="w-3.5 h-3.5" />
+            <ChevronDown className="w-4 h-4" />
           </button>
           <button
             onClick={() => {
               labAudio.playClick();
               onClose();
             }}
-            className="p-1 rounded-lg text-neutral-400 hover:text-white hover:bg-white/10 transition-colors"
-            title="Deselect"
+            className="p-1.5 rounded-xl text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors"
+            title="Close"
           >
-            <X className="w-3.5 h-3.5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
       </div>
 
       {/* Details */}
-      <div className="mt-3 space-y-2 text-xs">
-        <p className="text-neutral-300 leading-relaxed">{info.description}</p>
+      <div className="mt-3.5 space-y-2.5 text-xs">
+        <p className="text-neutral-600 leading-relaxed text-[12px]">{info.description}</p>
 
         <div className="grid grid-cols-2 gap-2 pt-1 font-mono text-[11px]">
-          <div className="bg-slate-900/60 p-2 rounded-lg border border-white/5">
-            <span className="text-neutral-400 block text-[9px] uppercase">Composition</span>
-            <span className="text-neutral-200 font-medium">{info.material}</span>
+          <div className="bg-neutral-50 p-2.5 rounded-2xl border border-neutral-150">
+            <span className="text-neutral-400 block text-[9px] uppercase font-sans font-semibold tracking-wider">Composition</span>
+            <span className="text-neutral-800 font-medium text-[11px] mt-0.5 block truncate">{info.material}</span>
           </div>
-          <div className="bg-slate-900/60 p-2 rounded-lg border border-white/5">
-            <span className="text-neutral-400 block text-[9px] uppercase">Thermal Limit</span>
-            <span className="text-amber-400 font-medium">{info.safeTempLimit}</span>
+          <div className="bg-neutral-50 p-2.5 rounded-2xl border border-neutral-150">
+            <span className="text-neutral-400 block text-[9px] uppercase font-sans font-semibold tracking-wider">Thermal Limit</span>
+            <span className="text-rose-600 font-semibold text-[11px] mt-0.5 block truncate">{info.safeTempLimit}</span>
           </div>
         </div>
 
-        <div className="p-2 bg-sky-950/40 rounded-lg border border-sky-500/20 text-[11px] text-sky-200/90 flex items-start gap-2">
-          <Info className="w-3.5 h-3.5 text-sky-400 shrink-0 mt-0.5" />
+        <div className="p-2.5 bg-blue-50/80 rounded-2xl border border-blue-100 text-[11px] text-blue-900 flex items-start gap-2 leading-relaxed">
+          <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
           <span>{info.usageTip}</span>
         </div>
       </div>
 
-      {/* Interactive Actions */}
-      <div className="mt-3 pt-2 border-t border-white/10 flex flex-wrap gap-1.5">
+      {/* Interactive Quick Actions */}
+      <div className="mt-4 pt-3 border-t border-neutral-100 flex flex-wrap gap-2">
         <button
           onClick={() => {
             labAudio.playClick();
             onRotateItem();
           }}
-          className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-neutral-200 text-xs font-medium flex items-center gap-1.5 border border-white/10 transition-colors"
+          className="px-3 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
         >
-          <RotateCw className="w-3.5 h-3.5 text-sky-400" />
-          <span>Rotate (R)</span>
+          <RotateCw className="w-3.5 h-3.5 text-neutral-300" />
+          <span>Rotate 3D (R)</span>
         </button>
 
         {toolType === 'beaker' && (
@@ -242,20 +243,20 @@ export const ObjectInspector: React.FC<ObjectInspectorProps> = ({
                 labAudio.playClick();
                 onRefillWater();
               }}
-              className="px-2.5 py-1.5 rounded-lg bg-sky-900/60 hover:bg-sky-800 text-sky-200 text-xs font-medium flex items-center gap-1.5 border border-sky-500/30 transition-colors"
+              className="px-3 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold flex items-center gap-1.5 border border-blue-200 transition-all cursor-pointer"
             >
-              <Droplets className="w-3.5 h-3.5 text-sky-400" />
-              <span>Refill H₂O</span>
+              <Droplets className="w-3.5 h-3.5 text-blue-600" />
+              <span>Refill Meniscus</span>
             </button>
             <button
               onClick={() => {
                 labAudio.playClick();
                 onAddIce();
               }}
-              className="px-2.5 py-1.5 rounded-lg bg-cyan-900/60 hover:bg-cyan-800 text-cyan-200 text-xs font-medium flex items-center gap-1.5 border border-cyan-500/30 transition-colors"
+              className="px-3 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-semibold flex items-center gap-1.5 border border-sky-200 transition-all cursor-pointer"
             >
-              <Snowflake className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Drop Ice Cube</span>
+              <Snowflake className="w-3.5 h-3.5 text-sky-600" />
+              <span>Add Ice Cube</span>
             </button>
           </>
         )}
@@ -266,19 +267,19 @@ export const ObjectInspector: React.FC<ObjectInspectorProps> = ({
               labAudio.playClick();
               onAddIce();
             }}
-            className="w-full py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-medium flex items-center justify-center gap-1.5 transition-colors"
+            className="w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-all shadow-sm cursor-pointer"
           >
-            <Snowflake className="w-3.5 h-3.5" />
-            <span>Add Ice Cube to Beaker</span>
+            <Snowflake className="w-4 h-4" />
+            <span>Transfer Cryogenic Ice Cube</span>
           </button>
         )}
 
         {(toolType === 'chemical_jar' || toolType === 'test_tubes') && (
-          <div className="w-full pt-1 space-y-1">
-            <span className="text-[10px] uppercase font-mono text-neutral-400 block">
-              Inject Chemical Solution:
+          <div className="w-full pt-1.5 space-y-1.5">
+            <span className="text-[10px] uppercase font-sans font-bold tracking-wider text-neutral-500 block">
+              Inject Chemical Solute:
             </span>
-            <div className="grid grid-cols-2 gap-1">
+            <div className="grid grid-cols-2 gap-1.5">
               {CHEMICAL_PRESETS.slice(1).map((chem) => (
                 <button
                   key={chem.formula}
@@ -286,10 +287,10 @@ export const ObjectInspector: React.FC<ObjectInspectorProps> = ({
                     labAudio.playClick();
                     onSelectChemical(chem.color, chem.name);
                   }}
-                  className="px-2 py-1 rounded bg-slate-800/80 hover:bg-slate-700 text-left text-[10px] font-mono flex items-center gap-1.5 text-neutral-200 border border-white/5 truncate"
+                  className="px-2.5 py-1.5 rounded-xl bg-neutral-50 hover:bg-neutral-100 text-left text-[11px] font-medium flex items-center gap-2 text-neutral-800 border border-neutral-200/70 truncate transition-all cursor-pointer"
                 >
                   <span
-                    className="w-2.5 h-2.5 rounded-full shrink-0"
+                    className="w-2.5 h-2.5 rounded-full shrink-0 shadow-sm"
                     style={{ backgroundColor: chem.color }}
                   />
                   <span className="truncate">{chem.formula}</span>

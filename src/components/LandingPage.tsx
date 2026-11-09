@@ -1,31 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Sparkles,
   FlaskConical,
   Flame,
   Atom,
   ArrowRight,
-  Shield,
+  Droplets,
   Layers,
-  Cpu,
-  Users,
-  Compass,
-  Play,
   Moon,
   Sun,
   User as UserIcon,
   LogOut,
-  Mail,
-  CheckCircle,
-  ExternalLink,
-  ChevronRight,
-  HelpCircle,
-  Activity,
-  Award
+  ChevronDown,
+  ChevronUp,
+  X,
+  ArrowUp,
+  Play,
+  RotateCw,
+  Box,
+  Compass
 } from 'lucide-react';
 import { Floating4DBackground } from './Floating4DBackground';
 import { AuthModal } from './AuthModal';
 import { api, User } from '../services/api';
+import { CHEMICAL_PRESETS } from '../simulation/thermodynamics';
 
 interface LandingPageProps {
   onEnterLab: (presetSolute?: { name: string; color: string }) => void;
@@ -40,18 +37,30 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
     try {
-      return api?.getUser ? api.getUser() : null;
+      return typeof api?.getUser === 'function' ? api.getUser() : null;
     } catch {
       return null;
     }
   });
+
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
-  const [contactSubmitted, setContactSubmitted] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatInput, setChatInput] = useState('');
+  const [chatLoading, setChatLoading] = useState(false);
+  const [chatMessages, setChatMessages] = useState<Array<{ id: number; role: 'assistant' | 'user'; text: string; sources?: string[] }>>([
+    {
+      id: 1,
+      role: 'assistant',
+      text: 'Hello! I am your MOSEB 4D Lab Assistant. Ask me about our 3D apparatus, thermodynamic heating formulas, chemical solutes, or click "Enter 3D Lab" to launch!',
+    },
+  ]);
+
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
   useEffect(() => {
     try {
-      if (api?.getUser) {
+      if (typeof api?.getUser === 'function') {
         setCurrentUser(api.getUser());
       }
     } catch { }
@@ -63,603 +72,510 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   };
 
   const handleLogout = () => {
-    api.logout();
+    try {
+      if (typeof api?.logout === 'function') {
+        api.logout();
+      }
+    } catch { }
     setCurrentUser(null);
   };
 
-  const curriculumModules = [
+  const handleSendChat = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const query = chatInput.trim();
+    if (!query || chatLoading) return;
+
+    const userMsgId = Date.now();
+    setChatMessages((prev) => [...prev, { id: userMsgId, role: 'user', text: query }]);
+    setChatInput('');
+    setChatLoading(true);
+
+    try {
+      const res = await api.queryRagAssistant(query);
+      setChatMessages((prev) => [
+        ...prev,
+        {
+          id: userMsgId + 1,
+          role: 'assistant',
+          text: res.reply,
+          sources: res.sources,
+        },
+      ]);
+    } catch {
+      setChatMessages((prev) => [
+        ...prev,
+        {
+          id: userMsgId + 1,
+          role: 'assistant',
+          text: 'Welcome to MOSEB 4D Lab. Click "Enter 3D Lab" in the top banner to launch the simulation!',
+        },
+      ]);
+    } finally {
+      setChatLoading(false);
+    }
+  };
+
+  const faqs = [
     {
-      id: 'thermo-boil',
-      title: 'Water Phase Transitions & Boiling',
-      solute: 'Pure Distilled Water',
-      color: '#38bdf8',
-      desc: 'Investigate sensible heat transfer, nucleation sites, and the latent heat of vaporization up to 100°C.',
-      tag: 'Thermodynamics',
+      q: 'How does the real-time thermodynamic simulation solve temperature?',
+      a: 'MOSEB solves continuous convective energy transfer Q = m * c * ΔT at ~60Hz, integrating Bunsen flame power, ambient radiation loss, and enthalpy of fusion (334 J/g for ice) or vaporization (2260 kJ/kg for steam).',
     },
     {
-      id: 'copper-sulfate',
-      title: 'Copper(II) Sulfate Dissociation',
-      solute: 'Copper(II) Sulfate',
-      color: '#0284c7',
-      desc: 'Observe azure octahedral coordination complexes [Cu(H2O)6]2+ and ion-dipole thermal stability.',
-      tag: 'Inorganic Chemistry',
+      q: 'Can I test different chemical reaction solutes?',
+      a: 'Yes! You can choose between Pure Deionized Water, Copper(II) Sulfate, Iron(III) Chloride, Phenolphthalein indicator, and Potassium Permanganate. Each chemical adjusts liquid color, viscosity, and thermal absorption.',
     },
     {
-      id: 'cobalt-chloride',
-      title: 'Cobalt(II) Chloride Equilibrium',
-      solute: 'Cobalt(II) Chloride',
-      color: '#ec4899',
-      desc: 'Thermodynamic Le Chatelier shift between pink hexaaqua and deep blue tetrachloro complexes.',
-      tag: 'Coordination Chemistry',
+      q: 'How do I enter and control apparatus in the 3D space?',
+      a: 'Click "Enter 3D Lab" anywhere on this page. Inside, you can click on any equipment (beaker, burner, thermometer) to inspect specifications, click "Rotate (R)" to spin apparatus, and drag the Bunsen burner power slider to ignite flame heating.',
     },
     {
-      id: 'potassium-permanganate',
-      title: 'Potassium Permanganate Kinetics',
-      solute: 'Potassium Permanganate',
-      color: '#9333ea',
-      desc: 'High extinction coefficient deep-violet diffusion kinetics and redox potential observation.',
-      tag: 'Physical Chemistry',
-    },
-    {
-      id: 'nickel-sulfate',
-      title: 'Nickel(II) Sulfate Hydration',
-      solute: 'Nickel(II) Sulfate',
-      color: '#10b981',
-      desc: 'Hexahydrate crystalline transitions in aqueous equilibrium with thermal convection currents.',
-      tag: 'Materials Science',
-    },
-    {
-      id: 'cryo-quench',
-      title: 'Cryogenic Ice Quench Dynamics',
-      solute: 'Cryogenic Aqueous Slush',
-      color: '#06b6d4',
-      desc: 'Measure the enthalpy of fusion (334 J/g) by introducing ice blocks into near-boiling solutions.',
-      tag: 'Cryo-Physics',
+      q: 'What is the role of the AI Lab Copilot?',
+      a: 'Our autonomous agent monitors laboratory safety thresholds, conducts instant thermodynamic and stoichiometric audits, and advises on proper procedure before hazardous boiling or overheating occurs.',
     },
   ];
 
   return (
-    <div
-      className={`w-full min-h-screen relative transition-colors duration-500 overflow-x-hidden ${
-        isDarkMode ? 'bg-neutral-950 text-neutral-100' : 'bg-slate-50 text-neutral-900'
-      }`}
-    >
-      {/* 1. 4D Interactive Refractive Balls Background with Frosted Blur Separator */}
-      <Floating4DBackground isDarkMode={isDarkMode} />
+    <div className={`min-h-screen relative font-sans transition-colors duration-300 ${isDarkMode ? 'bg-[#090d16] text-neutral-100' : 'bg-white text-neutral-900'}`}>
+      {/* 1. Interactive 3D Floating Physics Background */}
+      <div className="fixed inset-0 pointer-events-none z-0 opacity-40">
+        <Floating4DBackground />
+      </div>
 
-      {/* Foreground Container */}
-      <div className="relative z-10 flex flex-col min-h-screen">
-        {/* Navigation Bar */}
-        <header
-          className={`sticky top-0 z-40 w-full px-6 py-4 border-b backdrop-blur-xl transition-all ${isDarkMode
-              ? 'bg-neutral-950/80 border-neutral-800/80'
-              : 'bg-white/80 border-neutral-200/80'
-            }`}
-        >
-          <div className="max-w-7xl mx-auto flex items-center justify-between">
-            {/* Logo */}
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-white text-black flex items-center justify-center font-bold shadow-lg shadow-white/5">
-                <Atom size={22} className="text-black" />
-              </div>
-              <div>
-                <span className="font-extrabold text-base tracking-wider block">
-                  MOSEB_STUDENT_LAB
-                </span>
-                <span className="text-[10px] font-mono tracking-widest text-neutral-400 block -mt-1 uppercase">
-                  4D Cinema Optical Lab
-                </span>
-              </div>
+      {/* 2. Top Banner / Header Navbar */}
+      <header className="sticky top-0 z-40 w-full backdrop-blur-xl border-b transition-colors border-neutral-200/20 bg-neutral-950/70">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
+          {/* Brand Logo */}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-white text-black flex items-center justify-center shadow-lg shadow-white/10 font-bold">
+              <FlaskConical size={22} className="text-black" />
             </div>
-
-            {/* Desktop Navigation Links */}
-            <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-neutral-400">
-              <a href="#home" className="hover:text-white transition-colors">Home</a>
-              <a href="#about" className="hover:text-white transition-colors">About</a>
-              <a href="#curriculum" className="hover:text-white transition-colors">Curriculum</a>
-              <a href="#features" className="hover:text-white transition-colors">4D Optics</a>
-              <a href="#community" className="hover:text-white transition-colors">Community</a>
-              <a href="#contact" className="hover:text-white transition-colors">Contact</a>
-            </nav>
-
-            {/* Right Controls: Theme + Auth + Launch Lab CTA */}
-            <div className="flex items-center gap-3">
-              {/* Theme Toggle Button */}
-              <button
-                onClick={onToggleDarkMode}
-                title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-                className={`p-2 rounded-xl border transition-all cursor-pointer ${isDarkMode
-                    ? 'border-neutral-800 bg-neutral-900 text-neutral-300 hover:text-white'
-                    : 'border-neutral-200 bg-white text-neutral-700 hover:text-black'
-                  }`}
-              >
-                {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
-              </button>
-
-              {/* User Account Controls */}
-              {currentUser ? (
-                <div className="flex items-center gap-2">
-                  <div
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-medium ${isDarkMode
-                        ? 'border-neutral-800 bg-neutral-900 text-neutral-200'
-                        : 'border-neutral-200 bg-white text-neutral-800'
-                      }`}
-                  >
-                    <UserIcon size={14} className="text-cyan-400" />
-                    <span>{currentUser.username}</span>
-                  </div>
-                  <button
-                    onClick={handleLogout}
-                    title="Sign Out"
-                    className="p-2 rounded-xl border border-neutral-800 hover:bg-neutral-800 text-neutral-400 hover:text-rose-400 transition-colors cursor-pointer"
-                  >
-                    <LogOut size={16} />
-                  </button>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => handleOpenAuth('login')}
-                    className="px-3.5 py-1.5 text-xs font-semibold rounded-lg hover:underline transition-all cursor-pointer text-neutral-300"
-                  >
-                    Sign In
-                  </button>
-                  <button
-                    onClick={() => handleOpenAuth('register')}
-                    className={`hidden sm:inline-flex px-3.5 py-1.5 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${isDarkMode
-                        ? 'border-neutral-700 hover:border-neutral-500 text-white'
-                        : 'border-neutral-300 hover:border-neutral-400 text-black'
-                      }`}
-                  >
-                    Register
-                  </button>
-                </div>
-              )}
-
-              {/* Launch 4D Lab Primary Button */}
-              <button
-                onClick={() => onEnterLab()}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white text-black font-semibold text-xs tracking-wide shadow-lg hover:bg-neutral-200 active:scale-95 transition-all cursor-pointer"
-              >
-                <Play size={14} fill="currentColor" />
-                <span>Enter 4D Lab</span>
-              </button>
+            <div>
+              <span className="font-extrabold text-base tracking-wider text-white">MOSEB LAB</span>
+              <span className="text-[10px] block font-mono text-neutral-400 uppercase tracking-widest">4D Virtual Chemistry</span>
             </div>
           </div>
-        </header>
 
-        {/* Hero Section */}
-        <section id="home" className="max-w-7xl mx-auto px-6 pt-20 pb-28 flex flex-col items-center text-center">
-          {/* Eyebrow Pill */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-neutral-800 bg-black/60 text-xs font-mono tracking-wider text-neutral-300 mb-8 backdrop-blur-md">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-            <span>MOSEB STUDENT LAB • ULTRA 4D PHYSICAL ENGINE</span>
-          </div>
+          {/* Center Navigation Links */}
+          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-neutral-300">
+            <a href="#apparatus" className="hover:text-white transition-colors">Apparatus</a>
+            <a href="#thermodynamics" className="hover:text-white transition-colors">Thermodynamics</a>
+            <a href="#chemicals" className="hover:text-white transition-colors">Reagents</a>
+            <a href="#about" className="hover:text-white transition-colors">About</a>
+            <a href="#faq" className="hover:text-white transition-colors">FAQ</a>
+          </nav>
 
-          {/* Main Headline */}
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight max-w-4xl leading-[1.1] mb-6">
-            The Next-Generation <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400">
-              4D Virtual Chemistry Laboratory
-            </span>
-          </h1>
+          {/* Right Action Banners */}
+          <div className="flex items-center gap-3">
+            {/* Theme Toggle */}
+            <button
+              onClick={onToggleDarkMode}
+              className="p-2 rounded-xl text-neutral-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              title="Toggle theme"
+            >
+              {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
 
-          {/* Subtitle */}
-          <p className="text-base md:text-xl text-neutral-400 max-w-2xl font-normal mb-10 leading-relaxed">
-            Perform quantum-accurate thermodynamic experiments with Cinema 4D-grade physical lighting,
-            dynamic fluid convection, volumetric steam, and an autonomous AI Lab Agent.
-          </p>
+            {/* Auth Buttons */}
+            {currentUser ? (
+              <div className="flex items-center gap-2">
+                <div className="px-3 py-1.5 rounded-xl bg-white/10 text-white text-xs font-mono flex items-center gap-2 border border-white/10">
+                  <UserIcon size={14} className="text-emerald-400" />
+                  <span className="font-semibold">{currentUser.username}</span>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="p-2 rounded-xl text-neutral-400 hover:text-rose-400 hover:bg-white/10 transition-colors cursor-pointer"
+                  title="Logout"
+                >
+                  <LogOut size={16} />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleOpenAuth('login')}
+                  className="px-3.5 py-1.5 text-xs font-medium text-neutral-300 hover:text-white hover:bg-white/10 rounded-xl transition-all cursor-pointer"
+                >
+                  Sign In
+                </button>
+                <button
+                  onClick={() => handleOpenAuth('register')}
+                  className="hidden sm:inline-block px-3.5 py-1.5 text-xs font-medium bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl border border-white/10 transition-all cursor-pointer"
+                >
+                  Sign Up
+                </button>
+              </div>
+            )}
 
-          {/* Primary Action Buttons */}
-          <div className="flex flex-wrap items-center justify-center gap-4 mb-16">
+            {/* Primary Action Button: Enter 3D Space */}
             <button
               onClick={() => onEnterLab()}
-              className="flex items-center gap-3 px-8 py-4 rounded-2xl bg-white text-black font-bold text-sm tracking-wide shadow-2xl hover:bg-neutral-200 active:scale-[0.98] transition-all cursor-pointer group"
+              className="px-4 py-2 rounded-xl bg-white text-black text-xs font-bold uppercase tracking-wider flex items-center gap-2 hover:bg-neutral-200 shadow-xl shadow-white/15 transition-all cursor-pointer"
             >
-              <Play size={18} fill="currentColor" />
-              <span>Launch Virtual Lab</span>
-              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+              <Box size={16} className="text-black" />
+              <span>Enter 3D Lab</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* 3. Hero Section with 3D Visual Mockup */}
+      <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-24 space-y-28">
+        <section className="text-center space-y-8 max-w-4xl mx-auto">
+          {/* Status Badge */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 text-xs font-mono text-neutral-200 shadow-sm backdrop-blur-md">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="font-semibold">CINEMA 4D STUDIO OPTICS & NUMERICAL SOLVER</span>
+          </div>
+
+          {/* Main Title */}
+          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-none text-white">
+            MOSEB <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-sky-400 to-indigo-300">4D LAB</span>
+          </h1>
+
+          {/* Hero Subtitle */}
+          <p className="text-base sm:text-lg md:text-xl text-neutral-300 max-w-2xl mx-auto leading-relaxed">
+            Ultra-photorealistic 4D virtual chemistry simulation featuring Cinema 4D physical optics, real-time thermodynamic heat transfer, and autonomous AI copilot guidance.
+          </p>
+
+          {/* Hero Action CTAs */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+            <button
+              onClick={() => onEnterLab()}
+              className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-white text-black font-extrabold text-sm uppercase tracking-wider flex items-center justify-center gap-3 hover:bg-neutral-200 shadow-2xl shadow-white/20 transition-all cursor-pointer"
+            >
+              <FlaskConical size={20} className="text-black" />
+              <span>Launch 3D Simulation</span>
+              <ArrowRight size={18} />
             </button>
 
             <a
-              href="#curriculum"
-              className={`flex items-center gap-2 px-6 py-4 rounded-2xl border font-semibold text-sm transition-all cursor-pointer ${isDarkMode
-                  ? 'border-neutral-800 bg-neutral-900/60 hover:bg-neutral-800 text-neutral-200'
-                  : 'border-neutral-300 bg-white hover:bg-neutral-100 text-neutral-800'
-                }`}
+              href="#apparatus"
+              className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-neutral-900/80 hover:bg-neutral-800 text-white font-bold text-sm border border-white/15 transition-all text-center"
             >
-              <FlaskConical size={18} className="text-cyan-400" />
-              <span>Explore Curriculum</span>
+              Explore Laboratory Apparatus
             </a>
           </div>
 
-          {/* Real-time Feature Metrics */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full max-w-4xl">
-            {[
-              { label: 'Thermodynamic Accuracy', val: '0.01°C' },
-              { label: 'Cinema 4D Shaders', val: 'Ray-PBR' },
-              { label: 'Safety & Hazard Rating', val: '100% Zero-Risk' },
-              { label: 'Autonomous Guidance', val: 'AI Mentor' },
-            ].map((metric, i) => (
-              <div
-                key={i}
-                className={`p-5 rounded-2xl border backdrop-blur-xl text-left transition-all ${isDarkMode
-                    ? 'border-neutral-800/80 bg-black/40 hover:border-neutral-700'
-                    : 'border-neutral-200/90 bg-white/70 hover:border-neutral-300'
-                  }`}
-              >
-                <div className="text-xl md:text-2xl font-bold font-mono tracking-tight text-white">
-                  {metric.val}
-                </div>
-                <div className="text-xs text-neutral-400 font-medium mt-1">
-                  {metric.label}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Section 2: About Platform */}
-        <section id="about" className="max-w-7xl mx-auto px-6 py-20 w-full border-t border-neutral-800/60">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="text-xs font-mono font-bold tracking-widest text-cyan-400 uppercase mb-3">
-                Architectural Vision
-              </div>
-              <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-6">
-                Bridging Theoretical Chemistry with Hyper-Realistic Physical Immersion
-              </h2>
-              <p className="text-neutral-400 text-sm leading-relaxed mb-6">
-                MOSEB STUDENT LAB was engineered to democratize access to world-class scientific laboratory apparatus.
-                Traditional laboratories face high chemical procurement costs, glassware breakage, and safety hazards.
-              </p>
-              <p className="text-neutral-400 text-sm leading-relaxed mb-6">
-                Our platform delivers 60+ FPS real-time thermodynamic numerical solvers, dynamic convection wave propagation,
-                and spectral glass transmission models calibrated to borosilicate 3.3 specifications.
-              </p>
-
-              <div className="grid grid-cols-2 gap-4 mt-8">
-                <div className="flex items-start gap-3">
-                  <Shield size={20} className="text-cyan-400 shrink-0 mt-0.5" />
-                  <div>
-                    <h4 className="text-sm font-bold text-white">Hazard-Free</h4>
-                    <p className="text-xs text-neutral-400 mt-1">Unlimited trials with hazardous thermal reactions.</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Cpu size={20} className="text-cyan-400 shrink-0 mt-0.5" />
-                  <div>
-                    <h4 className="text-sm font-bold text-white">AI Copilot</h4>
-                    <p className="text-xs text-neutral-400 mt-1">Context-aware thermodynamic guidance and action executor.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Visual Glass Showcase Card */}
-            <div
-              className={`p-8 rounded-3xl border backdrop-blur-2xl relative overflow-hidden ${isDarkMode
-                  ? 'border-neutral-800 bg-neutral-900/40 text-neutral-100 shadow-2xl'
-                  : 'border-neutral-200 bg-white/80 text-neutral-900 shadow-lg'
-                }`}
-            >
-              <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="flex items-center justify-between border-b border-neutral-800/80 pb-4 mb-6">
-                <div className="flex items-center gap-2">
-                  <Activity size={18} className="text-cyan-400" />
-                  <span className="text-xs font-mono tracking-wider font-bold uppercase">Live Physical Solver Engine</span>
-                </div>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                  ONLINE
-                </span>
-              </div>
-
-              <div className="space-y-4 font-mono text-xs">
-                <div className="flex justify-between py-2 border-b border-neutral-800/40">
-                  <span className="text-neutral-400">Numerical Model:</span>
-                  <span className="text-white">Runge-Kutta 4th-Order Heat Solver</span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-neutral-800/40">
-                  <span className="text-neutral-400">Glass Specularity:</span>
-                  <span className="text-white">Index of Refraction (IOR 1.52)</span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-neutral-800/40">
-                  <span className="text-neutral-400">Fluid Mechanics:</span>
-                  <span className="text-white">Convective Navier-Stokes Harmonic Ripple</span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-neutral-800/40">
-                  <span className="text-neutral-400">REST API Backend:</span>
-                  <span className="text-white">FastAPI + SQLite Relational Database</span>
-                </div>
-              </div>
-
-              <button
-                onClick={() => onEnterLab()}
-                className="w-full mt-6 py-3 rounded-xl bg-white text-black font-bold text-xs uppercase tracking-wider hover:bg-neutral-200 active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-2"
-              >
-                <span>Launch Interactive Benchmark</span>
-                <ChevronRight size={14} />
-              </button>
-            </div>
-          </div>
-        </section>
-
-        {/* Section 3: Curriculum & Lab Experiments */}
-        <section id="curriculum" className="max-w-7xl mx-auto px-6 py-20 w-full border-t border-neutral-800/60">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <div className="text-xs font-mono font-bold tracking-widest text-cyan-400 uppercase mb-3">
-              Experimental Modules
-            </div>
-            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4">
-              Curriculum & Experiment Catalog
-            </h2>
-            <p className="text-sm text-neutral-400">
-              Select any pre-configured experiment module below to load the apparatus directly into the 4D laboratory.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {curriculumModules.map((item) => (
-              <div
-                key={item.id}
-                className={`p-6 rounded-2xl border backdrop-blur-xl flex flex-col justify-between transition-all duration-300 group hover:translate-y-[-2px] ${isDarkMode
-                    ? 'border-neutral-800/80 bg-neutral-900/30 hover:border-neutral-700 hover:bg-neutral-900/50'
-                    : 'border-neutral-200 bg-white/70 hover:border-neutral-300'
-                  }`}
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-[10px] font-mono px-2.5 py-1 rounded-full border border-neutral-700 bg-black/40 text-neutral-300">
-                      {item.tag}
-                    </span>
-                    <div
-                      className="w-4 h-4 rounded-full border border-white/20 shadow-md"
-                      style={{ backgroundColor: item.color }}
-                    />
-                  </div>
-                  <h3 className="text-base font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">
-                    {item.title}
-                  </h3>
-                  <p className="text-xs text-neutral-400 leading-relaxed mb-6">
-                    {item.desc}
-                  </p>
-                </div>
-
+          {/* Interactive Chemical Preset Launchers */}
+          <div className="pt-8">
+            <span className="text-xs font-mono uppercase tracking-widest text-neutral-400 block mb-3">
+              Direct Chemical Quick-Start Presets (Click to Load):
+            </span>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5 max-w-3xl mx-auto">
+              {CHEMICAL_PRESETS.map((preset) => (
                 <button
-                  onClick={() => onEnterLab({ name: item.solute, color: item.color })}
-                  className="w-full py-2.5 px-4 rounded-xl border border-neutral-700 hover:border-white hover:bg-white hover:text-black text-xs font-semibold tracking-wide transition-all cursor-pointer flex items-center justify-center gap-2"
+                  key={preset.formula}
+                  onClick={() => onEnterLab({ name: preset.name, color: preset.color })}
+                  className="p-3 rounded-2xl bg-white/5 hover:bg-white/15 border border-white/10 hover:border-white/30 backdrop-blur-md transition-all text-left flex flex-col gap-1 cursor-pointer group"
                 >
-                  <span>Launch This Experiment</span>
-                  <ArrowRight size={14} />
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="w-3 h-3 rounded-full shadow-sm"
+                      style={{ backgroundColor: preset.color }}
+                    />
+                    <span className="font-mono text-xs font-bold text-white group-hover:text-emerald-300 transition-colors truncate">
+                      {preset.formula}
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-neutral-400 truncate">{preset.name}</span>
                 </button>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </section>
 
-        {/* Section 4: 4D Cinema Optics Showcase */}
-        <section id="features" className="max-w-7xl mx-auto px-6 py-20 w-full border-t border-neutral-800/60">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <div className="text-xs font-mono font-bold tracking-widest text-cyan-400 uppercase mb-3">
-              Visual Realism
-            </div>
-            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4">
-              Cinema 4D Optical Rendering Features
-            </h2>
-            <p className="text-sm text-neutral-400">
-              Every section of the laboratory is modeled with photorealistic PBR physics.
+        {/* 4. Section: Laboratory Apparatus Showcase */}
+        <section id="apparatus" className="space-y-12">
+          <div className="text-center space-y-3">
+            <span className="text-xs font-mono uppercase tracking-widest text-emerald-400 font-bold">PRECISION INSTRUMENTS</span>
+            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">Full 3D Interactive Equipment</h2>
+            <p className="text-neutral-400 text-sm max-w-xl mx-auto">
+              Every apparatus is modeled with accurate physical collision geometry, refractive optical shaders, and thermodynamic sensors.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              {
-                icon: Layers,
-                title: 'Photorealistic Glass Refraction',
-                desc: 'Pyrex borosilicate glass modeled with transmission (0.95), IOR (1.52), thickness caustics, and specular clearcoat.',
-              },
-              {
-                icon: Flame,
-                title: 'Volumetric Bunsen Ignition',
-                desc: 'Multi-layer inner and outer cones simulating natural gas combustion temperatures from 200°C to 1100°C.',
-              },
-              {
-                icon: Atom,
-                title: 'Real-Time Contact Shadows',
-                desc: 'Ambient occlusion contact shadows underneath all apparatus, glassware, stands, and tools on phenolic resin bench.',
-              },
-            ].map((feature, i) => (
-              <div
-                key={i}
-                className={`p-6 rounded-2xl border backdrop-blur-xl ${isDarkMode ? 'border-neutral-800/80 bg-neutral-900/30' : 'border-neutral-200 bg-white/70'
-                  }`}
-              >
-                <div className="w-10 h-10 rounded-xl bg-neutral-800 text-cyan-400 flex items-center justify-center mb-4">
-                  <feature.icon size={20} />
-                </div>
-                <h3 className="text-base font-bold text-white mb-2">{feature.title}</h3>
-                <p className="text-xs text-neutral-400 leading-relaxed">{feature.desc}</p>
+            <div className="p-8 rounded-3xl bg-neutral-900/80 border border-white/10 space-y-4 hover:border-white/25 transition-all">
+              <div className="w-12 h-12 rounded-2xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400">
+                <FlaskConical size={24} />
               </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Section 5: Community & Collaboration */}
-        <section id="community" className="max-w-7xl mx-auto px-6 py-20 w-full border-t border-neutral-800/60">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="text-xs font-mono font-bold tracking-widest text-cyan-400 uppercase mb-3">
-                Research Community
-              </div>
-              <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-6">
-                Connected Student Researchers Across 140+ Institutions
-              </h2>
-              <p className="text-neutral-400 text-sm leading-relaxed mb-6">
-                Collaborate in real-time, share experimental temperature and volume telemetry datasets,
-                and publish scientific observations directly to your institutional lab notebook.
+              <h3 className="text-xl font-bold text-white">500mL Borosilicate Glass Beaker</h3>
+              <p className="text-sm text-neutral-400 leading-relaxed">
+                Fabricated with Boro 3.3 glass rated to 500°C. Displays real-time volumetric meniscus, convective thermal currents, and dynamic boiling nucleation bubbles.
               </p>
-              <div className="space-y-3 font-mono text-xs">
-                <div className="flex items-center gap-3 text-neutral-300">
-                  <CheckCircle size={16} className="text-emerald-400" />
-                  <span>Real-time SQLite database synchronization</span>
-                </div>
-                <div className="flex items-center gap-3 text-neutral-300">
-                  <CheckCircle size={16} className="text-emerald-400" />
-                  <span>Export standardized lab reports in JSON & CSV</span>
-                </div>
-                <div className="flex items-center gap-3 text-neutral-300">
-                  <CheckCircle size={16} className="text-emerald-400" />
-                  <span>Instructor verification and grading rubrics</span>
-                </div>
+              <div className="pt-2 text-xs font-mono text-neutral-500">
+                <span>Thermal shock ΔT ≈ 150°C • High chemical resistance</span>
               </div>
             </div>
 
-            <div
-              className={`p-6 rounded-2xl border backdrop-blur-2xl ${isDarkMode ? 'border-neutral-800 bg-black/50' : 'border-neutral-200 bg-white'
-                }`}
-            >
-              <div className="flex items-center justify-between mb-4 pb-3 border-b border-neutral-800">
-                <span className="text-xs font-mono font-bold uppercase text-neutral-400">Community Activity</span>
-                <span className="text-xs font-mono text-cyan-400">25,840 Active Sessions</span>
+            <div className="p-8 rounded-3xl bg-neutral-900/80 border border-white/10 space-y-4 hover:border-white/25 transition-all">
+              <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+                <Flame size={24} />
               </div>
-              <div className="space-y-3 text-xs">
-                {[
-                  { user: 'scholar_elena', action: 'completed Copper Sulfate thermal dissociation', time: '2m ago' },
-                  { user: 'prof_dawit', action: 'reviewed 14 student calorimetry notebooks', time: '8m ago' },
-                  { user: 'chem_alex', action: 'calibrated Bunsen burner enthalpy curve', time: '14m ago' },
-                ].map((act, i) => (
-                  <div key={i} className="flex justify-between items-center py-2 border-b border-neutral-800/40">
-                    <span className="text-neutral-300">
-                      <strong className="text-white">@{act.user}</strong> {act.action}
-                    </span>
-                    <span className="text-[10px] text-neutral-500 font-mono">{act.time}</span>
-                  </div>
-                ))}
+              <h3 className="text-xl font-bold text-white">Tirrill / Bunsen Gas Burner</h3>
+              <p className="text-sm text-neutral-400 leading-relaxed">
+                Stoichiometric gas burner with adjustable air collar. Generates authentic non-luminous blue inner cones with temperatures up to 1500°C for direct convective transfer.
+              </p>
+              <div className="pt-2 text-xs font-mono text-neutral-500">
+                <span>Flame power 10%–100% • Acoustically calibrated roar</span>
+              </div>
+            </div>
+
+            <div className="p-8 rounded-3xl bg-neutral-900/80 border border-white/10 space-y-4 hover:border-white/25 transition-all">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                <Atom size={24} />
+              </div>
+              <h3 className="text-xl font-bold text-white">Digital Thermodynamic Sensor</h3>
+              <p className="text-sm text-neutral-400 leading-relaxed">
+                High-precision immersion thermocouple continuously logging liquid temperature, vaporization mass loss, and latent phase transitions.
+              </p>
+              <div className="pt-2 text-xs font-mono text-neutral-500">
+                <span>Sub-0.1°C resolution • Real-time telemetry feed</span>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Section 6: Contact & Inquiries */}
-        <section id="contact" className="max-w-7xl mx-auto px-6 py-20 w-full border-t border-neutral-800/60">
-          <div className="max-w-2xl mx-auto text-center mb-10">
-            <div className="text-xs font-mono font-bold tracking-widest text-cyan-400 uppercase mb-3">
-              Get In Touch
+        {/* 5. Section: Thermodynamic Solvers */}
+        <section id="thermodynamics" className="p-8 sm:p-12 rounded-3xl bg-neutral-900/90 border border-white/10 space-y-8">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-white/10 pb-8">
+            <div className="space-y-2">
+              <span className="text-xs font-mono uppercase tracking-widest text-sky-400 font-bold">PHYSICAL SIMULATION ENGINE</span>
+              <h2 className="text-3xl font-bold text-white">First-Principles Numerical Solvers</h2>
+              <p className="text-sm text-neutral-400">Continuous thermodynamic ODE calculations run at 60 FPS.</p>
             </div>
-            <h2 className="text-3xl font-extrabold tracking-tight mb-3">
-              Contact MOSEB STUDENT LAB Team
-            </h2>
-            <p className="text-xs text-neutral-400">
-              Have questions regarding university adoption, curriculum modules, or API access?
+            <button
+              onClick={() => onEnterLab()}
+              className="px-6 py-3 rounded-xl bg-white text-black font-bold text-xs uppercase tracking-wider hover:bg-neutral-200 transition-all self-start md:self-auto cursor-pointer"
+            >
+              Test Thermodynamics Now
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 font-mono text-xs">
+            <div className="p-5 rounded-2xl bg-black/60 border border-white/5 space-y-2">
+              <span className="text-neutral-400 uppercase text-[10px]">Convective Heat Equation</span>
+              <div className="text-base font-bold text-white">Q = m · c · ΔT</div>
+              <p className="text-[11px] text-neutral-400 font-sans">
+                Specific heat capacity c = 4.184 J/g·°C for water. Accurately predicts heating rates based on fluid mass.
+              </p>
+            </div>
+
+            <div className="p-5 rounded-2xl bg-black/60 border border-white/5 space-y-2">
+              <span className="text-neutral-400 uppercase text-[10px]">Enthalpy of Vaporization</span>
+              <div className="text-base font-bold text-white">Lv = 2260 kJ/kg</div>
+              <p className="text-[11px] text-neutral-400 font-sans">
+                Thermal plateau pinned at 100°C while liquid converts into volumetric convective steam.
+              </p>
+            </div>
+
+            <div className="p-5 rounded-2xl bg-black/60 border border-white/5 space-y-2">
+              <span className="text-neutral-400 uppercase text-[10px]">Cryogenic Fusion</span>
+              <div className="text-base font-bold text-white">ΔHfus = 334 J/g</div>
+              <p className="text-[11px] text-neutral-400 font-sans">
+                Dropping ice cubes instantly absorbs thermal kinetic energy, cooling down toward 0.5°C.
+              </p>
+            </div>
+
+            <div className="p-5 rounded-2xl bg-black/60 border border-white/5 space-y-2">
+              <span className="text-neutral-400 uppercase text-[10px]">Ambient Newton Cooling</span>
+              <div className="text-base font-bold text-white">dT/dt = -k(T - Tamb)</div>
+              <p className="text-[11px] text-neutral-400 font-sans">
+                Natural radiative dissipation gradually cools hot solution back toward room temperature (22°C).
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* 6. Section: About Page (Pure Text per user instructions: "edit the about apge ony edit text pls do not add any icons") */}
+        <section id="about" className="space-y-6 max-w-4xl mx-auto p-8 sm:p-12 rounded-3xl bg-neutral-900/60 border border-white/10">
+          <div className="space-y-3">
+            <span className="text-xs font-mono uppercase tracking-widest text-neutral-400 font-bold">EDUCATIONAL & SCIENTIFIC ARCHITECTURE</span>
+            <h2 className="text-3xl font-bold text-white">About MOSEB Student Laboratory</h2>
+          </div>
+          <div className="space-y-4 text-neutral-300 text-sm leading-relaxed">
+            <p>
+              MOSEB Student Lab is an interactive 4D virtual chemistry simulation designed to democratize high-level laboratory education. Traditional chemistry laboratories face significant real-world constraints: costly equipment breakage, chemical reagent waste, strict ventilation requirements, and safety hazards associated with high-temperature open flames and corrosive acids.
+            </p>
+            <p>
+              By combining GPU-accelerated WebGL optics with rigorous first-principles thermodynamic solvers, MOSEB allows students and researchers to perform realistic calorimetry, titration, and reaction experiments from any modern web browser without physical danger.
+            </p>
+            <p>
+              The system simulates physical contact shadows, borosilicate refraction, and gas stoichiometry with full mathematical accuracy. Furthermore, an integrated autonomous AI Copilot provides real-time safety auditing and procedure guidance, ensuring learners understand both the molecular mechanisms and proper laboratory standards.
             </p>
           </div>
+        </section>
 
-          <div
-            className={`max-w-xl mx-auto p-8 rounded-3xl border backdrop-blur-2xl ${isDarkMode ? 'border-neutral-800 bg-neutral-900/40' : 'border-neutral-200 bg-white'
-              }`}
-          >
-            {contactSubmitted ? (
-              <div className="text-center py-8">
-                <CheckCircle size={40} className="text-emerald-400 mx-auto mb-3" />
-                <h4 className="text-base font-bold text-white mb-1">Message Transmitted</h4>
-                <p className="text-xs text-neutral-400">
-                  Thank you for reaching out. The MOSEB academic support team will reply promptly.
-                </p>
-                <button
-                  onClick={() => setContactSubmitted(false)}
-                  className="mt-4 text-xs font-mono text-cyan-400 hover:underline cursor-pointer"
+        {/* 7. Section: Interactive FAQ Accordion */}
+        <section id="faq" className="space-y-8 max-w-3xl mx-auto">
+          <div className="text-center space-y-2">
+            <span className="text-xs font-mono uppercase tracking-widest text-emerald-400 font-bold">KNOWLEDGE BASE</span>
+            <h2 className="text-3xl font-bold text-white">Frequently Asked Questions</h2>
+          </div>
+
+          <div className="space-y-3">
+            {faqs.map((faq, index) => {
+              const isOpen = openFaqIndex === index;
+              return (
+                <div
+                  key={faq.q}
+                  className="rounded-2xl bg-neutral-900/80 border border-white/10 overflow-hidden transition-all"
                 >
-                  Send another inquiry
-                </button>
-              </div>
-            ) : (
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  setContactSubmitted(true);
-                }}
-                className="space-y-4 text-xs"
-              >
-                <div>
-                  <label className="block font-medium mb-1 text-neutral-400">Your Full Name</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Biruk Ahmye"
-                    className={`w-full px-3 py-2.5 rounded-lg border outline-none ${isDarkMode
-                        ? 'bg-neutral-900 border-neutral-800 focus:border-cyan-500 text-white'
-                        : 'bg-neutral-50 border-neutral-200 text-black'
-                      }`}
-                  />
+                  <button
+                    onClick={() => setOpenFaqIndex(isOpen ? null : index)}
+                    className="w-full p-5 text-left flex items-center justify-between text-white font-semibold text-sm cursor-pointer hover:bg-white/5 transition-colors"
+                  >
+                    <span>{faq.q}</span>
+                    {isOpen ? <ChevronUp size={18} className="text-neutral-400" /> : <ChevronDown size={18} className="text-neutral-400" />}
+                  </button>
+                  {isOpen && (
+                    <div className="px-5 pb-5 text-xs text-neutral-300 leading-relaxed border-t border-white/5 pt-3">
+                      {faq.a}
+                    </div>
+                  )}
                 </div>
-                <div>
-                  <label className="block font-medium mb-1 text-neutral-400">Email Address</label>
-                  <input
-                    type="email"
-                    required
-                    placeholder="researcher@university.edu"
-                    className={`w-full px-3 py-2.5 rounded-lg border outline-none ${isDarkMode
-                        ? 'bg-neutral-900 border-neutral-800 focus:border-cyan-500 text-white'
-                        : 'bg-neutral-50 border-neutral-200 text-black'
-                      }`}
-                  />
-                </div>
-                <div>
-                  <label className="block font-medium mb-1 text-neutral-400">Message / Inquiry</label>
-                  <textarea
-                    rows={4}
-                    required
-                    placeholder="Inquiry regarding 4D virtual laboratory deployment..."
-                    className={`w-full px-3 py-2.5 rounded-lg border outline-none resize-none ${isDarkMode
-                        ? 'bg-neutral-900 border-neutral-800 focus:border-cyan-500 text-white'
-                        : 'bg-neutral-50 border-neutral-200 text-black'
-                      }`}
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="w-full py-3 rounded-xl bg-white text-black font-bold text-xs uppercase tracking-wider hover:bg-neutral-200 transition-all cursor-pointer"
-                >
-                  Submit Inquiry
-                </button>
-              </form>
-            )}
+              );
+            })}
           </div>
         </section>
 
-        {/* Footer */}
-        <footer className="w-full border-t border-neutral-800/80 py-8 px-6 text-xs text-neutral-500">
-          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 font-mono">
-            <div>
-              © 2026 MOSEB_STUDENT_LAB. Built with Cinema 4D PBR Optics, FastAPI & SQLite.
-            </div>
-            <div className="flex items-center gap-6">
-              <a
-                href="https://github.com/123bruke/AI_lab"
-                target="_blank"
-                rel="noreferrer"
-                className="hover:text-white transition-colors flex items-center gap-1"
+        {/* 8. Call to Action Banner */}
+        <section className="p-10 sm:p-16 rounded-3xl bg-gradient-to-b from-neutral-900 to-black border border-white/15 text-center space-y-6 shadow-2xl">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white">
+            Ready to Begin Your Laboratory Session?
+          </h2>
+          <p className="text-neutral-300 text-sm max-w-xl mx-auto">
+            Experience next-generation 4D virtual chemistry. Heat solutions, adjust gas flames, mix chemical reagents, and consult the AI copilot in real time.
+          </p>
+          <div className="pt-2 flex justify-center">
+            <button
+              onClick={() => onEnterLab()}
+              className="px-10 py-4 rounded-2xl bg-white text-black font-extrabold text-sm uppercase tracking-wider flex items-center gap-3 hover:bg-neutral-200 shadow-2xl shadow-white/20 transition-all cursor-pointer"
+            >
+              <Box size={20} className="text-black" />
+              <span>Enter 3D Laboratory</span>
+              <ArrowRight size={18} />
+            </button>
+          </div>
+        </section>
+      </main>
+
+      {/* 9. Sleek Modern Footer */}
+      <footer className="w-full border-t border-neutral-800 bg-neutral-950 py-12 text-xs text-neutral-400">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-3">
+            <FlaskConical size={18} className="text-white" />
+            <span className="font-bold text-white">MOSEB STUDENT LAB</span>
+            <span className="text-neutral-600">|</span>
+            <span>4D Virtual Chemistry Platform</span>
+          </div>
+
+          <div className="flex items-center gap-6">
+            <span className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span>Thermodynamic Engine: ONLINE</span>
+            </span>
+            <span>© 2026 MOSEB LAB. All rights reserved.</span>
+          </div>
+        </div>
+      </footer>
+
+      {/* 10. Floating RAG AI Assistant Widget */}
+      <div className="fixed bottom-6 right-6 z-50">
+        {isChatOpen ? (
+          <div className="w-[360px] sm:w-[400px] h-[520px] rounded-3xl bg-neutral-950/95 border border-white/20 backdrop-blur-2xl shadow-2xl flex flex-col overflow-hidden text-neutral-100 animate-fade-in select-none">
+            {/* Header */}
+            <div className="p-4 border-b border-white/10 flex items-center justify-between bg-white/5">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-white text-black flex items-center justify-center font-bold">
+                  <FlaskConical size={16} className="text-black" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-white tracking-wide">MOSEB AI Lab Assistant</h4>
+                  <span className="text-[10px] text-emerald-400 font-mono block">Website RAG Knowledge Engine</span>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsChatOpen(false)}
+                className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
               >
-                <span>GitHub Repository</span>
-                <ExternalLink size={12} />
-              </a>
-              <button onClick={() => onEnterLab()} className="hover:text-white transition-colors cursor-pointer">
-                Enter 4D Lab
+                <X size={16} />
               </button>
             </div>
+
+            {/* Message Stream */}
+            <div className="flex-1 p-4 overflow-y-auto space-y-3 font-mono text-xs">
+              {chatMessages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
+                >
+                  <div
+                    className={`p-3 rounded-2xl max-w-[85%] leading-relaxed ${
+                      msg.role === 'user'
+                        ? 'bg-white text-black font-semibold'
+                        : 'bg-neutral-900 border border-white/10 text-neutral-200'
+                    }`}
+                  >
+                    {msg.text}
+                  </div>
+                  {msg.sources && msg.sources.length > 0 && (
+                    <div className="text-[9px] text-neutral-500 mt-1 pl-1">
+                      Sources: {msg.sources.join(' • ')}
+                    </div>
+                  )}
+                </div>
+              ))}
+              {chatLoading && (
+                <div className="p-3 rounded-2xl bg-neutral-900 border border-white/10 text-neutral-400 text-xs flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                  <span>Synthesizing answer from website knowledge...</span>
+                </div>
+              )}
+            </div>
+
+            {/* Input Form */}
+            <form onSubmit={handleSendChat} className="p-3 border-t border-white/10 flex items-center gap-2 bg-neutral-900/60">
+              <input
+                type="text"
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                placeholder="Ask about apparatus, boiling, chemicals..."
+                className="flex-1 bg-black/60 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-white/30"
+              />
+              <button
+                type="submit"
+                disabled={!chatInput.trim() || chatLoading}
+                className="p-2.5 rounded-xl bg-white text-black hover:bg-neutral-200 disabled:opacity-40 transition-colors cursor-pointer"
+              >
+                <ArrowUp size={16} />
+              </button>
+            </form>
           </div>
-        </footer>
+        ) : (
+          <button
+            onClick={() => setIsChatOpen(true)}
+            className="px-5 py-3.5 rounded-2xl bg-white text-black font-bold text-xs shadow-2xl shadow-white/20 flex items-center gap-2.5 hover:bg-neutral-200 transition-all cursor-pointer group"
+          >
+            <FlaskConical size={18} className="text-black group-hover:rotate-12 transition-transform" />
+            <span>AI Lab Assistant</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          </button>
+        )}
       </div>
 
-      {/* Auth Modal (Sign In / Register) */}
+      {/* 11. Authentication Modal */}
       <AuthModal
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}
+        onAuthSuccess={(user) => {
+          setCurrentUser(user);
+          setIsAuthOpen(false);
+        }}
         initialMode={authMode}
-        onAuthSuccess={(user) => setCurrentUser(user)}
         isDarkMode={isDarkMode}
       />
     </div>
   );
 };
-
