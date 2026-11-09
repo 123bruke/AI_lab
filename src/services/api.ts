@@ -43,14 +43,15 @@ class ApiService {
   private currentUser: User | null = null;
 
   constructor() {
-    this.token = localStorage.getItem('moseb_token');
-    const cachedUser = localStorage.getItem('moseb_user');
-    if (cachedUser) {
-      try {
+    try {
+      this.token = typeof window !== 'undefined' ? localStorage.getItem('moseb_token') : null;
+      const cachedUser = typeof window !== 'undefined' ? localStorage.getItem('moseb_user') : null;
+      if (cachedUser) {
         this.currentUser = JSON.parse(cachedUser);
-      } catch {
-        this.currentUser = null;
       }
+    } catch {
+      this.token = null;
+      this.currentUser = null;
     }
   }
 
