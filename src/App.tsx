@@ -143,14 +143,16 @@ export default function App() {
   }, []);
 
   return (
-    <main className="w-screen h-screen relative overflow-hidden bg-neutral-950 font-sans">
+    <main className="w-screen h-screen relative bg-neutral-950 font-sans">
       {/* 1. Landing Page View */}
       {currentView === 'landing' ? (
-        <LandingPage
-          onEnterLab={handleEnterLab}
-          isDarkMode={isDarkMode}
-          onToggleDarkMode={() => setIsDarkMode((prev) => !prev)}
-        />
+        <div className="w-full h-full overflow-y-auto overflow-x-hidden">
+          <LandingPage
+            onEnterLab={handleEnterLab}
+            isDarkMode={isDarkMode}
+            onToggleDarkMode={() => setIsDarkMode((prev) => !prev)}
+          />
+        </div>
       ) : (
         /* 2. 3D Virtual Chemistry Lab View */
         <div className="w-full h-full relative">
