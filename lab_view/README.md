@@ -45,3 +45,4 @@ In the Vercel Project Settings:
 - **Framework Preset**: Vite
 - **Build Command**: `npm run build`
 - **Output Directory**: `dist`
+
