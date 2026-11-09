@@ -95,3 +95,4 @@ def cosine_similarity(v1: List[float], v2: List[float]) -> float:
     if norm1 < 1e-9 or norm2 < 1e-9:
         return 0.0
     return max(-1.0, min(1.0, dot / (norm1 * norm2)))
+

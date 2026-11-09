@@ -11,3 +11,4 @@
   "conclusion": "The empirical sensible heat capacity of liquid water matches established IUPAC thermochemical constants within experimental uncertainty bounds.",
   "mermaid_diagram": "graph LR\n  A[Heat Input Q=49.33kJ] --> B[150mL H2O]\n  B --> C[T_initial 21.2°C -> T_final 99.8°C]\n  C --> D[c = 4.179 J/g·°C]"
 }
+

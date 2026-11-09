@@ -72,3 +72,4 @@ export const initGlobalErrorHandling = () => {
 
   console.log('[Telemetry] MOSEB Lab Error Telemetry initialized.');
 };
+

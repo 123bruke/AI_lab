@@ -93,3 +93,4 @@ class DiagramAgent(BaseAgent):
                 {"action": "render_vector_svg_curve", "viewBox": "0 0 500 260"}
             ]
         }
+

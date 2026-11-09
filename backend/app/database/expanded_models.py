@@ -109,3 +109,4 @@ class DocumentRecord(Base):
     extracted_text = Column(Text, nullable=True)
     yolo_detections_json = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
+

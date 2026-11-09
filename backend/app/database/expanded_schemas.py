@@ -190,3 +190,4 @@ class ErrorLogResponse(BaseModel):
     component: Optional[str]
     stack_trace: Optional[str]
     resolved: bool
+

@@ -163,3 +163,4 @@ class ChemicalAgent(BaseAgent):
                 {"action": "hazard_risk_assessment", "hazards_count": len(chem_info["ghs_hazards"])}
             ]
         }
+

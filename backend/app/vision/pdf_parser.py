@@ -129,3 +129,4 @@ class ScientificPDFParser:
 
 # Global parser instance
 scientific_pdf_parser = ScientificPDFParser()
+

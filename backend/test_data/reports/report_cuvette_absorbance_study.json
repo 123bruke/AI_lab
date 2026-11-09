@@ -11,3 +11,4 @@
   "conclusion": "The molar absorptivity was determined with high precision. The system serves as an exemplary calibration standard for unknown concentration assays.",
   "mermaid_diagram": "graph TD\n  Lamp[Halogen Lamp] --> Monochromator[Diffraction Grating 635nm]\n  Monochromator --> Cuvette[CuSO4 Sample b=1.0cm]\n  Cuvette --> Detector[Photodiode Detector A=0.604 AU]"
 }
+

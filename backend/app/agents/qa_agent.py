@@ -74,3 +74,4 @@ class QualityAssuranceAgent(BaseAgent):
                 {"action": "assign_performance_grade", "grade": grade}
             ]
         }
+

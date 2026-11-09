@@ -86,3 +86,4 @@ class SafetyAgent(BaseAgent):
                 {"action": "ppe_protocol_verification", "score": safety_score}
             ]
         }
+

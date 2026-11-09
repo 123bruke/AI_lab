@@ -54,3 +54,4 @@ class BaseAgent(ABC):
         diagram_mermaid, svg_render, and actions_taken.
         """
         pass
+

@@ -145,3 +145,4 @@ class HybridSearchEngine:
 
 # Global Hybrid Search Instance
 hybrid_search = HybridSearchEngine()
+

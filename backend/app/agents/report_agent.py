@@ -131,3 +131,4 @@ class ReportAgent(BaseAgent):
                 {"action": "persist_report_to_sql", "report_id": report_id}
             ]
         }
+

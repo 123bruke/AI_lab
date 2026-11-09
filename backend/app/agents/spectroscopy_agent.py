@@ -74,3 +74,4 @@ class SpectroscopyAgent(BaseAgent):
                 {"action": "generate_calibration_points", "count": len(calibration_points)}
             ]
         }
+

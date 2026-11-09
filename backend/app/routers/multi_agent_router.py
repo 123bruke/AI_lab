@@ -239,3 +239,4 @@ def log_frontend_exception(payload: FrontendErrorPayload):
 def get_recorded_errors(limit: int = 50):
     """Retrieve recorded frontend and backend errors from error_logs.db."""
     return get_recent_errors(limit=limit)
+
