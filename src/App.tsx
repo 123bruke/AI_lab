@@ -229,11 +229,10 @@ export default function App() {
                   setCameraPreset(preset.id);
                   labAudio.playClick();
                 }}
-                className={`px-2.5 py-1 rounded-xl text-[11px] font-mono transition-all cursor-pointer ${
-                  cameraPreset === preset.id
+                className={`px-2.5 py-1 rounded-xl text-[11px] font-mono transition-all cursor-pointer ${cameraPreset === preset.id
                     ? 'bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-400/30'
                     : 'text-neutral-400 hover:text-white'
-                }`}
+                  }`}
               >
                 {preset.label}
               </button>
@@ -291,9 +290,8 @@ export default function App() {
       {/* 5. Smooth Laboratory Initialization Loading Screen */}
       <div
         id="lab-loader-overlay"
-        className={`absolute inset-0 bg-neutral-950 flex flex-col items-center justify-center pointer-events-none transition-opacity duration-700 z-50 ${
-          isReady ? 'opacity-0' : 'opacity-100'
-        }`}
+        className={`absolute inset-0 bg-neutral-950 flex flex-col items-center justify-center pointer-events-none transition-opacity duration-700 z-50 ${isReady ? 'opacity-0' : 'opacity-100'
+          }`}
       >
         <div className="flex flex-col items-center space-y-4 max-w-sm px-6 text-center">
           <div className="w-12 h-12 rounded-full border-2 border-cyan-500/20 border-t-cyan-400 animate-spin" />

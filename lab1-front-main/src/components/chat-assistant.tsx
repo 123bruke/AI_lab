@@ -149,11 +149,10 @@ export default function ChatAssistant() {
                   className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <p
-                    className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 leading-5 ${
-                      message.role === 'user'
+                    className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 leading-5 ${message.role === 'user'
                         ? 'bg-emerald-500 text-black font-medium'
                         : 'bg-[#14261f] text-gray-200 border border-emerald-500/20'
-                    }`}
+                      }`}
                   >
                     {message.text}
                   </p>
