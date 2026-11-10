@@ -336,17 +336,28 @@ I am your **Agentic AI Lab Assistant**. I can directly control the 3D apparatus,
       try {
         const agenticResult = executeAgenticActions(textToSend, currentAttachment);
 
-        // Also ping backend telemetry if running
+        // Consult Gemini LLM agent directly with full apparatus telemetry
         try {
-          await api.consultAgent({
+          const consultRes = await api.consultAgent({
             prompt: textToSend,
             current_temp: experiment.temperature,
             current_volume: experiment.liquidVolume,
             current_state: experiment.waterState,
             solute_name: experiment.soluteName,
           });
+
+          if (consultRes && consultRes.response) {
+            if (agenticResult.tools.length > 0) {
+              agenticResult.response = `${agenticResult.response}\n\n**Autonomous AI Lab Intelligence:**\n${consultRes.response}`;
+            } else {
+              agenticResult.response = consultRes.response;
+            }
+            if (consultRes.safety_level && !agenticResult.safetyAlert) {
+              agenticResult.safetyAlert = consultRes.safety_level;
+            }
+          }
         } catch {
-          // offline mode is fully handled client-side
+          // Fallback handled seamlessly
         }
 
         const assistantMessage: ChatMessage = {

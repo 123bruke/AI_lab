@@ -4,12 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "cd lab_view && vite --port=3000 --host=0.0.0.0",
+    "dev": "vite --port=3000 --host=0.0.0.0",
     "server": "python backend/run.py",
-    "build": "cd lab_view && vite build",
-    "preview": "cd lab_view && vite preview",
+    "build": "node scripts/build.cjs",
+    "preview": "vite preview",
     "clean": "rm -rf dist lab_view/dist server.js",
-    "lint": "cd lab_view && tsc --noEmit"
+    "lint": "tsc --noEmit"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

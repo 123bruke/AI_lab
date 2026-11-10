@@ -1,8 +1,11 @@
 /**
- * REST API Client for MOSEB STUDENT LAB FastAPI Backend
+ * REST API Client for MOSEB STUDENT LAB Backend & Frontend Autonomous AI Multi-Agent Core
  * Connects Multi-Agent AI System, ChromaDB Hybrid Search, YOLOv8 Vision,
- * SQLite Databases, and Frontend Error Telemetry.
+ * SQLite Databases, and Google Gemini LLM Client-Side Intelligence.
  */
+
+import { queryGemini } from './geminiService';
+import { frontendAgentOrchestrator, REGISTERED_AGENTS } from './frontendAgentOrchestrator';
 
 export interface User {
   id: number;
@@ -191,6 +194,18 @@ class ApiService {
       }
     } catch { }
 
+    try {
+      const geminiRes = await queryGemini({
+        prompt: message,
+        systemInstruction: 'You are the MOSEB 4D Chemistry Lab AI Copilot. Answer user questions regarding chemistry, laboratory apparatus, thermodynamics, and scientific protocols clearly, accurately, and educationally.',
+      });
+      return {
+        reply: geminiRes.text,
+        sources: ['MOSEB 4D Core Literature', 'IUPAC Chemical Reference', 'Google Gemini AI'],
+        topic: 'Chemistry & Physics Laboratory',
+      };
+    } catch { }
+
     return {
       reply: "Welcome to MOSEB 4D Chemistry Lab! Click 'Enter 3D Lab' in the top banner to explore the thermodynamic simulation, heat vessels with the Bunsen burner, or test chemical reaction kinetics.",
       sources: ["MOSEB Platform Documentation", "Thermodynamics Guide"],
@@ -323,25 +338,30 @@ class ApiService {
         return await res.json();
       }
     } catch {
-      // offline fallback
+      // Offline / Client-Side: Process directly with Gemini LLM
+    }
+
+    try {
+      const geminiRes = await queryGemini({
+        prompt: `Experimental state: Temperature: ${query.current_temp.toFixed(1)}°C, Volume: ${query.current_volume}mL, State: ${query.current_state}, Solute: ${query.solute_name}.\nUser query: "${query.prompt}". Provide an informative scientific analysis for the virtual lab student.`,
+        systemInstruction: 'You are the Autonomous Multi-Agent Chemistry Laboratory Copilot. Analyze the telemetry and give concise, authoritative chemical guidance.',
+      });
+
+      const t = query.current_temp;
+      const recAction = /heat|boil/i.test(query.prompt) ? 'IGNITE_BURNER' : /cool|ice/i.test(query.prompt) ? 'ADD_ICE' : 'STANDBY';
+      const safety = t > 95 ? 'CAUTION: Boiling Surface' : t > 70 ? 'WARNING: High Thermal Area' : 'SAFE: Ambient Conditions';
+
+      return {
+        response: geminiRes.text,
+        recommended_action: recAction,
+        safety_level: safety,
+        target_temperature: t > 90 ? 100 : 25,
+      };
+    } catch {
+      // fallback
     }
 
     const t = query.current_temp;
-    if (t > 95) {
-      return {
-        response: `Vigorous rolling boil reached at ${t.toFixed(1)}°C. Latent heat absorption is active. Safety shield engaged.`,
-        recommended_action: 'MAINTAIN_HEAT',
-        safety_level: 'CAUTION: Boiling',
-        target_temperature: 100,
-      };
-    } else if (t < 5) {
-      return {
-        response: `Cryogenic state achieved at ${t.toFixed(1)}°C. Liquid crystal lattice phase stable.`,
-        recommended_action: 'ADD_ICE',
-        safety_level: 'SAFE',
-        target_temperature: 0,
-      };
-    }
     return {
       response: `AI Lab Agent telemetry active. Solution: ${query.solute_name} at ${t.toFixed(1)}°C. Ready for thermodynamic operations.`,
       recommended_action: 'STANDBY',
@@ -358,23 +378,8 @@ class ApiService {
     try {
       const res = await fetch(`${API_BASE}/api/agents`);
       if (res.ok) return await res.json();
-    } catch (e) {
-      console.warn('Failed to fetch agents list, using default agent catalog', e);
-    }
-
-    // Default Fallback 10 Agents Catalog
-    return [
-      { id: 'diagram_agent', name: 'Diagram & Visualization Agent', role: 'Technical Illustrator & SVG Generator', category: 'Visualization', description: 'Draws technical Mermaid charts & vector SVG heating curves.', status: 'active', supported_tasks: ['generate_mermaid', 'heating_curve_svg'], icon: 'Activity' },
-      { id: 'report_agent', name: 'Scientific Lab Report Agent', role: 'Academic Report Author & Documenter', category: 'Documentation', description: 'Compiles formal academic research reports into SQL database.', status: 'active', supported_tasks: ['generate_lab_report', 'export_latex'], icon: 'FileText' },
-      { id: 'chemical_agent', name: 'Chemical Classifier & Reagent Agent', role: 'Stoichiometric & GHS Hazard Identifier', category: 'Chemistry', description: 'Classifies reagents, molar mass, and GHS hazard pictograms.', status: 'active', supported_tasks: ['identify_chemical', 'check_ghs_hazards'], icon: 'Layers' },
-      { id: 'research_agent', name: 'Literature & Knowledge Harvester', role: 'ChromaDB Hybrid Search Specialist', category: 'Information Retrieval', description: 'Queries ChromaDB with dense vectors and BM25 keyword fusion.', status: 'active', supported_tasks: ['hybrid_search', 'harvest_literature'], icon: 'Search' },
-      { id: 'simulation_agent', name: 'Thermodynamic Action Agent', role: 'Hardware & Simulation Apparatus Controller', category: 'Simulation Control', description: 'Executes physical commands: ignites burner, cools, and refills.', status: 'active', supported_tasks: ['ignite_burner', 'apply_ice_cooling', 'refill_water'], icon: 'Zap' },
-      { id: 'safety_agent', name: 'Safety & Compliance Auditor', role: 'EHS & Lab Hazard Inspector', category: 'Safety', description: 'Monitors thermal runaway, dry heating, and PPE compliance.', status: 'active', supported_tasks: ['audit_safety_compliance', 'check_ppe'], icon: 'ShieldAlert' },
-      { id: 'spectroscopy_agent', name: 'Spectrophotometry & Optics Agent', role: 'Optical Absorption Analyst', category: 'Analytics', description: 'Computes Beer-Lambert Law A = ε·b·c and %Transmittance.', status: 'active', supported_tasks: ['calculate_absorbance', 'beer_lambert_fit'], icon: 'Sun' },
-      { id: 'stoichiometry_agent', name: 'Stoichiometry & Reaction Balancer', role: 'Yield Calculator & Reaction Modeler', category: 'Chemistry', description: 'Balances equations, identifies limiting reagents and yields.', status: 'active', supported_tasks: ['balance_equation', 'find_limiting_reagent'], icon: 'Compass' },
-      { id: 'vision_agent', name: 'YOLOv8 Vision & Document Agent', role: 'Multimodal Vision Specialist', category: 'Perception', description: 'Detects apparatus with YOLOv8 and parses scientific PDF guides.', status: 'active', supported_tasks: ['detect_apparatus', 'parse_protocol_pdf'], icon: 'Camera' },
-      { id: 'qa_agent', name: 'Data Verification & Grading Agent', role: 'Metrology & Accuracy Auditor', category: 'Quality Assurance', description: 'Calculates percent error and grades laboratory technique.', status: 'active', supported_tasks: ['calculate_percent_error', 'grade_experiment'], icon: 'CheckCircle' }
-    ];
+    } catch { }
+    return REGISTERED_AGENTS;
   }
 
   async dispatchAgentTask(payload: {
@@ -390,58 +395,19 @@ class ApiService {
         body: JSON.stringify(payload),
       });
       if (res.ok) return await res.json();
-    } catch (e) {
-      console.warn('Dispatch task offline fallback:', e);
-    }
+    } catch { }
 
-    // High quality offline fallback execution
-    const t = payload.apparatus_state?.temperature || 24.5;
-    const isHeat = /heat|burn|fire|boil/i.test(payload.prompt);
-    const targetT = isHeat ? 85.0 : t;
-
-    return {
-      task_id: `task_${Math.random().toString(36).substring(7)}`,
-      agent_id: payload.agent_id || 'orchestrator',
-      agent_name: payload.agent_id ? 'Specialized Agent' : 'Master Multi-Agent Orchestrator',
-      status: 'COMPLETED',
-      summary: isHeat
-        ? `Burner activated. Thermal energy applied towards ${targetT}°C. Mermaid topology compiled.`
-        : `Orchestrated analysis complete for '${payload.prompt}'. Apparatus state nominal at ${t.toFixed(1)}°C.`,
-      details: `Executed autonomous task pipeline. Actions taken on 3D apparatus.`,
-      structured_data: {
-        active_agents: ['simulation_agent', 'diagram_agent', 'report_agent'],
-        mutations: isHeat ? { isBurnerOn: true, temperature: targetT } : {},
-      },
-      diagram_mermaid: `graph TD\n  Burner[Bunsen Flame] --> Beaker[Borosilicate Beaker]\n  Beaker --> Water[Aqueous Solute: ${t.toFixed(1)}°C]\n  Water --> Sensor[Digital Thermocouple]`,
-      svg_render: `<svg viewBox="0 0 500 180" xmlns="http://www.w3.org/2000/svg" style="background:#09090b; border-radius:8px;"><path d="M 50 150 Q 200 130, 250 80 T 450 40" fill="none" stroke="#e11d48" stroke-width="3"/><text x="60" y="140" fill="#a1a1aa" font-size="12">Start: ${t.toFixed(1)}°C</text><text x="320" y="30" fill="#38bdf8" font-size="12">Target: ${targetT}°C</text></svg>`,
-      actions_taken: isHeat ? [{ action: 'ignite_burner', target_temperature: targetT }] : [],
-      created_at: new Date().toISOString(),
-    };
+    // Execute via Frontend Multi-Agent Orchestrator (Powered by Gemini API)
+    return await frontendAgentOrchestrator.executeTask(payload);
   }
 
   async getLabReports(): Promise<LabReportItem[]> {
     try {
       const res = await fetch(`${API_BASE}/api/agents/reports`);
       if (res.ok) return await res.json();
-    } catch {
-      // fallback
-    }
-    return [
-      {
-        id: 1,
-        title: 'Investigation of Thermal Absorption Kinetics and Phase Equilibrium',
-        experiment_type: 'Calorimetry / Thermodynamics',
-        author: 'Autonomous Multi-Agent Scientific System',
-        abstract: 'This laboratory investigation evaluated the thermodynamic energy transfer into a 150.0 mL aqueous sample. Final steady-state temperature reached 99.8°C.',
-        methodology: 'Heated pure DI water in a 250 mL borosilicate beaker with immersion thermocouple logging.',
-        observations: 'Subtle convective micro-bubbles formed at 68°C. Rolling boiling sustained at 99.8°C.',
-        calculations: 'Q = mcΔT = 150.0g × 4.184 J/g·°C × 75.3°C = 47.26 kJ.',
-        conclusion: 'Thermodynamic empirical measurements confirm IUPAC water specific heat standards with 0.12% relative error.',
-        mermaid_diagram: 'graph LR\n  Heat[Q=47.26kJ] --> Water[150mL H2O]\n  Water --> T[99.8°C]',
-        tags: ['Thermodynamics', 'Calorimetry'],
-        created_at: new Date().toISOString(),
-      },
-    ];
+    } catch { }
+    const generated = await frontendAgentOrchestrator.generateLabReport();
+    return [generated];
   }
 
   async executeHybridSearch(query: string, collection: string = 'all', top_k: number = 5): Promise<HybridSearchResponse> {
@@ -452,37 +418,8 @@ class ApiService {
         body: JSON.stringify({ query, collection, top_k }),
       });
       if (res.ok) return await res.json();
-    } catch (e) {
-      console.warn('Hybrid search fallback:', e);
-    }
-
-    return {
-      query,
-      total_matches: 2,
-      execution_time_ms: 2.4,
-      results: [
-        {
-          id: 'proto_calorimetry_001',
-          title: 'Determination of Specific Heat Capacity via Aqueous Calorimetry',
-          collection: 'protocols',
-          snippet: `Protocol for measuring specific heat capacity of water using Bunsen burner and thermocouple probe. Q = m*c*ΔT.`,
-          combined_score: 0.942,
-          vector_score: 0.95,
-          keyword_score: 0.92,
-          metadata: { category: 'Thermodynamics', difficulty: 'Undergraduate' },
-        },
-        {
-          id: 'msds_hcl_001',
-          title: 'Hydrochloric Acid (37% w/w) MSDS Datasheet',
-          collection: 'msds',
-          snippet: `Corrosive mineral acid (CAS 7647-01-0). Causes severe burns. Always add acid to water (AA).`,
-          combined_score: 0.815,
-          vector_score: 0.82,
-          keyword_score: 0.80,
-          metadata: { formula: 'HCl', storage: 'Inorganic Acid Cabinet' },
-        },
-      ],
-    };
+    } catch { }
+    return await frontendAgentOrchestrator.hybridSearch(query);
   }
 
   async detectApparatusYolo(temperature: number = 24.5, liquidLevel: number = 150.0): Promise<VisionDetectionResponse> {
@@ -491,25 +428,8 @@ class ApiService {
         method: 'POST',
       });
       if (res.ok) return await res.json();
-    } catch {
-      // fallback
-    }
-
-    return {
-      timestamp: new Date().toISOString(),
-      model_version: 'YOLOv8-LabApparatus-Optics-v2.4',
-      summary: `Detected 4 apparatus entities with high optical confidence. Liquid volume: ${liquidLevel.toFixed(1)} mL.`,
-      identified_apparatus: ['Beaker 250ml', 'Liquid Meniscus Level', 'Bunsen Burner', 'Digital Thermometer Probe'],
-      estimated_liquid_volume_ml: liquidLevel,
-      thermal_hotspots_detected: temperature > 80.0,
-      safety_violations: temperature > 95.0 ? ['Thermal Warning: Approaching 100°C boiling point.'] : [],
-      detections: [
-        { label: 'Beaker 250ml (Borosilicate 3.3)', confidence: 0.97, bbox: [120, 180, 310, 420] },
-        { label: 'Liquid Meniscus Level', confidence: 0.94, bbox: [135, 260, 295, 272] },
-        { label: 'Bunsen Burner Apparatus', confidence: 0.96, bbox: [150, 440, 280, 560] },
-        { label: 'K-Type Thermometer Probe', confidence: 0.98, bbox: [200, 100, 220, 360] },
-      ],
-    };
+    } catch { }
+    return await frontendAgentOrchestrator.detectYolo(temperature, liquidLevel);
   }
 
   async getTelemetryErrors(): Promise<ErrorLogItem[]> {

@@ -11,8 +11,57 @@ type Message = {
   text: string
 }
 
-function getReply(message: string) {
+const GEMINI_API_KEY =
+  process.env.NEXT_PUBLIC_GEMINI_API_KEY ||
+  process.env.GEMINI_API_KEY ||
+  ''
+
+async function getReply(message: string): Promise<string> {
   const text = message.toLowerCase()
+
+  // Try direct Gemini LLM call
+  try {
+    const models = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-3.8-flash']
+    for (const model of models) {
+      try {
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [
+              {
+                role: 'user',
+                parts: [
+                  {
+                    text: `[System Instruction]: You are the AFRO Lab Scientific AI Assistant. Assist scientists and students with chemical stoichiometry, thermodynamics, spectroscopy, 4D simulation, and lab apparatus mechanics. Keep answers concise, accurate, and insightful.\n\nUser Question: ${message}`,
+                  },
+                ],
+              },
+            ],
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 512,
+            },
+          }),
+        })
+
+        if (res.ok) {
+          const data = await res.json()
+          const answer = data.candidates?.[0]?.content?.parts?.[0]?.text
+          if (answer && typeof answer === 'string') {
+            return answer.trim()
+          }
+        }
+      } catch {
+        // try next model
+      }
+    }
+  } catch {
+    // fallback
+  }
+
+  // Deterministic fallback
   if (text.includes('titrat') || text.includes('ph') || text.includes('acid') || text.includes('base')) {
     return 'For acid-base neutralization (HCl + NaOH → NaCl + H₂O), equivalence occurs at pH 7.00. Phenolphthalein transitions to vibrant magenta between pH 8.2 and 10.0.'
   }
@@ -40,13 +89,8 @@ export default function ChatAssistant() {
     },
   ])
   const nextId = useRef(2)
-  const typingTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  useEffect(() => () => {
-    if (typingTimeout.current) clearTimeout(typingTimeout.current)
-  }, [])
-
-  const sendMessage = (event: FormEvent<HTMLFormElement>) => {
+  const sendMessage = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const text = input.trim()
     if (!text || isTyping) return
@@ -54,14 +98,16 @@ export default function ChatAssistant() {
     setMessages((current) => [...current, { id: nextId.current++, role: 'user', text }])
     setInput('')
     setIsTyping(true)
-    typingTimeout.current = setTimeout(() => {
+
+    try {
+      const reply = await getReply(text)
       setMessages((current) => [
         ...current,
-        { id: nextId.current++, role: 'assistant', text: getReply(text) },
+        { id: nextId.current++, role: 'assistant', text: reply },
       ])
+    } finally {
       setIsTyping(false)
-      typingTimeout.current = null
-    }, 600)
+    }
   }
 
   return (
