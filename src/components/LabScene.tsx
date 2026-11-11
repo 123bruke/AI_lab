@@ -5,13 +5,15 @@ import { ContactShadows } from '@react-three/drei';
 import { Laboratory } from '../environment/Laboratory';
 import { InteractiveBench } from './InteractiveBench';
 import { CameraManager } from './CameraManager';
-import { ExperimentState, CameraViewPreset, LabToolType, LabLightingState } from '../types';
+import { ExperimentState, CameraViewPreset, LabToolType, LabLightingState, BenchItemData } from '../types';
 import { updateThermodynamics } from '../simulation/thermodynamics';
 import { labAudio } from '../utils/audio';
 
 interface LabSceneProps {
   experiment: ExperimentState;
   setExperiment: React.Dispatch<React.SetStateAction<ExperimentState>>;
+  benchItems: BenchItemData[];
+  setBenchItems: React.Dispatch<React.SetStateAction<BenchItemData[]>>;
   selectedId: string | null;
   onSelectItem: (id: string | null, type: LabToolType | null, name: string | null) => void;
   cameraPreset: CameraViewPreset;
@@ -20,6 +22,7 @@ interface LabSceneProps {
   isDraggingItem: boolean;
   setIsDraggingItem: (dragging: boolean) => void;
   lighting: LabLightingState;
+  onRemoveBenchItem?: (id: string) => void;
 }
 
 // Inner simulation loop component inside Canvas context
@@ -64,6 +67,8 @@ const SimulationLoop: React.FC<{
 export const LabScene: React.FC<LabSceneProps> = ({
   experiment,
   setExperiment,
+  benchItems,
+  setBenchItems,
   selectedId,
   onSelectItem,
   cameraPreset,
@@ -72,6 +77,7 @@ export const LabScene: React.FC<LabSceneProps> = ({
   isDraggingItem,
   setIsDraggingItem,
   lighting,
+  onRemoveBenchItem,
 }) => {
   const burnerPos = useRef<[number, number, number]>([0, 0.88, 0]);
   const beakerPos = useRef<[number, number, number]>([0, 1.24, 0]);
@@ -146,6 +152,8 @@ export const LabScene: React.FC<LabSceneProps> = ({
           {/* 5. Interactive Workbench & Equipment Apparatus */}
           <InteractiveBench
             experiment={experiment}
+            items={benchItems}
+            setItems={setBenchItems}
             selectedId={selectedId}
             onSelectItem={onSelectItem}
             onBurnerPosChange={(pos) => {
@@ -158,6 +166,7 @@ export const LabScene: React.FC<LabSceneProps> = ({
             onAddChemical={onAddChemical}
             isDraggingItem={isDraggingItem}
             setIsDraggingItem={setIsDraggingItem}
+            onRemoveItem={onRemoveBenchItem}
           />
         </Canvas>
       </Suspense>

@@ -4,6 +4,7 @@
 
 export type MaterialCategory =
   | 'all'
+  | 'optics'
   | 'fire_type'
   | 'glassware'
   | 'metals'
@@ -28,13 +29,178 @@ export interface LabMaterial {
     chemicalResistance?: string;
     quantumPhase?: string;
     dimensionFactor?: string;
+    functionPurpose?: string;
   };
   is4D?: boolean;
   isFireType?: boolean;
   visualEffect?: 'fire_burst' | 'quantum_distortion' | 'holographic' | 'tesseract_flow' | 'standard';
+  toolType?: string;
 }
 
 export const LAB_MATERIALS_DATABASE: LabMaterial[] = [
+  // ==========================================
+  // 0. OPTICAL & 4D LAB EQUIPMENT (10 Items)
+  // ==========================================
+  {
+    id: 'mat_optics_convex_lens',
+    name: 'Convex Lens',
+    category: 'optics',
+    composition: 'Crown Optical Glass (BK7) Double Convex',
+    color: '#38bdf8',
+    description: 'Precision biconvex optical lens that converges parallel incident light rays to a real focal point. Essential for magnification, image formation, and ray optics studies.',
+    is4D: true,
+    visualEffect: 'holographic',
+    toolType: 'convex_lens',
+    properties: {
+      refractiveIndex: 'n = 1.5168 (BK7)',
+      functionPurpose: 'Converging light',
+      density: '2.51 g/cm³',
+    },
+  },
+  {
+    id: 'mat_optics_concave_lens',
+    name: 'Concave Lens',
+    category: 'optics',
+    composition: 'Flint Optical Glass Bi-Concave Element',
+    color: '#818cf8',
+    description: 'Precision biconcave optical lens that diverges collimated light outward from a virtual focal point, used in beam expanders and optical corrections.',
+    is4D: true,
+    visualEffect: 'holographic',
+    toolType: 'concave_lens',
+    properties: {
+      refractiveIndex: 'n = 1.6200 (Flint Glass)',
+      functionPurpose: 'Diverging light',
+      density: '3.88 g/cm³',
+    },
+  },
+  {
+    id: 'mat_optics_plane_mirror',
+    name: 'Plane Mirror',
+    category: 'optics',
+    composition: 'First-Surface Enhanced Aluminum on Float Glass',
+    color: '#e2e8f0',
+    description: 'Flat high-specularity first-surface front-aluminized mirror for studying the law of specular reflection (angle of incidence = angle of reflection) without ghosting.',
+    is4D: true,
+    visualEffect: 'holographic',
+    toolType: 'plane_mirror',
+    properties: {
+      refractiveIndex: 'Reflectance > 99.2%',
+      functionPurpose: 'Reflection',
+      density: '2.50 g/cm³',
+    },
+  },
+  {
+    id: 'mat_optics_concave_mirror',
+    name: 'Concave Mirror',
+    category: 'optics',
+    composition: 'Spherical Polished Pyrex with Dielectric Reflective Coating',
+    color: '#cbd5e1',
+    description: 'Curved converging mirror designed for studying spherical aberration, real/virtual focal points, and caustic reflection curves.',
+    is4D: true,
+    visualEffect: 'holographic',
+    toolType: 'concave_mirror',
+    properties: {
+      refractiveIndex: 'Focal Length f = +150mm',
+      functionPurpose: 'Studying reflection',
+      density: '2.23 g/cm³',
+    },
+  },
+  {
+    id: 'mat_optics_convex_mirror',
+    name: 'Convex Mirror',
+    category: 'optics',
+    composition: 'Spherical Outer Curve Chrome Alloy',
+    color: '#94a3b8',
+    description: 'Curved diverging mirror for studying diminished virtual images, wide field-of-view reflection dynamics, and optical wave divergence.',
+    is4D: true,
+    visualEffect: 'holographic',
+    toolType: 'convex_mirror',
+    properties: {
+      refractiveIndex: 'Focal Length f = -150mm',
+      functionPurpose: 'Studying reflection',
+      density: '7.85 g/cm³',
+    },
+  },
+  {
+    id: 'mat_optics_prism',
+    name: 'Prism',
+    category: 'optics',
+    composition: 'Equilateral 60° Dense Flint Glass (SF11)',
+    color: '#a855f7',
+    description: 'Triangular dispersive optical prism that separates polychromatic white light into constituent spectral wavelengths (ROYGBIV) via wavelength-dependent Snell refraction.',
+    is4D: true,
+    visualEffect: 'quantum_distortion',
+    toolType: 'prism',
+    properties: {
+      refractiveIndex: 'n = 1.7847 (Dense Dispersive SF11)',
+      functionPurpose: 'Studying refraction',
+      density: '4.74 g/cm³',
+    },
+  },
+  {
+    id: 'mat_optics_optical_bench',
+    name: 'Optical Bench',
+    category: 'optics',
+    composition: 'Extruded Anodized Aircraft-Grade Aluminum Track',
+    color: '#334155',
+    description: 'Graduated 1.2-meter precision optical rail with millimeter vernier scales and sliding clamp riders for mounting, aligning, and testing optical assemblies.',
+    is4D: true,
+    visualEffect: 'standard',
+    toolType: 'optical_bench',
+    properties: {
+      refractiveIndex: 'Vernier Precision 0.1 mm',
+      functionPurpose: 'Supporting optical equipment',
+      density: '2.70 g/cm³',
+    },
+  },
+  {
+    id: 'mat_optics_light_source',
+    name: 'Light Source',
+    category: 'optics',
+    composition: 'High-CRI 5500K LED Lamp with Adjustable Condenser Lens',
+    color: '#fef08a',
+    description: 'Laboratory optical illuminator producing stable, uniform white illumination with adjustable aperture diaphragm for image projection experiments.',
+    is4D: true,
+    visualEffect: 'holographic',
+    toolType: 'light_source',
+    properties: {
+      refractiveIndex: 'Luminous Flux 1200 lm (5500K)',
+      functionPurpose: 'Producing light',
+      density: '1.85 g/cm³',
+    },
+  },
+  {
+    id: 'mat_optics_screen',
+    name: 'Screen',
+    category: 'optics',
+    composition: 'Diffuse White Matte Target Plate with Millimeter Crosshair Grid',
+    color: '#f1f5f9',
+    description: 'Lambertian projection screen for capturing projected real optical images, measuring focal lengths, diffraction patterns, and laser spots.',
+    is4D: true,
+    visualEffect: 'standard',
+    toolType: 'screen',
+    properties: {
+      refractiveIndex: 'Lambertian Diffuse Albedo 98%',
+      functionPurpose: 'Receiving images',
+      density: '1.40 g/cm³',
+    },
+  },
+  {
+    id: 'mat_optics_laser_pointer',
+    name: 'Laser Pointer',
+    category: 'optics',
+    composition: '532nm Diode-Pumped Solid-State (DPSS) Coherent Laser',
+    color: '#22c55e',
+    description: 'Collimated 532nm emerald laser beam emitter for tracing ray trajectories in 4D space, visualizing Snell refraction, total internal reflection, and optical scattering.',
+    is4D: true,
+    visualEffect: 'holographic',
+    toolType: 'laser_pointer',
+    properties: {
+      refractiveIndex: 'Coherent 532nm Emerald Laser Beam',
+      functionPurpose: 'Studying light propagation',
+      density: '3.12 g/cm³',
+    },
+  },
   // ==========================================
   // 1. FIRE-TYPE LAB MATERIALS (12 Items)
   // ==========================================

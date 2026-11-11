@@ -10,7 +10,30 @@ export type LabToolType =
   | 'petri_dish'
   | 'chemical_jar'
   | 'ice_bucket'
-  | 'stirring_rod';
+  | 'stirring_rod'
+  | 'convex_lens'
+  | 'concave_lens'
+  | 'plane_mirror'
+  | 'concave_mirror'
+  | 'convex_mirror'
+  | 'prism'
+  | 'optical_bench'
+  | 'light_source'
+  | 'screen'
+  | 'laser_pointer'
+  | 'dynamic_material';
+
+export interface BenchItemData {
+  id: string;
+  type: LabToolType;
+  name: string;
+  pos: [number, number, number];
+  rotY: number;
+  isRemovable?: boolean;
+  materialRefId?: string;
+  color?: string;
+  description?: string;
+}
 
 export interface LabItem {
   id: string;

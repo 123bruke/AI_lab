@@ -14,19 +14,28 @@ import {
   PetriDish,
   Pipette,
 } from '../chemistry/OtherEquipment';
-import { ExperimentState, LabToolType } from '../types';
+import { DynamicBenchToolRenderer } from '../chemistry/Optics4DEquipment';
+import { ExperimentState, LabToolType, BenchItemData } from '../types';
 import { labAudio } from '../utils/audio';
 
-interface BenchItemData {
-  id: string;
-  type: LabToolType;
-  name: string;
-  pos: [number, number, number];
-  rotY: number;
-}
+export const INITIAL_BENCH_ITEMS: BenchItemData[] = [
+  { id: 'stand', type: 'stand', name: 'Retort Stand & Wire Gauze', pos: [0, 0.88, 0], rotY: 0 },
+  { id: 'burner', type: 'burner', name: 'Bunsen Burner', pos: [0, 0.88, 0], rotY: 0 },
+  { id: 'beaker', type: 'beaker', name: '500mL Borosilicate Beaker', pos: [0, 1.24, 0], rotY: 0 },
+  { id: 'thermometer', type: 'thermometer', name: 'Laboratory Thermometer', pos: [0.08, 1.29, 0], rotY: -0.15 },
+  { id: 'flask', type: 'flask', name: '250mL Erlenmeyer Flask', pos: [0.85, 0.88, 0.15], rotY: 0.4 },
+  { id: 'test_tubes', type: 'test_tubes', name: 'Test Tube Rack & Reagents', pos: [-0.95, 0.88, -0.15], rotY: 0 },
+  { id: 'cylinder', type: 'cylinder', name: '100mL Graduated Cylinder', pos: [0.55, 0.88, -0.25], rotY: 0 },
+  { id: 'chemical_jar', type: 'chemical_jar', name: 'CuSO₄ Reagent Jar', pos: [-0.55, 0.88, 0.28], rotY: 0.3 },
+  { id: 'ice_bucket', type: 'ice_bucket', name: 'Thermal Ice Bucket', pos: [1.15, 0.88, -0.2], rotY: 0 },
+  { id: 'petri_dish', type: 'petri_dish', name: 'Petri Dish (Agar Culture)', pos: [-0.85, 0.88, 0.3], rotY: 0 },
+  { id: 'pipette', type: 'pipette', name: 'Transfer Pipette', pos: [0.38, 0.88, 0.8], rotY: 0.8 },
+];
 
 interface InteractiveBenchProps {
   experiment: ExperimentState;
+  items: BenchItemData[];
+  setItems: React.Dispatch<React.SetStateAction<BenchItemData[]>>;
   selectedId: string | null;
   onSelectItem: (id: string | null, type: LabToolType | null, name: string | null) => void;
   onBurnerPosChange: (pos: [number, number, number]) => void;
@@ -35,10 +44,13 @@ interface InteractiveBenchProps {
   onAddChemical: (color: string, name: string) => void;
   isDraggingItem: boolean;
   setIsDraggingItem: (dragging: boolean) => void;
+  onRemoveItem?: (id: string) => void;
 }
 
 export const InteractiveBench: React.FC<InteractiveBenchProps> = ({
   experiment,
+  items,
+  setItems,
   selectedId,
   onSelectItem,
   onBurnerPosChange,
@@ -47,6 +59,7 @@ export const InteractiveBench: React.FC<InteractiveBenchProps> = ({
   onAddChemical,
   isDraggingItem,
   setIsDraggingItem,
+  onRemoveItem,
 }) => {
   const { camera, gl } = useThree();
 
@@ -54,25 +67,10 @@ export const InteractiveBench: React.FC<InteractiveBenchProps> = ({
   const benchY = 0.88;
   const standGauzeY = 0.88 + 0.36; // 1.24m (height of wire gauze)
 
-  // Initial items placed on the bench with convenient initial layout
-  const [items, setItems] = useState<BenchItemData[]>([
-    { id: 'stand', type: 'stand', name: 'Retort Stand & Wire Gauze', pos: [0, benchY, 0], rotY: 0 },
-    { id: 'burner', type: 'burner', name: 'Bunsen Burner', pos: [0, benchY, 0], rotY: 0 },
-    { id: 'beaker', type: 'beaker', name: '500mL Borosilicate Beaker', pos: [0, standGauzeY, 0], rotY: 0 },
-    { id: 'thermometer', type: 'thermometer', name: 'Laboratory Thermometer', pos: [0.08, standGauzeY + 0.05, 0], rotY: -0.15 },
-    { id: 'flask', type: 'flask', name: '250mL Erlenmeyer Flask', pos: [0.85, benchY, 0.15], rotY: 0.4 },
-    { id: 'test_tubes', type: 'test_tubes', name: 'Test Tube Rack & Reagents', pos: [-0.95, benchY, -0.15], rotY: 0 },
-    { id: 'cylinder', type: 'cylinder', name: '100mL Graduated Cylinder', pos: [0.55, benchY, -0.25], rotY: 0 },
-    { id: 'chemical_jar', type: 'chemical_jar', name: 'CuSO₄ Reagent Jar', pos: [-0.55, benchY, 0.28], rotY: 0.3 },
-    { id: 'ice_bucket', type: 'ice_bucket', name: 'Thermal Ice Bucket', pos: [1.15, benchY, -0.2], rotY: 0 },
-    { id: 'petri_dish', type: 'petri_dish', name: 'Petri Dish (Agar Culture)', pos: [-0.85, benchY, 0.3], rotY: 0 },
-    { id: 'pipette', type: 'pipette', name: 'Transfer Pipette', pos: [0.38, benchY, 0.3], rotY: 0.8 },
-  ]);
-
   const [activeDragId, setActiveDragId] = useState<string | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
-  // References for ultra-smooth continuous raycasting
+  // References for continuous raycasting
   const activeDragIdRef = useRef<string | null>(null);
   activeDragIdRef.current = activeDragId;
 
@@ -81,11 +79,12 @@ export const InteractiveBench: React.FC<InteractiveBenchProps> = ({
   const planeRaycaster = useRef(new THREE.Raycaster());
   const planeIntersection = useRef(new THREE.Vector3());
 
-  // Listen for keyboard 'R' to rotate selected item
+  // Listen for keyboard 'R' to rotate, and 'Delete' / 'Backspace' to delete selected item
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (!selectedId) return;
+
       if (e.key === 'r' || e.key === 'R') {
-        if (!selectedId) return;
         setItems((prev) =>
           prev.map((item) =>
             item.id === selectedId
@@ -94,149 +93,111 @@ export const InteractiveBench: React.FC<InteractiveBenchProps> = ({
           )
         );
         labAudio.playClick();
+      } else if (e.key === 'Delete' || e.key === 'Backspace') {
+        // Prevent deleting if user is typing in an input
+        const tag = (e.target as HTMLElement)?.tagName?.toLowerCase();
+        if (tag === 'input' || tag === 'textarea') return;
+
+        if (onRemoveItem) {
+          onRemoveItem(selectedId);
+        } else {
+          setItems((prev) => prev.filter((item) => item.id !== selectedId));
+          onSelectItem(null, null, null);
+        }
+        labAudio.playGlassClink();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedId]);
+  }, [selectedId, setItems, onSelectItem, onRemoveItem]);
 
-  // Pointer down on an item to initiate effortless drag
-  const handlePointerDown = (e: ThreeEvent<PointerEvent>, item: BenchItemData) => {
-    e.stopPropagation();
-    setActiveDragId(item.id);
-    setIsDraggingItem(true);
-    onSelectItem(item.id, item.type, item.name);
-    labAudio.playClick();
+  // Pointer Down to initiate drag or selection
+  const handlePointerDown = useCallback(
+    (e: ThreeEvent<PointerEvent>, item: BenchItemData) => {
+      e.stopPropagation();
 
-    // Calculate plane intersection offset with camera ray
-    const canvasRect = gl.domElement.getBoundingClientRect();
-    const ndcX = ((e.clientX - canvasRect.left) / canvasRect.width) * 2 - 1;
-    const ndcY = -((e.clientY - canvasRect.top) / canvasRect.height) * 2 + 1;
+      onSelectItem(item.id, item.type, item.name);
+      setActiveDragId(item.id);
+      setIsDraggingItem(true);
+      labAudio.playClick();
 
-    planeRaycaster.current.setFromCamera(new THREE.Vector2(ndcX, ndcY), camera);
-    if (planeRaycaster.current.ray.intersectPlane(groundPlane.current, planeIntersection.current)) {
-      dragOffset.current.set(
-        item.pos[0] - planeIntersection.current.x,
-        0,
-        item.pos[2] - planeIntersection.current.z
+      // Intersect ray with ground plane
+      const mouse = new THREE.Vector2(
+        (e.clientX / window.innerWidth) * 2 - 1,
+        -(e.clientY / window.innerHeight) * 2 + 1
       );
-    } else {
-      dragOffset.current.set(0, 0, 0);
-    }
+      planeRaycaster.current.setFromCamera(mouse, camera);
 
-    // Special quick action triggers
-    if (item.type === 'ice_bucket') {
-      onAddIce();
-    }
-    if (item.type === 'chemical_jar') {
-      onAddChemical('#0284c7', 'Copper(II) Sulfate Pentahydrate');
-    }
-  };
+      if (planeRaycaster.current.ray.intersectPlane(groundPlane.current, planeIntersection.current)) {
+        dragOffset.current.set(
+          item.pos[0] - planeIntersection.current.x,
+          0,
+          item.pos[2] - planeIntersection.current.z
+        );
+      }
+    },
+    [camera, onSelectItem, setIsDraggingItem]
+  );
 
-  // Window-level smooth pointer move: never slips or drops regardless of mouse speed
+  // Global window listeners for drag movement
   useEffect(() => {
     const onWindowPointerMove = (e: PointerEvent) => {
-      const currentDragId = activeDragIdRef.current;
-      if (!currentDragId) return;
+      if (!activeDragIdRef.current) return;
 
-      const canvasRect = gl.domElement.getBoundingClientRect();
-      const ndcX = ((e.clientX - canvasRect.left) / canvasRect.width) * 2 - 1;
-      const ndcY = -((e.clientY - canvasRect.top) / canvasRect.height) * 2 + 1;
+      const mouse = new THREE.Vector2(
+        (e.clientX / window.innerWidth) * 2 - 1,
+        -(e.clientY / window.innerHeight) * 2 + 1
+      );
+      planeRaycaster.current.setFromCamera(mouse, camera);
 
-      planeRaycaster.current.setFromCamera(new THREE.Vector2(ndcX, ndcY), camera);
       if (planeRaycaster.current.ray.intersectPlane(groundPlane.current, planeIntersection.current)) {
-        const targetX = THREE.MathUtils.clamp(
-          planeIntersection.current.x + dragOffset.current.x,
-          -1.65,
-          1.65
-        );
-        const targetZ = THREE.MathUtils.clamp(
-          planeIntersection.current.z + dragOffset.current.z,
-          -0.68,
-          0.68
-        );
+        let newX = planeIntersection.current.x + dragOffset.current.x;
+        let newZ = planeIntersection.current.z + dragOffset.current.z;
 
-        setItems((prev) => {
-          const standItem = prev.find((i) => i.id === 'stand');
+        // Clamp to laboratory bench bounds [-1.6, 1.6] x [-0.6, 0.6]
+        newX = THREE.MathUtils.clamp(newX, -1.6, 1.6);
+        newZ = THREE.MathUtils.clamp(newZ, -0.6, 0.6);
 
-          return prev.map((item) => {
-            if (item.id !== currentDragId) return item;
-
-            // Lift slightly off the bench for pleasant tactile feel
-            let currentY = benchY + 0.035;
-
-            // Snapping preview when hovering near retort stand
-            if (standItem && (item.type === 'beaker' || item.type === 'thermometer')) {
-              const distToStand = Math.hypot(targetX - standItem.pos[0], targetZ - standItem.pos[2]);
-              if (distToStand < 0.26) {
-                currentY = standGauzeY + 0.03;
-              }
+        setItems((prev) =>
+          prev.map((item) => {
+            if (item.id === activeDragIdRef.current) {
+              const currentY = item.pos[1];
+              return { ...item, pos: [newX, currentY, newZ] };
             }
-
-            const newPos: [number, number, number] = [targetX, currentY, targetZ];
-
-            if (item.type === 'burner') onBurnerPosChange(newPos);
-            if (item.type === 'beaker') onBeakerPosChange(newPos);
-
-            return { ...item, pos: newPos };
-          });
-        });
+            return item;
+          })
+        );
       }
     };
 
     const onWindowPointerUp = () => {
-      const currentDragId = activeDragIdRef.current;
-      if (!currentDragId) return;
+      if (!activeDragIdRef.current) return;
 
       setItems((prev) => {
-        const standItem = prev.find((i) => i.id === 'stand');
+        const currentItems = [...prev];
+        const stand = currentItems.find((i) => i.id === 'stand');
+        const beaker = currentItems.find((i) => i.id === 'beaker');
+        const burner = currentItems.find((i) => i.id === 'burner');
 
-        return prev.map((item) => {
-          if (item.id !== currentDragId) return item;
-
-          let finalY = benchY;
-          let finalX = item.pos[0];
-          let finalZ = item.pos[2];
-
-          // Beaker snapping cleanly to retort stand wire gauze
-          if (item.type === 'beaker' && standItem) {
-            const distToStand = Math.hypot(finalX - standItem.pos[0], finalZ - standItem.pos[2]);
-            if (distToStand < 0.28) {
-              finalX = standItem.pos[0];
-              finalZ = standItem.pos[2];
-              finalY = standGauzeY;
-            }
+        if (stand && beaker) {
+          const distToBeaker = Math.hypot(beaker.pos[0] - stand.pos[0], beaker.pos[2] - stand.pos[2]);
+          if (distToBeaker < 0.28) {
+            beaker.pos = [stand.pos[0], standGauzeY, stand.pos[2]];
+          } else {
+            beaker.pos = [beaker.pos[0], benchY, beaker.pos[2]];
           }
+          onBeakerPosChange(beaker.pos);
+        }
 
-          // Thermometer snapping neatly into reaction vessel
-          if (item.type === 'thermometer') {
-            const beakerItem = prev.find((i) => i.id === 'beaker');
-            if (beakerItem) {
-              const distToBeaker = Math.hypot(finalX - beakerItem.pos[0], finalZ - beakerItem.pos[2]);
-              if (distToBeaker < 0.3) {
-                finalX = beakerItem.pos[0] + 0.08;
-                finalZ = beakerItem.pos[2];
-                finalY = beakerItem.pos[1] + 0.05;
-              }
-            }
+        if (stand && burner) {
+          const distToBurner = Math.hypot(burner.pos[0] - stand.pos[0], burner.pos[2] - stand.pos[2]);
+          if (distToBurner < 0.22) {
+            burner.pos = [stand.pos[0], benchY, stand.pos[2]];
           }
+          onBurnerPosChange(burner.pos);
+        }
 
-          // Burner snapping directly underneath retort stand
-          if (item.type === 'burner' && standItem) {
-            const distToStand = Math.hypot(finalX - standItem.pos[0], finalZ - standItem.pos[2]);
-            if (distToStand < 0.24) {
-              finalX = standItem.pos[0];
-              finalZ = standItem.pos[2];
-              finalY = benchY;
-            }
-          }
-
-          const resolvedPos: [number, number, number] = [finalX, finalY, finalZ];
-          if (item.type === 'burner') onBurnerPosChange(resolvedPos);
-          if (item.type === 'beaker') onBeakerPosChange(resolvedPos);
-
-          return { ...item, pos: resolvedPos };
-        });
+        return currentItems;
       });
 
       labAudio.playGlassClink();
@@ -251,7 +212,7 @@ export const InteractiveBench: React.FC<InteractiveBenchProps> = ({
       window.removeEventListener('pointermove', onWindowPointerMove);
       window.removeEventListener('pointerup', onWindowPointerUp);
     };
-  }, [camera, gl, onBeakerPosChange, onBurnerPosChange, setIsDraggingItem, standGauzeY]);
+  }, [camera, onBeakerPosChange, onBurnerPosChange, setItems, setIsDraggingItem, standGauzeY]);
 
   // Handle bench background click to deselect
   const handleBenchClick = useCallback(
@@ -299,7 +260,7 @@ export const InteractiveBench: React.FC<InteractiveBenchProps> = ({
               }
             }}
           >
-            {/* 1. Beaker */}
+            {/* Standard Chemistry Items */}
             {item.type === 'beaker' && (
               <Beaker
                 temperature={experiment.temperature}
@@ -311,8 +272,6 @@ export const InteractiveBench: React.FC<InteractiveBenchProps> = ({
                 isSelected={isSel}
               />
             )}
-
-            {/* 2. Bunsen Burner */}
             {item.type === 'burner' && (
               <Burner
                 isLit={experiment.isBurnerLit}
@@ -320,40 +279,43 @@ export const InteractiveBench: React.FC<InteractiveBenchProps> = ({
                 isSelected={isSel}
               />
             )}
-
-            {/* 3. Retort Stand */}
             {item.type === 'stand' && <LabStand isSelected={isSel} />}
-
-            {/* 4. Thermometer */}
             {item.type === 'thermometer' && (
               <Thermometer
                 temperature={experiment.temperature}
                 isSelected={isSel}
               />
             )}
-
-            {/* 5. Erlenmeyer Flask */}
             {item.type === 'flask' && <Flask isSelected={isSel} />}
-
-            {/* 6. Test Tube Rack */}
             {item.type === 'test_tubes' && <TestTubes isSelected={isSel} />}
-
-            {/* 7. Measuring Cylinder */}
             {item.type === 'cylinder' && <MeasuringCylinder isSelected={isSel} />}
-
-            {/* 8. Chemical Powder Jar */}
             {item.type === 'chemical_jar' && <ChemicalJar isSelected={isSel} />}
-
-            {/* 9. Ice Bucket */}
             {item.type === 'ice_bucket' && <IceBucket isSelected={isSel} />}
-
-            {/* 10. Petri Dish */}
             {item.type === 'petri_dish' && <PetriDish isSelected={isSel} />}
-
-            {/* 11. Pipette */}
             {item.type === 'pipette' && <Pipette isSelected={isSel} />}
 
-            {/* Responsive Visual Ring on Table: Hover, Selection, and Drag Lift Disc */}
+            {/* Dynamic 4D Optics & Custom Placed Equipment */}
+            {item.type !== 'beaker' &&
+              item.type !== 'burner' &&
+              item.type !== 'stand' &&
+              item.type !== 'thermometer' &&
+              item.type !== 'flask' &&
+              item.type !== 'test_tubes' &&
+              item.type !== 'cylinder' &&
+              item.type !== 'chemical_jar' &&
+              item.type !== 'ice_bucket' &&
+              item.type !== 'petri_dish' &&
+              item.type !== 'pipette' && (
+                <DynamicBenchToolRenderer
+                  toolType={item.type}
+                  color={item.color}
+                  name={item.name}
+                  isSelected={isSel}
+                  isHovered={isHovered}
+                />
+              )}
+
+            {/* Interactive Ground Target Ring: Selection & Drag Highlighting */}
             {(isDraggingThis || isSel || isHovered) && (
               <mesh
                 position={[0, item.pos[1] > benchY + 0.1 ? -(item.pos[1] - benchY) + 0.003 : 0.003, 0]}
@@ -361,15 +323,15 @@ export const InteractiveBench: React.FC<InteractiveBenchProps> = ({
               >
                 <ringGeometry
                   args={[
-                    item.type === 'stand' ? 0.26 : 0.14,
-                    item.type === 'stand' ? 0.28 : 0.16,
+                    item.type === 'stand' || item.type === 'optical_bench' ? 0.28 : 0.14,
+                    item.type === 'stand' || item.type === 'optical_bench' ? 0.31 : 0.16,
                     32,
                   ]}
                 />
                 <meshBasicMaterial
-                  color={isDraggingThis ? '#38bdf8' : isSel ? '#0ea5e9' : '#94a3b8'}
+                  color={isDraggingThis ? '#22c55e' : isSel ? '#10b981' : '#94a3b8'}
                   transparent
-                  opacity={isDraggingThis ? 0.9 : isSel ? 0.6 : 0.3}
+                  opacity={isDraggingThis ? 0.95 : isSel ? 0.75 : 0.35}
                   side={THREE.DoubleSide}
                 />
               </mesh>
