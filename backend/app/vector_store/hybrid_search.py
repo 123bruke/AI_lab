@@ -9,8 +9,12 @@ from typing import List, Dict, Any, Optional
 from collections import Counter
 import time
 
-from backend.app.vector_store.chroma_service import chroma_service
-from backend.app.logging_system.logger import app_logger
+try:
+    from backend.app.vector_store.chroma_service import chroma_service
+    from backend.app.logging_system.logger import app_logger
+except ImportError:
+    from .chroma_service import chroma_service
+    from ..logging_system.logger import app_logger
 
 
 class BM25Scorer:

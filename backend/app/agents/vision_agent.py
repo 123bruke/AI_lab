@@ -5,10 +5,16 @@ scientific protocol PDF manuals for experimental extraction.
 """
 
 from typing import Dict, Any, Optional
-from backend.app.agents.base_agent import BaseAgent
-from backend.app.vision.yolo_detector import yolo_lab_detector
-from backend.app.vision.pdf_parser import scientific_pdf_parser
-from backend.app.logging_system.logger import app_logger
+try:
+    from backend.app.agents.base_agent import BaseAgent
+    from backend.app.vision.yolo_detector import yolo_lab_detector
+    from backend.app.vision.pdf_parser import scientific_pdf_parser
+    from backend.app.logging_system.logger import app_logger
+except ImportError:
+    from .base_agent import BaseAgent
+    from ..vision.yolo_detector import yolo_lab_detector
+    from ..vision.pdf_parser import scientific_pdf_parser
+    from ..logging_system.logger import app_logger
 
 
 class VisionAgent(BaseAgent):
