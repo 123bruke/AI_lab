@@ -9,8 +9,12 @@ import os
 import pathlib
 from typing import Dict, Any, List, Optional
 
-from backend.app.logging_system.logger import app_logger
-from backend.app.vector_store.chroma_service import chroma_service
+try:
+    from backend.app.logging_system.logger import app_logger
+    from backend.app.vector_store.chroma_service import chroma_service
+except ImportError:
+    from ..logging_system.logger import app_logger
+    from ..vector_store.chroma_service import chroma_service
 
 
 class ScientificPDFParser:
