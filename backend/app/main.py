@@ -5,15 +5,30 @@ SQL Database, and Frontend Error Telemetry.
 """
 
 import sys
+import os
+import types
 from pathlib import Path
 
-# Ensure both backend root and workspace root are in sys.path
+# Ensure backend root, app dir, and workspace root are in sys.path
 _current_dir = Path(__file__).resolve().parent
 _backend_dir = _current_dir.parent
 _workspace_dir = _backend_dir.parent
-for _p in [str(_backend_dir), str(_workspace_dir)]:
+for _p in [str(_backend_dir), str(_current_dir), str(_workspace_dir)]:
     if _p not in sys.path:
         sys.path.insert(0, _p)
+
+# Module aliasing for serverless deployments where backend is root
+if "backend" not in sys.modules:
+    _backend_mod = types.ModuleType("backend")
+    _backend_mod.__path__ = [str(_backend_dir)]
+    _backend_mod.__package__ = "backend"
+    sys.modules["backend"] = _backend_mod
+    try:
+        import app as _app_mod
+        _backend_mod.app = _app_mod
+        sys.modules["backend.app"] = _app_mod
+    except Exception:
+        pass
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware

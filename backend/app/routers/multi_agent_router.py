@@ -10,26 +10,48 @@ import os
 import shutil
 import tempfile
 
-from backend.app.database.connection import get_db
-from backend.app.database.expanded_models import LabReport, AgentTaskLog, ChemicalInventory
-from backend.app.database.expanded_schemas import (
-    AgentInfo,
-    AgentTaskRequest,
-    AgentTaskResponse,
-    LabReportCreate,
-    LabReportResponse,
-    HybridSearchRequest,
-    HybridSearchResponse,
-    VisionDetectionResponse,
-    FrontendErrorPayload,
-    ErrorLogResponse
-)
-from backend.app.agents.orchestrator import master_orchestrator
-from backend.app.vector_store.hybrid_search import hybrid_search
-from backend.app.vision.yolo_detector import yolo_lab_detector
-from backend.app.vision.pdf_parser import scientific_pdf_parser
-from backend.app.logging_system.logger import app_logger, log_frontend_error
-from backend.app.logging_system.error_database import record_error_to_db, get_recent_errors
+try:
+    from backend.app.database.connection import get_db
+    from backend.app.database.expanded_models import LabReport, AgentTaskLog, ChemicalInventory
+    from backend.app.database.expanded_schemas import (
+        AgentInfo,
+        AgentTaskRequest,
+        AgentTaskResponse,
+        LabReportCreate,
+        LabReportResponse,
+        HybridSearchRequest,
+        HybridSearchResponse,
+        VisionDetectionResponse,
+        FrontendErrorPayload,
+        ErrorLogResponse
+    )
+    from backend.app.agents.orchestrator import master_orchestrator
+    from backend.app.vector_store.hybrid_search import hybrid_search
+    from backend.app.vision.yolo_detector import yolo_lab_detector
+    from backend.app.vision.pdf_parser import scientific_pdf_parser
+    from backend.app.logging_system.logger import app_logger, log_frontend_error
+    from backend.app.logging_system.error_database import record_error_to_db, get_recent_errors
+except ImportError:
+    from ..database.connection import get_db
+    from ..database.expanded_models import LabReport, AgentTaskLog, ChemicalInventory
+    from ..database.expanded_schemas import (
+        AgentInfo,
+        AgentTaskRequest,
+        AgentTaskResponse,
+        LabReportCreate,
+        LabReportResponse,
+        HybridSearchRequest,
+        HybridSearchResponse,
+        VisionDetectionResponse,
+        FrontendErrorPayload,
+        ErrorLogResponse
+    )
+    from ..agents.orchestrator import master_orchestrator
+    from ..vector_store.hybrid_search import hybrid_search
+    from ..vision.yolo_detector import yolo_lab_detector
+    from ..vision.pdf_parser import scientific_pdf_parser
+    from ..logging_system.logger import app_logger, log_frontend_error
+    from ..logging_system.error_database import record_error_to_db, get_recent_errors
 
 router = APIRouter(prefix="/api/agents", tags=["Multi-Agent AI System"])
 

@@ -6,9 +6,14 @@ classifies GHS hazards, and checks reagent compatibility.
 
 from typing import Dict, Any, Optional, List
 import re
-from backend.app.agents.base_agent import BaseAgent
-from backend.app.database.expanded_models import ChemicalInventory
-from backend.app.logging_system.logger import app_logger
+try:
+    from backend.app.agents.base_agent import BaseAgent
+    from backend.app.database.expanded_models import ChemicalInventory
+    from backend.app.logging_system.logger import app_logger
+except ImportError:
+    from .base_agent import BaseAgent
+    from ..database.expanded_models import ChemicalInventory
+    from ..logging_system.logger import app_logger
 
 # Atomic Weights Periodic Table Reference
 ATOMIC_WEIGHTS = {

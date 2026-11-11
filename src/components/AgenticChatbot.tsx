@@ -302,7 +302,7 @@ You can inspect the 4D dispersion fan directly on the 3D bench!`;
         prompt: textToSend,
         current_temp: experiment.temperature,
         current_volume: experiment.liquidVolume,
-        is_burner_lit: experiment.isBurnerLit,
+        current_state: experiment.waterState,
         solute_name: experiment.soluteName,
       });
 

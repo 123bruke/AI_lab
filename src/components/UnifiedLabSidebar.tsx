@@ -977,11 +977,11 @@ export const UnifiedLabSidebar: React.FC<UnifiedLabSidebarProps> = ({
               </div>
               <div>
                 <h3 className="text-xs font-bold font-mono tracking-wider uppercase text-white">
-                  MOSEB AI Lab Copilot
+                  AI Lab Assistant
                 </h3>
-                <span className="text-[10px] text-cyan-400 font-mono flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-                  Autonomous Assistant Online
+                <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  Assistant Online
                 </span>
               </div>
             </div>

@@ -1,16 +1,27 @@
 """
-Unified SQLAlchemy Models forwarding to backend.app.database.expanded_models.
+Unified SQLAlchemy Models forwarding to expanded_models.
 """
 
-from backend.app.database.expanded_models import (
-    User,
-    ExperimentRecord,
-    LabNotebook,
-    AgentTaskLog,
-    LabReport,
-    ChemicalInventory,
-    DocumentRecord
-)
+try:
+    from backend.app.database.expanded_models import (
+        User,
+        ExperimentRecord,
+        LabNotebook,
+        AgentTaskLog,
+        LabReport,
+        ChemicalInventory,
+        DocumentRecord
+    )
+except ImportError:
+    from app.database.expanded_models import (
+        User,
+        ExperimentRecord,
+        LabNotebook,
+        AgentTaskLog,
+        LabReport,
+        ChemicalInventory,
+        DocumentRecord
+    )
 
 __all__ = [
     "User",

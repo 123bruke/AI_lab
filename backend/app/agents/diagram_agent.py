@@ -6,8 +6,12 @@ and high-resolution SVG curves for lab reports.
 
 from typing import Dict, Any, Optional
 import json
-from backend.app.agents.base_agent import BaseAgent
-from backend.app.logging_system.logger import app_logger
+try:
+    from backend.app.agents.base_agent import BaseAgent
+    from backend.app.logging_system.logger import app_logger
+except ImportError:
+    from .base_agent import BaseAgent
+    from ..logging_system.logger import app_logger
 
 
 class DiagramAgent(BaseAgent):

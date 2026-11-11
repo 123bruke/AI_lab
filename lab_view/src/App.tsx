@@ -6,7 +6,7 @@ import { MaterialsModal } from './components/MaterialsModal';
 import { INITIAL_BENCH_ITEMS } from './components/InteractiveBench';
 import { INITIAL_EXPERIMENT_STATE } from './simulation/thermodynamics';
 import { ExperimentState, CameraViewPreset, LabToolType, LabLightingState, BenchItemData } from './types';
-import { LabMaterial } from './data/materialsData';
+import { LabMaterial, LAB_MATERIALS_DATABASE } from './data/materialsData';
 import { labAudio } from './utils/audio';
 import { initGlobalErrorHandling } from './services/telemetry';
 import {
