@@ -6,9 +6,14 @@ adjusting flame intensity, ice cooling, water refill, magnetic stirring).
 
 from typing import Dict, Any, Optional
 import re
-from backend.app.agents.base_agent import BaseAgent
-from backend.app.database.expanded_models import AgentTaskLog
-from backend.app.logging_system.logger import app_logger
+try:
+    from backend.app.agents.base_agent import BaseAgent
+    from backend.app.database.expanded_models import AgentTaskLog
+    from backend.app.logging_system.logger import app_logger
+except ImportError:
+    from .base_agent import BaseAgent
+    from ..database.expanded_models import AgentTaskLog
+    from ..logging_system.logger import app_logger
 
 
 class SimulationAgent(BaseAgent):

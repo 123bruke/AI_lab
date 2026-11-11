@@ -5,10 +5,16 @@ to gather empirical constants, scientific papers, and experimental procedures.
 """
 
 from typing import Dict, Any, Optional
-from backend.app.agents.base_agent import BaseAgent
-from backend.app.vector_store.hybrid_search import hybrid_search
-from backend.app.vector_store.chroma_service import chroma_service
-from backend.app.logging_system.logger import app_logger
+try:
+    from backend.app.agents.base_agent import BaseAgent
+    from backend.app.vector_store.hybrid_search import hybrid_search
+    from backend.app.vector_store.chroma_service import chroma_service
+    from backend.app.logging_system.logger import app_logger
+except ImportError:
+    from .base_agent import BaseAgent
+    from ..vector_store.hybrid_search import hybrid_search
+    from ..vector_store.chroma_service import chroma_service
+    from ..logging_system.logger import app_logger
 
 
 class ResearchAgent(BaseAgent):
