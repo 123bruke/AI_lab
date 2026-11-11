@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { LabToolType, EquipmentInfo } from '../types';
 import { CHEMICAL_PRESETS } from '../simulation/thermodynamics';
-import { Info, RotateCw, Snowflake, Droplets, FlaskConical, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { Info, RotateCw, Snowflake, Droplets, FlaskConical, X, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 import { labAudio } from '../utils/audio';
 
 const EQUIPMENT_DETAILS: Record<LabToolType, EquipmentInfo> = {
@@ -101,6 +101,94 @@ const EQUIPMENT_DETAILS: Record<LabToolType, EquipmentInfo> = {
     description: 'Solid glass rod with rounded fire-polished ends for promoting solute dissolution and thermal uniformity.',
     usageTip: 'Stir gently in circular motions without striking the beaker walls.',
   },
+  convex_lens: {
+    name: 'Convex Lens (Converging)',
+    category: 'Optical Equipment',
+    material: 'Crown Optical Glass (BK7)',
+    safeTempLimit: 'Converging Light (f = +100mm)',
+    description: 'Precision biconvex optical lens that converges parallel incident rays to a real focal point. Essential for magnification, image formation, and ray optics studies.',
+    usageTip: 'Position in front of laser or light source to observe converging ray paths.',
+  },
+  concave_lens: {
+    name: 'Concave Lens (Diverging)',
+    category: 'Optical Equipment',
+    material: 'Flint Optical Glass',
+    safeTempLimit: 'Diverging Light (f = -100mm)',
+    description: 'Precision biconcave optical lens that diverges light outward from a virtual focal point, used in beam expanders.',
+    usageTip: 'Observe outward ray divergence and virtual focal geometry.',
+  },
+  plane_mirror: {
+    name: 'Plane Mirror (Reflection)',
+    category: 'Optical Equipment',
+    material: 'Front-Aluminized Float Glass',
+    safeTempLimit: 'Specular Reflection (>99%)',
+    description: 'Flat high-specularity mirror for demonstrating the law of reflection (angle of incidence = angle of reflection).',
+    usageTip: 'Rotate with R key to redirect reflected light rays across the bench.',
+  },
+  concave_mirror: {
+    name: 'Concave Mirror',
+    category: 'Optical Equipment',
+    material: 'Spherical Polished Glass with Dielectric Coating',
+    safeTempLimit: 'Converging Reflection (f = +150mm)',
+    description: 'Curved converging mirror designed for studying focal points and image magnification.',
+    usageTip: 'Align with incident light to observe inward caustic convergence.',
+  },
+  convex_mirror: {
+    name: 'Convex Mirror',
+    category: 'Optical Equipment',
+    material: 'Chrome Alloy Spherical Dome',
+    safeTempLimit: 'Diverging Reflection (f = -150mm)',
+    description: 'Curved diverging mirror for studying diminished virtual images and wide-field reflection.',
+    usageTip: 'Rotate to inspect wide-angle reflection dynamics.',
+  },
+  prism: {
+    name: 'Dispersive Optical Prism',
+    category: 'Optical Equipment',
+    material: 'Dense Flint Glass (SF11)',
+    safeTempLimit: 'Refraction & Dispersion (n = 1.78)',
+    description: 'Triangular optical prism that disperses polychromatic light into continuous visible spectrum wavelengths via Snell refraction.',
+    usageTip: 'Observe multi-color rainbow dispersion fan emanating from the exit face.',
+  },
+  optical_bench: {
+    name: 'Optical Bench Rail',
+    category: 'Optical Equipment',
+    material: 'Extruded Aircraft Aluminum',
+    safeTempLimit: 'Length 1.0 Meter Track',
+    description: 'Graduated optical rail with millimeter vernier scales and sliding carrier saddles for component mounting.',
+    usageTip: 'Use as a baseline track to align lenses, mirrors, and light sources.',
+  },
+  light_source: {
+    name: 'Laboratory Light Source',
+    category: 'Optical Equipment',
+    material: '5500K LED Lamp with Condenser Lens',
+    safeTempLimit: 'Producing Light (1200 lm)',
+    description: 'Optical illuminator projecting stable collimated light rays across the bench for image projection.',
+    usageTip: 'Align with lens or screen for projection experiments.',
+  },
+  screen: {
+    name: 'Optical Projection Screen',
+    category: 'Optical Equipment',
+    material: 'Matte White Target with Crosshair Grid',
+    safeTempLimit: 'Receiving Images',
+    description: 'Diffuse target projection screen for capturing projected real images, measuring focal lengths, and laser spots.',
+    usageTip: 'Place behind lens or mirror to receive sharp focal points.',
+  },
+  laser_pointer: {
+    name: '532nm DPSS Laser Diode',
+    category: 'Optical Equipment',
+    material: 'Anodized Diode Laser Housing',
+    safeTempLimit: 'Studying Light Propagation (532nm)',
+    description: 'Emits an intense coherent emerald laser beam across 3D space for real-time ray tracing and reflection studies.',
+    usageTip: 'Trace the green laser ray through lenses, mirrors, and prisms.',
+  },
+  dynamic_material: {
+    name: 'Laboratory Specimen',
+    category: 'Material Specimen',
+    material: 'Physical / 4D Specimen',
+    safeTempLimit: 'Active Laboratory Material',
+    description: 'Material placed on the laboratory table for physical, optical, and thermodynamic testing.',
+    usageTip: 'Click or drag to position on the table.',
+  },
 };
 
 interface ObjectInspectorProps {
@@ -110,6 +198,7 @@ interface ObjectInspectorProps {
   onAddIce: () => void;
   onSelectChemical: (color: string, name: string) => void;
   onRefillWater: () => void;
+  onDeleteItem?: () => void;
 }
 
 export const ObjectInspector: React.FC<ObjectInspectorProps> = ({
@@ -119,6 +208,7 @@ export const ObjectInspector: React.FC<ObjectInspectorProps> = ({
   onAddIce,
   onSelectChemical,
   onRefillWater,
+  onDeleteItem,
 }) => {
   const [isMinimized, setIsMinimized] = useState<boolean>(false);
   if (!toolType) return null;
@@ -233,8 +323,23 @@ export const ObjectInspector: React.FC<ObjectInspectorProps> = ({
           className="px-3 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
         >
           <RotateCw className="w-3.5 h-3.5 text-neutral-300" />
-          <span>Rotate 3D (R)</span>
+          <span>Rotate (R)</span>
         </button>
+
+        {onDeleteItem && (
+          <button
+            onClick={() => {
+              labAudio.playGlassClink();
+              onDeleteItem();
+              onClose();
+            }}
+            title="Remove from 3D Table (or press Delete key)"
+            className="px-3 py-2 rounded-xl bg-rose-50 hover:bg-rose-500 text-rose-600 hover:text-white border border-rose-200 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            <span>Remove from Table</span>
+          </button>
+        )}
 
         {toolType === 'beaker' && (
           <>

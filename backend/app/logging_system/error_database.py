@@ -1,5 +1,6 @@
 import os
 import shutil
+import tempfile
 import datetime
 from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime
 from sqlalchemy.orm import sessionmaker, declarative_base
@@ -8,12 +9,25 @@ from .logger import lab_logger
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_ERROR_DB = os.path.abspath(os.path.join(BASE_DIR, "..", "..", "error_logs.db"))
 
+def _is_serverless_or_readonly(directory: str) -> bool:
+    if os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME") or os.environ.get("LAMBDA_TASK_ROOT"):
+        return True
+    try:
+        test_file = os.path.join(directory, f".probe_errdb_{os.getpid()}")
+        with open(test_file, "w") as f:
+            f.write("probe")
+        os.remove(test_file)
+        return False
+    except Exception:
+        return True
+
 def _resolve_error_db_path(target_path: str) -> str:
     db_dir = os.path.dirname(target_path)
-    if os.access(db_dir, os.W_OK):
+    if not _is_serverless_or_readonly(db_dir):
         return target_path
     
-    tmp_path = os.path.join("/tmp", "error_logs.db")
+    tmp_dir = "/tmp" if os.path.exists("/tmp") else tempfile.gettempdir()
+    tmp_path = os.path.join(tmp_dir, "error_logs.db")
     if os.path.exists(target_path) and not os.path.exists(tmp_path):
         try:
             shutil.copy2(target_path, tmp_path)

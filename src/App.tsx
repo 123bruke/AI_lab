@@ -2,8 +2,11 @@ import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { LabScene } from './components/LabScene';
 import { AgenticChatbot } from './components/AgenticChatbot';
 import { ObjectInspector } from './components/ObjectInspector';
+import { MaterialsModal } from './components/MaterialsModal';
+import { INITIAL_BENCH_ITEMS } from './components/InteractiveBench';
 import { INITIAL_EXPERIMENT_STATE } from './simulation/thermodynamics';
-import { ExperimentState, CameraViewPreset, LabToolType, LabLightingState } from './types';
+import { ExperimentState, CameraViewPreset, LabToolType, LabLightingState, BenchItemData } from './types';
+import { LabMaterial } from './data/materialsData';
 import { labAudio } from './utils/audio';
 import { initGlobalErrorHandling } from './services/telemetry';
 import {
@@ -18,16 +21,19 @@ import {
   Layers,
   FlaskConical,
   Sun,
+  Boxes,
 } from 'lucide-react';
 
 export default function App() {
   const [experiment, setExperiment] = useState<ExperimentState>(INITIAL_EXPERIMENT_STATE);
+  const [benchItems, setBenchItems] = useState<BenchItemData[]>(INITIAL_BENCH_ITEMS);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedToolType, setSelectedToolType] = useState<LabToolType | null>(null);
   const [cameraPreset, setCameraPreset] = useState<CameraViewPreset>('experiment_focus');
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [isDraggingItem, setIsDraggingItem] = useState<boolean>(false);
   const [isReady, setIsReady] = useState<boolean>(false);
+  const [isMaterialsOpen, setIsMaterialsOpen] = useState<boolean>(false);
   const [lighting, setLighting] = useState<LabLightingState>({
     mainCeiling: true,
     benchSpot: true,
@@ -83,6 +89,9 @@ export default function App() {
       liquidColor: experiment.liquidColor,
       soluteName: experiment.soluteName,
     });
+    setBenchItems(INITIAL_BENCH_ITEMS);
+    setSelectedId(null);
+    setSelectedToolType(null);
     labAudio.playClick();
   }, [experiment.liquidColor, experiment.soluteName]);
 
@@ -134,6 +143,55 @@ export default function App() {
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'r' }));
   }, []);
 
+  // Add material / tool to the 3D table
+  const handleAddMaterialToBench = useCallback(
+    (material: LabMaterial) => {
+      const count = benchItems.length;
+      // Stagger items neatly across the bench
+      const col = ((count - 10) % 5) - 2;
+      const row = Math.floor((count - 10) / 5) % 2 === 0 ? 0.35 : -0.35;
+      const posX = col * 0.42;
+      const posZ = row;
+
+      const newItem: BenchItemData = {
+        id: `placed_${material.id}_${Date.now()}`,
+        type: (material.toolType as LabToolType) || 'dynamic_material',
+        name: material.name,
+        pos: [posX, 0.88, posZ],
+        rotY: 0,
+        isRemovable: true,
+        materialRefId: material.id,
+        color: material.color,
+        description: material.description,
+      };
+
+      setBenchItems((prev) => [...prev, newItem]);
+      setSelectedId(newItem.id);
+      setSelectedToolType(newItem.type);
+    },
+    [benchItems.length]
+  );
+
+  // Delete / Remove item from table
+  const handleRemoveBenchItem = useCallback(
+    (id: string) => {
+      setBenchItems((prev) => prev.filter((item) => item.id !== id));
+      if (selectedId === id) {
+        setSelectedId(null);
+        setSelectedToolType(null);
+      }
+      labAudio.playGlassClink();
+    },
+    [selectedId]
+  );
+
+  const handleClearCustomItems = useCallback(() => {
+    setBenchItems(INITIAL_BENCH_ITEMS);
+    setSelectedId(null);
+    setSelectedToolType(null);
+    labAudio.playGlassClink();
+  }, []);
+
   // Temperature color indicator
   const getTempColor = (temp: number) => {
     if (temp <= 5) return 'text-cyan-400 bg-cyan-500/10 border-cyan-500/30';
@@ -149,6 +207,8 @@ export default function App() {
         <LabScene
           experiment={experiment}
           setExperiment={setExperiment}
+          benchItems={benchItems}
+          setBenchItems={setBenchItems}
           selectedId={selectedId}
           onSelectItem={handleSelectItem}
           cameraPreset={cameraPreset}
@@ -157,19 +217,32 @@ export default function App() {
           isDraggingItem={isDraggingItem}
           setIsDraggingItem={setIsDraggingItem}
           lighting={lighting}
+          onRemoveBenchItem={handleRemoveBenchItem}
         />
       </div>
 
       {/* 2. Top Floating Minimal Glassmorphic Telemetry HUD */}
       <header className="absolute top-4 left-4 right-4 z-30 pointer-events-none flex items-center justify-between">
-        {/* Left: Branding & Active Telemetry Badges */}
+        {/* Left: Clean Branding & Active Telemetry */}
         <div className="flex items-center gap-2 pointer-events-auto flex-wrap">
-          <div className="flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-neutral-950/80 border border-white/10 backdrop-blur-xl shadow-2xl">
-            <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
-            <span className="text-xs font-mono font-bold tracking-wider text-white uppercase">
-              MOSEB 4D LAB
+          <div className="flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-neutral-950/85 border border-white/10 backdrop-blur-xl shadow-2xl">
+            <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-xs font-semibold tracking-wide text-white">
+              Virtual Science Lab
             </span>
           </div>
+
+          {/* Dedicated Materials Button */}
+          <button
+            onClick={() => {
+              setIsMaterialsOpen(true);
+              labAudio.playClick();
+            }}
+            className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-[#10a37f] hover:bg-emerald-600 text-white font-medium text-xs transition-all shadow-lg shadow-emerald-700/30 active:scale-95 cursor-pointer border border-emerald-400/40"
+          >
+            <Boxes size={15} />
+            <span>Materials & Optics ({LAB_MATERIALS_DATABASE.length})</span>
+          </button>
 
           {/* Current Chemical Solute */}
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-neutral-950/80 border border-white/10 backdrop-blur-xl shadow-lg text-xs font-mono">
@@ -229,10 +302,11 @@ export default function App() {
                   setCameraPreset(preset.id);
                   labAudio.playClick();
                 }}
-                className={`px-2.5 py-1 rounded-xl text-[11px] font-mono transition-all cursor-pointer ${cameraPreset === preset.id
-                    ? 'bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-400/30'
+                className={`px-2.5 py-1 rounded-xl text-[11px] font-mono transition-all cursor-pointer ${
+                  cameraPreset === preset.id
+                    ? 'bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-400/30'
                     : 'text-neutral-400 hover:text-white'
-                  }`}
+                }`}
               >
                 {preset.label}
               </button>
@@ -251,7 +325,7 @@ export default function App() {
           {/* Reset Bench */}
           <button
             onClick={handleReset}
-            title="Reset Laboratory Bench"
+            title="Reset Laboratory Bench & Items"
             className="p-2 rounded-2xl bg-neutral-950/80 border border-white/10 text-neutral-400 hover:text-rose-400 hover:bg-white/10 backdrop-blur-xl shadow-lg transition-all cursor-pointer"
           >
             <RotateCcw size={15} />
@@ -259,7 +333,7 @@ export default function App() {
         </div>
       </header>
 
-      {/* 3. Modern ChatGPT-Style Agentic AI Copilot (Right-Docked / Expandable) */}
+      {/* 3. Modern ChatGPT-Style Agentic AI Copilot (White & Emerald Green) */}
       <AgenticChatbot
         experiment={experiment}
         onToggleBurner={handleToggleBurner}
@@ -270,9 +344,20 @@ export default function App() {
         onSetCameraPreset={setCameraPreset}
         onToggleLight={handleToggleLight}
         onReset={handleReset}
+        onOpenMaterials={() => setIsMaterialsOpen(true)}
       />
 
-      {/* 4. Floating Scientific Object Inspector (Appears when apparatus item is clicked) */}
+      {/* 4. Materials Drawer / Modal */}
+      <MaterialsModal
+        isOpen={isMaterialsOpen}
+        onClose={() => setIsMaterialsOpen(false)}
+        benchItems={benchItems}
+        onAddMaterialToBench={handleAddMaterialToBench}
+        onRemoveBenchItem={handleRemoveBenchItem}
+        onClearCustomItems={handleClearCustomItems}
+      />
+
+      {/* 5. Floating Scientific Object Inspector (Appears when apparatus item is clicked) */}
       {selectedToolType && (
         <ObjectInspector
           toolType={selectedToolType}
@@ -284,23 +369,25 @@ export default function App() {
           onAddIce={handleAddIce}
           onSelectChemical={handleSelectChemical}
           onRefillWater={handleRefillWater}
+          onDeleteItem={() => selectedId && handleRemoveBenchItem(selectedId)}
         />
       )}
 
-      {/* 5. Smooth Laboratory Initialization Loading Screen */}
+      {/* 6. Smooth Laboratory Initialization Loading Screen */}
       <div
         id="lab-loader-overlay"
-        className={`absolute inset-0 bg-neutral-950 flex flex-col items-center justify-center pointer-events-none transition-opacity duration-700 z-50 ${isReady ? 'opacity-0' : 'opacity-100'
-          }`}
+        className={`absolute inset-0 bg-neutral-950 flex flex-col items-center justify-center pointer-events-none transition-opacity duration-700 z-50 ${
+          isReady ? 'opacity-0' : 'opacity-100'
+        }`}
       >
         <div className="flex flex-col items-center space-y-4 max-w-sm px-6 text-center">
-          <div className="w-12 h-12 rounded-full border-2 border-cyan-500/20 border-t-cyan-400 animate-spin" />
+          <div className="w-12 h-12 rounded-full border-2 border-emerald-500/20 border-t-emerald-400 animate-spin" />
           <div>
-            <h1 className="text-sm font-mono tracking-widest text-white font-bold uppercase">
-              MOSEB 4D VIRTUAL LABORATORY
+            <h1 className="text-sm font-semibold tracking-wide text-white">
+              Virtual Science Laboratory
             </h1>
-            <p className="text-xs text-neutral-400 mt-1 font-mono">
-              Loading 3D Optical Shaders & Thermodynamic Solvers...
+            <p className="text-xs text-neutral-400 mt-1 font-sans">
+              Initializing 3D optical shaders & physical simulator...
             </p>
           </div>
         </div>

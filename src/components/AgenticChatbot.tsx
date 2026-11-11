@@ -1,25 +1,21 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  Bot,
   Sparkles,
-  Send,
+  ArrowUp,
   Paperclip,
   X,
-  Flame,
-  Droplets,
-  Snowflake,
-  Camera,
-  Sun,
   RotateCcw,
+  Minimize2,
+  Maximize2,
   FileText,
   CheckCircle2,
   AlertTriangle,
-  ChevronDown,
-  Minimize2,
-  Maximize2,
+  Bot,
+  Flame,
+  Snowflake,
+  Droplets,
+  Layers,
   Zap,
-  Atom,
-  HelpCircle,
 } from 'lucide-react';
 import { ExperimentState, CameraViewPreset, LabLightingState } from '../types';
 import { CHEMICAL_PRESETS } from '../simulation/thermodynamics';
@@ -53,6 +49,7 @@ interface AgenticChatbotProps {
   onSetCameraPreset: (preset: CameraViewPreset) => void;
   onToggleLight: (lightKey: keyof LabLightingState) => void;
   onReset: () => void;
+  onOpenMaterials?: () => void;
 }
 
 export const AgenticChatbot: React.FC<AgenticChatbotProps> = ({
@@ -65,6 +62,7 @@ export const AgenticChatbot: React.FC<AgenticChatbotProps> = ({
   onSetCameraPreset,
   onToggleLight,
   onReset,
+  onOpenMaterials,
 }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [isMinimized, setIsMinimized] = useState(false);
@@ -78,13 +76,11 @@ export const AgenticChatbot: React.FC<AgenticChatbotProps> = ({
     {
       id: 'welcome',
       role: 'assistant',
-      content: `### Welcome to MOSEB Autonomous Chemistry Lab Copilot 🧪
-I am your **Agentic AI Lab Assistant**. I can directly control the 3D apparatus, configure reagents, manage thermodynamics, and analyze experimental protocols.
+      content: `Hello! I'm your AI Lab Assistant.
 
-**How can I assist you today?**
-- Ask me to prepare the lab space: *"Prepare copper sulfate solution and heat to 80°C"*
-- Attach an experimental protocol or laboratory manual (clip icon)
-- Ask chemistry, thermodynamics, or reaction mechanism questions`,
+I can help you explore materials, set up optical experiments (lenses, mirrors, prisms, laser), manage chemical reactions, or simulate thermodynamics on the 3D bench.
+
+What would you like to explore today?`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
   ]);
@@ -103,10 +99,10 @@ I am your **Agentic AI Lab Assistant**. I can directly control the 3D apparatus,
 
     const reader = new FileReader();
     reader.onload = (event) => {
-      const content = event.target?.result as string || '';
+      const content = (event.target?.result as string) || '';
       setAttachedFile({
         name: file.name,
-        content: content.slice(0, 10000), // inspect first 10k chars
+        content: content.slice(0, 10000),
       });
       labAudio.playClick();
     };
@@ -127,254 +123,208 @@ I am your **Agentic AI Lab Assistant**. I can directly control the 3D apparatus,
     const executedTools: ToolExecutionRecord[] = [];
     let safety: string | undefined = undefined;
 
-    // 1. Tool: prepare_apparatus / chemical selection
+    // 1. Tool: Chemical Selection
     let matchedChemical: (typeof CHEMICAL_PRESETS)[0] | null = null;
     if (textLower.includes('copper') || textLower.includes('cuso4') || textLower.includes('blue')) {
-      matchedChemical = CHEMICAL_PRESETS[1]; // Copper sulfate
+      matchedChemical = CHEMICAL_PRESETS[1];
     } else if (textLower.includes('potassium') || textLower.includes('permanganate') || textLower.includes('kmno4') || textLower.includes('purple')) {
-      matchedChemical = CHEMICAL_PRESETS[2]; // KMnO4
-    } else if (textLower.includes('iron') || textLower.includes('fecl3') || textLower.includes('chloride') || textLower.includes('amber')) {
-      matchedChemical = CHEMICAL_PRESETS[3]; // Iron chloride
-    } else if (textLower.includes('universal') || textLower.includes('indicator') || textLower.includes('ph')) {
-      matchedChemical = CHEMICAL_PRESETS[4]; // Universal indicator
-    } else if (textLower.includes('pure water') || textLower.includes('distilled') || textLower.includes('water') || textLower.includes('h2o')) {
-      matchedChemical = CHEMICAL_PRESETS[0]; // Pure H2O
+      matchedChemical = CHEMICAL_PRESETS[2];
+    } else if (textLower.includes('iron') || textLower.includes('fecl3') || textLower.includes('amber')) {
+      matchedChemical = CHEMICAL_PRESETS[3];
+    } else if (textLower.includes('indicator') || textLower.includes('ph')) {
+      matchedChemical = CHEMICAL_PRESETS[4];
+    } else if (textLower.includes('pure water') || textLower.includes('distilled') || textLower.includes('water')) {
+      matchedChemical = CHEMICAL_PRESETS[0];
     }
 
     if (matchedChemical) {
       onSelectChemical(matchedChemical.color, matchedChemical.name);
       executedTools.push({
         tool: 'prepare_reagents',
-        parameters: { solute: matchedChemical.name, formula: matchedChemical.formula, colorHex: matchedChemical.color },
-        description: `Dispensed 350 mL of ${matchedChemical.name} into borosilicate beaker.`,
+        parameters: { solute: matchedChemical.name, formula: matchedChemical.formula },
+        description: `Dispensed 350 mL of ${matchedChemical.name} into the reaction beaker.`,
         timestamp: new Date().toLocaleTimeString(),
       });
     }
 
-    // 2. Tool: control_burner (heat / boil / ignite / fire)
+    // 2. Tool: Burner & Heat Control
     if (
-      textLower.includes('heat') ||
-      textLower.includes('fire') ||
-      textLower.includes('burner') ||
       textLower.includes('ignite') ||
+      textLower.includes('heat') ||
       textLower.includes('boil') ||
-      textLower.includes('warm')
+      textLower.includes('fire') ||
+      textLower.includes('burner')
     ) {
-      let power = 75;
-      if (textLower.includes('100') || textLower.includes('max') || textLower.includes('boil')) power = 100;
-      else if (textLower.includes('low') || textLower.includes('30') || textLower.includes('gentle')) power = 40;
-      else if (textLower.includes('50') || textLower.includes('half')) power = 50;
-      else if (textLower.includes('80') || textLower.includes('high')) power = 85;
-
       if (!experiment.isBurnerLit) {
         onToggleBurner();
       }
+      let power = 85;
+      if (textLower.includes('max') || textLower.includes('100%') || textLower.includes('high')) {
+        power = 100;
+      } else if (textLower.includes('gentle') || textLower.includes('low') || textLower.includes('simmer')) {
+        power = 40;
+      }
       onFirePowerChange(power);
-
       executedTools.push({
-        tool: 'ignite_burner',
-        parameters: { firePowerPercentage: power, status: 'LIT' },
-        description: `Ignited Bunsen burner with convective thermal power at ${power}%.`,
+        tool: 'control_burner',
+        parameters: { isLit: true, firePower: power },
+        description: `Ignited Bunsen burner to ${power}% power for solution heating.`,
         timestamp: new Date().toLocaleTimeString(),
       });
-
-      safety = 'HOT SURFACE: Thermal hazard active. Wear heat-resistant silicone gloves.';
-    }
-
-    // 3. Tool: stop_heat / extinguish
-    if (textLower.includes('stop heat') || textLower.includes('extinguish') || textLower.includes('turn off burner')) {
+    } else if (textLower.includes('extinguish') || textLower.includes('turn off burner')) {
       if (experiment.isBurnerLit) {
         onToggleBurner();
+        executedTools.push({
+          tool: 'control_burner',
+          parameters: { isLit: false, firePower: 0 },
+          description: `Extinguished burner flame to safely cool apparatus.`,
+          timestamp: new Date().toLocaleTimeString(),
+        });
       }
-      onFirePowerChange(0);
-      executedTools.push({
-        tool: 'extinguish_burner',
-        parameters: { status: 'OFF' },
-        description: 'Extinguished Bunsen burner gas flow. Surface entering natural convection cooling.',
-        timestamp: new Date().toLocaleTimeString(),
-      });
     }
 
-    // 4. Tool: cool_solution / ice quench
-    if (textLower.includes('ice') || textLower.includes('cool') || textLower.includes('quench') || textLower.includes('cryo')) {
+    // 3. Tool: Cryogenic Ice Quench
+    if (textLower.includes('ice') || textLower.includes('cool') || textLower.includes('quench')) {
       onAddIce();
       executedTools.push({
-        tool: 'quench_solution',
-        parameters: { coolant: 'Cryogenic Ice Block (-20°C)' },
-        description: 'Dropped high-purity cryogenic ice block into solution. Thermal dissipation initiated.',
+        tool: 'thermal_quench',
+        parameters: { deltaTemp: -20, coolant: 'Cryogenic Ice' },
+        description: `Added thermal ice cubes to rapidly quench beaker temperature.`,
         timestamp: new Date().toLocaleTimeString(),
       });
     }
 
-    // 5. Tool: refill_water
-    if (textLower.includes('refill') || textLower.includes('dilute') || textLower.includes('reset water')) {
+    // 4. Tool: Refill Water
+    if (textLower.includes('refill') || textLower.includes('add water')) {
       onRefillWater();
       executedTools.push({
-        tool: 'refill_solvent',
-        parameters: { volumeMl: 350, solvent: 'Deionized Water' },
-        description: 'Replenished solvent volume to nominal 350 mL standard.',
+        tool: 'refill_water',
+        parameters: { targetVolume: 350 },
+        description: `Refilled beaker meniscus to 350 mL pure distilled water.`,
         timestamp: new Date().toLocaleTimeString(),
       });
     }
 
-    // 6. Tool: camera_preset
-    if (textLower.includes('macro') || textLower.includes('zoom') || textLower.includes('close up') || textLower.includes('beaker view')) {
+    // 5. Tool: Camera Positioning
+    if (textLower.includes('macro') || textLower.includes('zoom') || textLower.includes('close-up')) {
       onSetCameraPreset('macro_beaker');
       executedTools.push({
-        tool: 'set_camera_angle',
+        tool: 'set_camera_view',
         parameters: { preset: 'macro_beaker' },
-        description: 'Repositioned cinema camera to Macro Optical Beaker view.',
+        description: `Switched viewport to high-magnification macro focus.`,
         timestamp: new Date().toLocaleTimeString(),
       });
     } else if (textLower.includes('top') || textLower.includes('overhead')) {
       onSetCameraPreset('top_down');
       executedTools.push({
-        tool: 'set_camera_angle',
+        tool: 'set_camera_view',
         parameters: { preset: 'top_down' },
-        description: 'Switched camera perspective to top-down optical alignment.',
-        timestamp: new Date().toLocaleTimeString(),
-      });
-    } else if (textLower.includes('overview') || textLower.includes('wide')) {
-      onSetCameraPreset('overview');
-      executedTools.push({
-        tool: 'set_camera_angle',
-        parameters: { preset: 'overview' },
-        description: 'Expanded viewpoint to studio workbench overview.',
+        description: `Positioned camera for top-down meniscus and convection viewing.`,
         timestamp: new Date().toLocaleTimeString(),
       });
     }
 
-    // 7. Tool: lighting
-    if (textLower.includes('blacklight') || textLower.includes('uv') || textLower.includes('fluorescence')) {
-      onToggleLight('uvBlacklight');
-      executedTools.push({
-        tool: 'toggle_uv_lighting',
-        parameters: { mode: 'UV_Blacklight' },
-        description: 'Toggled 365nm UV excitation illuminator on the reagent bench.',
-        timestamp: new Date().toLocaleTimeString(),
-      });
-    }
-
-    // 8. Tool: reset_lab
-    if (textLower.includes('reset all') || textLower.includes('clear bench') || textLower.includes('start over')) {
-      onReset();
-      executedTools.push({
-        tool: 'reset_laboratory',
-        parameters: { status: 'INITIALIZED' },
-        description: 'Reset thermodynamics, apparatus positions, and beaker solution to default state.',
-        timestamp: new Date().toLocaleTimeString(),
-      });
-    }
-
-    // Formulate intelligent educational narrative response
-    let narrative = '';
-    if (fileData) {
-      narrative += `### Protocol Document Analyzed: "${fileData.name}"\n`;
-      narrative += `I have parsed your experimental protocol and extracted the procedure requirements.\n\n`;
-      if (executedTools.length > 0) {
-        narrative += `**Apparatus Actions Executed on the 3D Bench:**\n`;
-        executedTools.forEach((t) => {
-          narrative += `- **${t.tool}**: ${t.description}\n`;
+    // 6. Tool: Materials Drawer trigger
+    if (textLower.includes('material') || textLower.includes('lens') || textLower.includes('mirror') || textLower.includes('prism') || textLower.includes('optic')) {
+      if (onOpenMaterials) {
+        onOpenMaterials();
+        executedTools.push({
+          tool: 'open_materials_catalog',
+          parameters: { section: 'optics_and_materials' },
+          description: `Opened Materials drawer with 10 optical instruments and 4D specimens.`,
+          timestamp: new Date().toLocaleTimeString(),
         });
-        narrative += `\n*The 3D space is now prepared for this protocol. Current Temperature: **${experiment.temperature.toFixed(1)}°C**.*`;
-      } else {
-        narrative += `Protocol processed. Ready to execute specific equipment controls or thermodynamic simulations upon your instruction.`;
       }
+    }
+
+    // 7. Dynamic Natural Response Formulation
+    let responseText = '';
+    if (textLower.includes('lens') || textLower.includes('convex') || textLower.includes('concave')) {
+      responseText = `**Optical Lens Fundamentals:**
+- **Convex Lens (Converging):** Thicker in the center than at the edges. Parallel incident rays converge at a real focal point ($f > 0$). Used for real image projection and magnification.
+- **Concave Lens (Diverging):** Thinner in the middle. Parallel rays diverge as if originating from a virtual focal point ($f < 0$).
+
+You can click the **Materials** button to place both lenses onto your 3D optical bench!`;
+    } else if (textLower.includes('mirror') || textLower.includes('reflection')) {
+      responseText = `**Specular Reflection Dynamics:**
+- **Plane Mirror:** Angle of incidence equals angle of reflection ($\\theta_i = \\theta_r$). Forms a virtual, erect, and laterally inverted image.
+- **Concave Mirror:** Curved converging reflector. Focuses parallel light to an intense focal point.
+- **Convex Mirror:** Curved diverging reflector. Produces upright, diminished virtual images with a wide field of view.
+
+Check the **Materials** drawer to add and position mirrors on the 3D table!`;
+    } else if (textLower.includes('prism') || textLower.includes('refraction') || textLower.includes('rainbow')) {
+      responseText = `**Prism Dispersion & Snell's Law:**
+When polychromatic light enters an optical prism, different wavelengths experience varying refractive indices ($n_{red} < n_{violet}$). As a result, violet light bends the most while red bends the least, separating into constituent spectral colors.
+
+You can inspect the 4D dispersion fan directly on the 3D bench!`;
     } else if (executedTools.length > 0) {
-      narrative += `### Lab Space Configured Successfully ⚡\n`;
-      narrative += `I have executed **${executedTools.length} automated tool action${executedTools.length > 1 ? 's' : ''}** directly on the 3D laboratory bench:\n\n`;
-      executedTools.forEach((t) => {
-        narrative += `- **${t.tool.replace(/_/g, ' ').toUpperCase()}**: ${t.description}\n`;
-      });
-      narrative += `\n**Scientific Overview:**\n`;
-      if (matchedChemical) {
-        narrative += `- **Reagent**: ${matchedChemical.name} (\`${matchedChemical.formula}\`)\n`;
-        narrative += `- **Thermodynamic Behavior**: ${matchedChemical.description}\n`;
-      }
-      narrative += `- **System Temperature**: ${experiment.temperature.toFixed(1)}°C (${experiment.waterState.replace('_', ' ')})\n`;
-      narrative += `- **Next Steps**: You can observe fluid convective currents, adjust flame power, or ask me for molecular dynamics analysis.`;
+      responseText = `I have updated the 3D bench according to your instructions. All actions have been executed in real-time. Let me know what else you'd like to investigate!`;
     } else {
-      narrative = `### AI Lab Assistant Analysis\nI have evaluated your query: "${userText}".\n\n`;
-      narrative += `**Current Laboratory Telemetry:**\n`;
-      narrative += `- Solution: **${experiment.soluteName}**\n`;
-      narrative += `- Temperature: **${experiment.temperature.toFixed(1)}°C** (${experiment.waterState})\n`;
-      narrative += `- Solvent Volume: **${Math.round(experiment.liquidVolume)} mL**\n`;
-      narrative += `- Burner State: **${experiment.isBurnerLit ? `LIT (${experiment.firePower}% power)` : 'OFF'}**\n\n`;
-      narrative += `To prepare apparatus, say something like:\n`;
-      narrative += `> *"Prepare copper sulfate solution and heat to 85°C"*\n`;
-      narrative += `> *"Quench solution with cryogenic ice"* or attach a protocol file.`;
+      responseText = `I'm monitoring your 3D laboratory bench. You can ask me to:
+- Explain optical physics (lenses, reflection, prism dispersion, laser tracing)
+- Balance chemical reactions or calculate thermodynamic heat transfer ($Q = mc\\Delta T$)
+- Directly prepare apparatus, ignite burners, or open the Materials catalog`;
     }
 
     return {
       tools: executedTools,
-      response: narrative,
+      response: responseText,
       safetyAlert: safety,
     };
   };
 
-  const handleSendMessage = async (customPrompt?: string) => {
-    const textToSend = customPrompt || inputMessage;
+  const handleSendMessage = async (customText?: string) => {
+    const textToSend = customText || inputMessage;
     if (!textToSend.trim() && !attachedFile) return;
 
-    const userMessage: ChatMessage = {
+    const userMsg: ChatMessage = {
       id: `user-${Date.now()}`,
       role: 'user',
-      content: textToSend || `Please analyze this attached protocol: ${attachedFile?.name}`,
+      content: textToSend,
       attachedFileName: attachedFile?.name,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMsg]);
     setInputMessage('');
     const currentAttachment = attachedFile;
     setAttachedFile(null);
     setIsThinking(true);
     labAudio.playClick();
 
-    // Call backend API if reachable, while executing real 3D apparatus tools
-    setTimeout(async () => {
-      try {
-        const agenticResult = executeAgenticActions(textToSend, currentAttachment);
+    // Execute agentic tools
+    const localResult = executeAgenticActions(textToSend, currentAttachment);
 
-        // Consult Gemini LLM agent directly with full apparatus telemetry
-        try {
-          const consultRes = await api.consultAgent({
-            prompt: textToSend,
-            current_temp: experiment.temperature,
-            current_volume: experiment.liquidVolume,
-            current_state: experiment.waterState,
-            solute_name: experiment.soluteName,
-          });
+    // Call Backend / Gemini LLM
+    let aiText = localResult.response;
+    try {
+      const response = await api.consultAgent({
+        prompt: textToSend,
+        current_temp: experiment.temperature,
+        current_volume: experiment.liquidVolume,
+        is_burner_lit: experiment.isBurnerLit,
+        solute_name: experiment.soluteName,
+      });
 
-          if (consultRes && consultRes.response) {
-            if (agenticResult.tools.length > 0) {
-              agenticResult.response = `${agenticResult.response}\n\n**Autonomous AI Lab Intelligence:**\n${consultRes.response}`;
-            } else {
-              agenticResult.response = consultRes.response;
-            }
-            if (consultRes.safety_level && !agenticResult.safetyAlert) {
-              agenticResult.safetyAlert = consultRes.safety_level;
-            }
-          }
-        } catch {
-          // Fallback handled seamlessly
-        }
-
-        const assistantMessage: ChatMessage = {
-          id: `assistant-${Date.now()}`,
-          role: 'assistant',
-          content: agenticResult.response,
-          toolExecutions: agenticResult.tools.length > 0 ? agenticResult.tools : undefined,
-          safetyAlert: agenticResult.safetyAlert,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        };
-
-        setMessages((prev) => [...prev, assistantMessage]);
-        labAudio.playGlassClink();
-      } finally {
-        setIsThinking(false);
+      if (response && response.response) {
+        aiText = response.response;
       }
-    }, 450);
+    } catch {
+      // Use refined response
+    }
+
+    const assistantMsg: ChatMessage = {
+      id: `assistant-${Date.now()}`,
+      role: 'assistant',
+      content: aiText,
+      toolExecutions: localResult.tools.length > 0 ? localResult.tools : undefined,
+      safetyAlert: localResult.safetyAlert,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
+
+    setIsThinking(false);
+    setMessages((prev) => [...prev, assistantMsg]);
+    labAudio.playGlassClink();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -389,7 +339,7 @@ I am your **Agentic AI Lab Assistant**. I can directly control the 3D apparatus,
       {
         id: 'welcome-cleared',
         role: 'assistant',
-        content: `Chat history cleared. I am ready to prepare materials and run experiments on the 3D bench. What should we set up?`,
+        content: `Chat history cleared. How can I help you with your laboratory experiments today?`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       },
     ]);
@@ -404,10 +354,10 @@ I am your **Agentic AI Lab Assistant**. I can directly control the 3D apparatus,
           setIsMinimized(false);
           labAudio.playClick();
         }}
-        className="fixed bottom-6 right-6 z-40 flex items-center gap-2.5 px-4 py-3 rounded-full bg-cyan-500 text-black font-semibold text-sm shadow-2xl hover:bg-cyan-400 hover:scale-105 active:scale-95 transition-all cursor-pointer border border-cyan-300/40"
+        className="fixed bottom-6 right-6 z-40 flex items-center gap-2.5 px-4 py-3 rounded-full bg-[#10a37f] text-white font-medium text-sm shadow-2xl hover:bg-emerald-600 hover:scale-105 active:scale-95 transition-all cursor-pointer border border-emerald-400/40"
       >
-        <Sparkles size={18} className="animate-spin" />
-        <span>Open AI Lab Copilot</span>
+        <Sparkles size={18} />
+        <span>Ask AI Assistant</span>
       </button>
     );
   }
@@ -415,174 +365,168 @@ I am your **Agentic AI Lab Assistant**. I can directly control the 3D apparatus,
   return (
     <aside
       className={`fixed top-4 bottom-4 right-4 z-40 transition-all duration-300 ease-in-out flex flex-col ${
-        isMinimized ? 'h-14 w-80' : 'w-[420px] max-w-[calc(100vw-2rem)]'
-      } rounded-2xl bg-neutral-950/90 border border-white/15 backdrop-blur-2xl shadow-2xl overflow-hidden font-sans`}
+        isMinimized ? 'h-14 w-80' : 'w-[410px] max-w-[calc(100vw-2rem)]'
+      } rounded-3xl bg-neutral-950/95 border border-white/15 backdrop-blur-2xl shadow-2xl overflow-hidden font-sans`}
     >
-      {/* 1. Sleek ChatGPT-Style Header */}
-      <div className="px-4 py-3 border-b border-white/10 bg-neutral-900/60 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
-            <Atom size={18} className="animate-pulse" />
+      {/* 1. Clean ChatGPT-Style Header: White & Emerald Green */}
+      <div className="px-4 py-3.5 border-b border-white/10 bg-neutral-900/80 flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-3">
+          {/* OpenAI-Style Green Icon */}
+          <div className="w-8 h-8 rounded-full bg-[#10a37f] flex items-center justify-center text-white shadow-md shadow-emerald-600/30">
+            <Sparkles size={16} />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-xs font-bold text-white tracking-wider font-mono uppercase">
-                AI Lab Copilot
+              <h2 className="text-sm font-semibold text-white tracking-wide">
+                AI Assistant
               </h2>
-              <span className="px-1.5 py-0.5 rounded-full bg-cyan-400/10 border border-cyan-400/30 text-[9px] font-mono text-cyan-300 font-bold">
-                Agentic 4D
-              </span>
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             </div>
-            <p className="text-[10px] text-neutral-400 flex items-center gap-1.5 font-mono">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-              <span>Direct 3D Bench Tool Control</span>
+            <p className="text-[11px] text-neutral-400 font-normal">
+              Scientific Paired Copilot
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 text-neutral-400">
           <button
             onClick={clearChat}
-            title="Clear Chat History"
-            className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-white/10 transition-colors"
+            title="New Chat"
+            className="p-1.5 rounded-lg hover:text-white hover:bg-white/10 transition-colors"
           >
-            <RotateCcw size={14} />
+            <RotateCcw size={15} />
           </button>
           <button
             onClick={() => setIsMinimized((prev) => !prev)}
-            title={isMinimized ? 'Expand Chat' : 'Minimize Chat'}
-            className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-white/10 transition-colors"
+            title={isMinimized ? 'Expand' : 'Minimize'}
+            className="p-1.5 rounded-lg hover:text-white hover:bg-white/10 transition-colors"
           >
-            {isMinimized ? <Maximize2 size={14} /> : <Minimize2 size={14} />}
+            {isMinimized ? <Maximize2 size={15} /> : <Minimize2 size={15} />}
           </button>
           <button
             onClick={() => setIsOpen(false)}
-            title="Close Assistant"
-            className="p-1.5 rounded-lg text-neutral-400 hover:text-rose-400 hover:bg-white/10 transition-colors"
+            title="Close"
+            className="p-1.5 rounded-lg hover:text-white hover:bg-white/10 transition-colors"
           >
-            <X size={14} />
+            <X size={15} />
           </button>
         </div>
       </div>
 
-      {/* 2. Messages Scroll Area */}
+      {/* 2. Messages List (ChatGPT Clean Aesthetics) */}
       {!isMinimized && (
         <>
           <div className="flex-1 overflow-y-auto p-4 space-y-4 text-xs">
             {messages.map((msg) => (
               <div
                 key={msg.id}
-                className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
+                className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
-                {/* Message Bubble */}
+                {/* Assistant Avatar */}
+                {msg.role === 'assistant' && (
+                  <div className="w-7 h-7 rounded-full bg-[#10a37f] shrink-0 flex items-center justify-center text-white mt-0.5 shadow-sm">
+                    <Bot size={14} />
+                  </div>
+                )}
+
                 <div
-                  className={`max-w-[90%] rounded-2xl px-3.5 py-3 shadow-md leading-relaxed ${
+                  className={`max-w-[85%] rounded-2xl px-4 py-3 leading-relaxed shadow-sm ${
                     msg.role === 'user'
-                      ? 'bg-cyan-600 text-white rounded-br-none'
-                      : 'bg-neutral-900 border border-white/10 text-neutral-200 rounded-bl-none'
+                      ? 'bg-[#10a37f] text-white rounded-tr-sm font-normal'
+                      : 'bg-neutral-900 border border-white/10 text-neutral-200 rounded-tl-sm'
                   }`}
                 >
-                  {/* File Attachment tag if user uploaded file */}
+                  {/* File Attachment Pill */}
                   {msg.attachedFileName && (
-                    <div className="mb-2 flex items-center gap-1.5 px-2 py-1 rounded bg-black/30 border border-white/10 text-[11px] text-cyan-200">
+                    <div className="mb-2 flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-black/30 border border-white/10 text-[11px] text-emerald-200">
                       <FileText size={12} />
                       <span className="truncate max-w-[200px]">{msg.attachedFileName}</span>
                     </div>
                   )}
 
-                  {/* Formatted Text */}
-                  <div className="whitespace-pre-wrap break-words space-y-1.5">
+                  {/* Formatted Content */}
+                  <div className="whitespace-pre-wrap break-words space-y-1.5 text-xs">
                     {msg.content}
                   </div>
 
-                  {/* Tool Execution Visual Cards */}
+                  {/* Executed Tools Cards (Clean Green Badges) */}
                   {msg.toolExecutions && msg.toolExecutions.length > 0 && (
-                    <div className="mt-3 pt-3 border-t border-white/10 space-y-2">
-                      <div className="text-[10px] font-mono text-cyan-400 font-bold uppercase tracking-wider flex items-center gap-1">
-                        <Zap size={11} />
-                        <span>Action Tools Executed on 3D Bench</span>
-                      </div>
+                    <div className="mt-3 pt-2.5 border-t border-white/10 space-y-1.5">
                       {msg.toolExecutions.map((t, idx) => (
                         <div
                           key={idx}
-                          className="p-2.5 rounded-xl bg-black/40 border border-cyan-500/20 text-[11px] font-mono space-y-1"
+                          className="px-2.5 py-1.5 rounded-xl bg-black/40 border border-emerald-500/20 text-[11px] flex items-center gap-2"
                         >
-                          <div className="flex items-center justify-between text-cyan-300 font-semibold">
-                            <span>{t.tool}</span>
-                            <span className="flex items-center gap-1 text-[9px] text-emerald-400 font-bold">
-                              <CheckCircle2 size={10} /> Active
-                            </span>
-                          </div>
-                          <p className="text-[10px] text-neutral-300 font-sans">{t.description}</p>
-                          <div className="text-[9px] text-neutral-400 bg-neutral-950/60 p-1.5 rounded overflow-x-auto">
-                            {JSON.stringify(t.parameters)}
-                          </div>
+                          <CheckCircle2 size={13} className="text-emerald-400 shrink-0" />
+                          <span className="text-neutral-300 font-sans">{t.description}</span>
                         </div>
                       ))}
                     </div>
                   )}
 
-                  {/* Safety Warning Badge */}
+                  {/* Safety Warning */}
                   {msg.safetyAlert && (
-                    <div className="mt-2.5 flex items-center gap-1.5 p-2 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[10px] font-mono">
+                    <div className="mt-2.5 flex items-center gap-1.5 p-2 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[11px]">
                       <AlertTriangle size={13} className="shrink-0" />
                       <span>{msg.safetyAlert}</span>
                     </div>
                   )}
                 </div>
-
-                <span className="text-[9px] text-neutral-400 font-mono mt-1 px-1">
-                  {msg.timestamp}
-                </span>
               </div>
             ))}
 
-            {/* Thinking / Tool Calling Animation */}
+            {/* Thinking Animation (Clean 3 Bouncing Dots) */}
             {isThinking && (
-              <div className="flex items-center gap-2 text-cyan-400 text-xs font-mono bg-neutral-900/80 p-3 rounded-2xl border border-cyan-500/20 w-fit">
-                <Sparkles size={14} className="animate-spin" />
-                <span>AI Copilot evaluating protocol & preparing tools...</span>
+              <div className="flex items-center gap-3">
+                <div className="w-7 h-7 rounded-full bg-[#10a37f] shrink-0 flex items-center justify-center text-white">
+                  <Bot size={14} />
+                </div>
+                <div className="px-4 py-3 rounded-2xl bg-neutral-900 border border-white/10 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-bounce" />
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-bounce [animation-delay:0.2s]" />
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-bounce [animation-delay:0.4s]" />
+                </div>
               </div>
             )}
             <div ref={messagesEndRef} />
           </div>
 
-          {/* 3. Quick Action Chips */}
-          <div className="px-3 py-2 border-t border-white/5 bg-neutral-900/40 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
+          {/* 3. Helpful Quick Prompt Suggestions */}
+          <div className="px-3 py-2 border-t border-white/5 bg-neutral-900/40 flex items-center gap-2 overflow-x-auto no-scrollbar shrink-0 text-xs">
             <button
-              onClick={() => handleSendMessage('Please prepare lab space for copper sulfate experiment and heat to 80°C')}
-              className="whitespace-nowrap px-2.5 py-1 rounded-full bg-white/5 border border-white/10 hover:border-cyan-400/50 hover:bg-cyan-500/10 text-[10px] text-neutral-300 transition-all cursor-pointer flex items-center gap-1"
+              onClick={() => handleSendMessage('Explain convex lens converging vs concave lens diverging')}
+              className="whitespace-nowrap px-3 py-1.5 rounded-full bg-white/5 border border-white/10 hover:border-emerald-400/50 hover:bg-emerald-500/10 text-neutral-300 transition-all cursor-pointer"
             >
-              🧪 Copper Sulfate (80°C)
+              Convex vs Concave Lens
+            </button>
+            <button
+              onClick={() => handleSendMessage('How does an optical prism disperse white light?')}
+              className="whitespace-nowrap px-3 py-1.5 rounded-full bg-white/5 border border-white/10 hover:border-emerald-400/50 hover:bg-emerald-500/10 text-neutral-300 transition-all cursor-pointer"
+            >
+              Prism Dispersion
             </button>
             <button
               onClick={() => handleSendMessage('Ignite burner to 85% power and switch camera to macro beaker view')}
-              className="whitespace-nowrap px-2.5 py-1 rounded-full bg-white/5 border border-white/10 hover:border-orange-400/50 hover:bg-orange-500/10 text-[10px] text-neutral-300 transition-all cursor-pointer flex items-center gap-1"
+              className="whitespace-nowrap px-3 py-1.5 rounded-full bg-white/5 border border-white/10 hover:border-orange-400/50 hover:bg-orange-500/10 text-neutral-300 transition-all cursor-pointer"
             >
-              🔥 Ignite Burner & Zoom
+              🔥 Heat Solution
             </button>
             <button
               onClick={() => handleSendMessage('Quench reaction with cryogenic ice')}
-              className="whitespace-nowrap px-2.5 py-1 rounded-full bg-white/5 border border-white/10 hover:border-cyan-400/50 hover:bg-cyan-500/10 text-[10px] text-neutral-300 transition-all cursor-pointer flex items-center gap-1"
+              className="whitespace-nowrap px-3 py-1.5 rounded-full bg-white/5 border border-white/10 hover:border-cyan-400/50 hover:bg-cyan-500/10 text-neutral-300 transition-all cursor-pointer"
             >
-              🧊 Quench Solution
-            </button>
-            <button
-              onClick={() => handleSendMessage('Prepare potassium permanganate and turn on UV blacklight')}
-              className="whitespace-nowrap px-2.5 py-1 rounded-full bg-white/5 border border-white/10 hover:border-purple-400/50 hover:bg-purple-500/10 text-[10px] text-neutral-300 transition-all cursor-pointer flex items-center gap-1"
-            >
-              🟣 KMnO₄ + UV Light
+              🧊 Quench to 0°C
             </button>
           </div>
 
-          {/* 4. Input Box with File Attachment (ChatGPT-Style) */}
+          {/* 4. Signature ChatGPT-Style Input Bar */}
           <div className="p-3 border-t border-white/10 bg-neutral-900/70 shrink-0">
-            {/* Attached file pill preview */}
+            {/* Attached file tag preview */}
             {attachedFile && (
-              <div className="mb-2 flex items-center justify-between px-3 py-1.5 rounded-xl bg-cyan-950/60 border border-cyan-500/40 text-cyan-200 text-xs">
+              <div className="mb-2 flex items-center justify-between px-3 py-1.5 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-200 text-xs">
                 <div className="flex items-center gap-2 truncate">
-                  <FileText size={14} className="shrink-0 text-cyan-400" />
-                  <span className="truncate font-mono">{attachedFile.name}</span>
+                  <FileText size={14} className="shrink-0 text-emerald-400" />
+                  <span className="truncate">{attachedFile.name}</span>
                 </div>
                 <button
                   onClick={() => setAttachedFile(null)}
@@ -593,8 +537,8 @@ I am your **Agentic AI Lab Assistant**. I can directly control the 3D apparatus,
               </div>
             )}
 
-            <div className="flex items-center gap-2">
-              {/* Hidden file input */}
+            {/* Input Pill Box */}
+            <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-neutral-900 border border-white/15 focus-within:border-emerald-500 transition-all">
               <input
                 type="file"
                 ref={fileInputRef}
@@ -603,40 +547,40 @@ I am your **Agentic AI Lab Assistant**. I can directly control the 3D apparatus,
                 className="hidden"
               />
 
-              {/* Attachment Button */}
+              {/* Paperclip */}
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                title="Attach experiment protocol file (PDF, TXT, MD, JSON)"
-                className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-neutral-400 hover:text-cyan-400 hover:bg-white/10 transition-colors cursor-pointer"
+                title="Attach experiment protocol or document"
+                className="p-2 rounded-xl text-neutral-400 hover:text-emerald-400 hover:bg-white/5 transition-colors cursor-pointer"
               >
                 <Paperclip size={16} />
               </button>
 
-              {/* Input Area */}
+              {/* Text Input Area */}
               <textarea
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Ask AI Copilot or say 'prepare lab space for...'"
+                placeholder="Message AI Assistant..."
                 rows={1}
-                className="flex-1 bg-black/50 border border-white/15 focus:border-cyan-400 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-neutral-500 outline-none resize-none transition-all"
+                className="flex-1 bg-transparent px-1 py-1.5 text-xs text-white placeholder-neutral-500 outline-none resize-none leading-relaxed"
               />
 
-              {/* Send Button */}
+              {/* Signature Circular Green ArrowUp Send Button */}
               <button
                 type="button"
                 onClick={() => handleSendMessage()}
                 disabled={(!inputMessage.trim() && !attachedFile) || isThinking}
-                title="Send instruction to AI Agent"
-                className="p-2.5 rounded-xl bg-cyan-500 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-cyan-400 text-black font-bold transition-all cursor-pointer shadow-lg shadow-cyan-500/20 active:scale-95"
+                title="Send message"
+                className="w-8 h-8 rounded-full bg-[#10a37f] disabled:opacity-30 disabled:cursor-not-allowed hover:bg-emerald-500 text-white flex items-center justify-center transition-all cursor-pointer shadow-md shadow-emerald-600/30 active:scale-95 shrink-0"
               >
-                <Send size={15} />
+                <ArrowUp size={16} />
               </button>
             </div>
 
-            <p className="text-[10px] text-neutral-500 font-mono mt-1.5 text-center">
-              Autonomous Agent: Executes 3D tools, controls burner, dispenses reagents & parses protocols.
+            <p className="text-[10px] text-neutral-500 mt-1.5 text-center font-normal">
+              AI Assistant can control 3D tools, manage materials & analyze experimental protocols.
             </p>
           </div>
         </>

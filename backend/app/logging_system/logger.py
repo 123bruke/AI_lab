@@ -1,18 +1,33 @@
 import logging
 import os
 import sys
+import tempfile
 from logging.handlers import RotatingFileHandler
 
-# Safe log directory with fallback for read-only serverless environments (Vercel/Lambda)
-LOG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "logs")
-try:
-    os.makedirs(LOG_DIR, exist_ok=True)
-    LOG_FILE = os.path.join(LOG_DIR, "moseb_lab_agents.log")
-except (OSError, PermissionError):
-    # Fallback to writable /tmp directory on Vercel / serverless runtimes
-    LOG_DIR = os.path.join("/tmp", "moseb_logs")
-    os.makedirs(LOG_DIR, exist_ok=True)
-    LOG_FILE = os.path.join(LOG_DIR, "moseb_lab_agents.log")
+is_serverless = bool(os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME") or os.environ.get("LAMBDA_TASK_ROOT"))
+
+if is_serverless:
+    tmp_base = "/tmp" if os.path.exists("/tmp") else tempfile.gettempdir()
+    LOG_DIR = os.path.join(tmp_base, "moseb_logs")
+    try:
+        os.makedirs(LOG_DIR, exist_ok=True)
+        LOG_FILE = os.path.join(LOG_DIR, "moseb_lab_agents.log")
+    except Exception:
+        LOG_FILE = None
+else:
+    LOG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "logs")
+    try:
+        os.makedirs(LOG_DIR, exist_ok=True)
+        LOG_FILE = os.path.join(LOG_DIR, "moseb_lab_agents.log")
+    except (OSError, PermissionError):
+        tmp_base = "/tmp" if os.path.exists("/tmp") else tempfile.gettempdir()
+        LOG_DIR = os.path.join(tmp_base, "moseb_logs")
+        try:
+            os.makedirs(LOG_DIR, exist_ok=True)
+            LOG_FILE = os.path.join(LOG_DIR, "moseb_lab_agents.log")
+        except Exception:
+            LOG_FILE = None
+
 
 
 def setup_logger() -> logging.Logger:
