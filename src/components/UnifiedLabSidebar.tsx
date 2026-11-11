@@ -199,8 +199,8 @@ export const UnifiedLabSidebar: React.FC<UnifiedLabSidebarProps> = ({
           </button>
 
           <div className="px-3.5 py-2 rounded-xl bg-black/90 border border-white/10 backdrop-blur-xl text-xs font-mono flex items-center gap-2 shadow-2xl text-neutral-300">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-            <span className="font-bold text-white tracking-wider">MOSEB_STUDENT_LAB</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="font-bold text-white tracking-wider">VIRTUAL_SCIENCE_LAB</span>
             <span className="text-neutral-500">|</span>
             <span className="text-neutral-300 max-w-[180px] sm:max-w-[320px] truncate">{experiment.soluteName}</span>
           </div>

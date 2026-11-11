@@ -1,4 +1,9 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
+try:
+    import email_validator
+    from pydantic import EmailStr
+except Exception:
+    EmailStr = str
 from typing import Optional, List
 import datetime
 
