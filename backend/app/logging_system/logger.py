@@ -51,16 +51,17 @@ def setup_logger() -> logging.Logger:
     logger.addHandler(console_handler)
 
     # 2. Rotating File Handler (Max 10 MB per file, keep 5 backups)
-    try:
-        file_handler = RotatingFileHandler(
-            LOG_FILE, maxBytes=10 * 1024 * 1024, backupCount=5, encoding="utf-8"
-        )
-        file_handler.setLevel(logging.DEBUG)
-        file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
-    except (OSError, PermissionError, IOError):
-        # Gracefully continue with console handler if file logging is restricted
-        pass
+    if LOG_FILE:
+        try:
+            file_handler = RotatingFileHandler(
+                LOG_FILE, maxBytes=10 * 1024 * 1024, backupCount=5, encoding="utf-8"
+            )
+            file_handler.setLevel(logging.DEBUG)
+            file_handler.setFormatter(formatter)
+            logger.addHandler(file_handler)
+        except (OSError, PermissionError, IOError):
+            # Gracefully continue with console handler if file logging is restricted
+            pass
 
     return logger
 

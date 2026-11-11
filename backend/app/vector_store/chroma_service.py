@@ -95,21 +95,41 @@ class EmbeddedVectorCollection:
 
 class ChromaService:
     def __init__(self, db_dir: Optional[str] = None):
+        is_serverless = bool(os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME") or os.environ.get("LAMBDA_TASK_ROOT"))
+        base_dir = pathlib.Path(__file__).resolve().parent.parent.parent
+        target_dir = base_dir / "chroma_db"
+
         if db_dir is None:
-            base_dir = pathlib.Path(__file__).resolve().parent.parent.parent
-            target_dir = base_dir / "chroma_db"
-            if os.access(str(base_dir), os.W_OK):
-                self.db_dir = str(target_dir)
-            else:
+            if is_serverless:
                 self.db_dir = "/tmp/chroma_db"
+            else:
+                try:
+                    test_file = target_dir / f".write_probe_{os.getpid()}"
+                    target_dir.mkdir(parents=True, exist_ok=True)
+                    with open(test_file, "w") as f:
+                        f.write("probe")
+                    test_file.unlink()
+                    self.db_dir = str(target_dir)
+                except Exception:
+                    self.db_dir = "/tmp/chroma_db"
         else:
             self.db_dir = db_dir
 
         try:
             os.makedirs(self.db_dir, exist_ok=True)
+            # If running in serverless /tmp, copy existing pre-seeded collections if available
+            if self.db_dir == "/tmp/chroma_db":
+                seed_collections = target_dir / "collections"
+                tmp_collections = pathlib.Path("/tmp/chroma_db/collections")
+                if seed_collections.exists() and not tmp_collections.exists():
+                    import shutil
+                    shutil.copytree(str(seed_collections), str(tmp_collections), dirs_exist_ok=True)
         except Exception:
             self.db_dir = "/tmp/chroma_db"
-            os.makedirs(self.db_dir, exist_ok=True)
+            try:
+                os.makedirs(self.db_dir, exist_ok=True)
+            except Exception:
+                pass
         self.embedder = LocalScientificEmbedder()
         self.is_chroma_native = False
         self.collections: Dict[str, Any] = {}
